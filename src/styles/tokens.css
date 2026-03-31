@@ -1,0 +1,221 @@
+/* ============================================================
+   H&P DESIGN SYSTEM — TWO-LAYER TOKEN SYSTEM
+   
+   Layer 1: Raw tokens (source values — never use in components)
+   Layer 2: Semantic tokens (what components reference)
+   
+   Used by: RigSafe (dark only), Pre-Job Planning (dark + light)
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   LAYER 1 — RAW TOKENS
+   These never change between themes. Never reference directly
+   in components — always use semantic tokens instead.
+   ------------------------------------------------------------ */
+:root {
+
+  /* Brand */
+  --raw-primary:          #2B5597;
+  --raw-secondary:        #143269;
+  --raw-white:            #FFFFFF;
+  --raw-black:            #0E141F;
+
+  /* Primary scale */
+  --raw-primary-1:        #6F8FD9;
+  --raw-primary-2:        #5E7FC8;
+  --raw-primary-3:        #4D6FB6;
+
+  /* Dark surfaces */
+  --raw-dark-surface-1:   #0E141F;
+  --raw-dark-surface-2:   #121A28;
+  --raw-dark-surface-3:   #182235;
+  --raw-dark-surface-4:   #1F2B42;
+  --raw-dark-surface-5:   #253552;
+
+  /* Light surfaces */
+  --raw-light-surface-1:  #F0F4FA;
+  --raw-light-surface-2:  #E0E8F4;
+  --raw-light-surface-3:  #CDD8EE;
+  --raw-light-surface-4:  #BAC8E4;
+  --raw-light-surface-5:  #A6B6D8;
+
+  /* Dark text */
+  --raw-dark-text-1:      #E7ECF5;
+  --raw-dark-text-2:      #B6C2D9;
+  --raw-dark-text-3:      #8A9AB6;
+  --raw-dark-text-4:      #5F6F8A;
+
+  /* Light text */
+  --raw-light-text-1:     #0E141F;
+  --raw-light-text-2:     #2A3A5C;
+  --raw-light-text-3:     #4A5A7A;
+  --raw-light-text-4:     #6A7A9A;
+
+  /* Status — dark mode */
+  --raw-positive-dark:    #4ED199;
+  --raw-warning-dark:     #FFDA8A;
+  --raw-negative-dark:    #F7A3A8;
+  --raw-info-dark:        #6F8FD9;
+  --raw-positive-bg-dark: #173D2F;
+  --raw-error-bg-dark:    #502B2E;
+
+  /* Status — light mode */
+  --raw-positive-light:   #116844;
+  --raw-warning-light:    #93461D;
+  --raw-negative-light:   #B62531;
+  --raw-info-light:       #1A4A9A;
+  --raw-positive-bg-light:#DFF7ED;
+  --raw-error-bg-light:   #F6E6EB;
+
+  /* Border radius — theme-independent */
+  --border-radius-sm:     4px;
+  --border-radius-md:     6px;
+  --border-radius-lg:     8px;
+  --border-radius-xl:     12px;
+}
+
+
+/* ------------------------------------------------------------
+   LAYER 2 — SEMANTIC TOKENS: DARK MODE (default)
+   Matches: RigSafe + Pre-Job dark screenshots exactly
+   ------------------------------------------------------------ */
+:root,
+[data-theme="dark"] {
+
+  /* ── Backgrounds ── */
+  --bg-page:              var(--raw-dark-surface-1);   /* #0E141F */
+  --bg-header:            var(--raw-dark-surface-2);   /* #121A28 */
+  --bg-context-bar:       var(--raw-dark-surface-2);   /* #121A28 */
+  --bg-card:              var(--raw-dark-surface-3);   /* #182235 */
+  --bg-sidebar:           var(--raw-dark-surface-2);   /* #121A28 */
+  --bg-input:             var(--raw-dark-surface-2);   /* #121A28 */
+  --bg-hover:             var(--raw-dark-surface-4);   /* #1F2B42 */
+  --bg-active:            var(--raw-dark-surface-4);   /* #1F2B42 */
+  --bg-bottom-bar:        var(--raw-dark-surface-2);   /* #121A28 */
+  --bg-chip:              var(--raw-dark-surface-4);   /* #1F2B42 */
+  --bg-button-secondary:  var(--raw-dark-surface-4);   /* #1F2B42 */
+  --bg-online-badge:      #173D2F;
+
+  /* ── Text ── */
+  --text-primary:         var(--raw-dark-text-1);      /* #E7ECF5 */
+  --text-secondary:       var(--raw-dark-text-2);      /* #B6C2D9 */
+  --text-tertiary:        var(--raw-dark-text-3);      /* #8A9AB6 */
+  --text-muted:           var(--raw-dark-text-4);      /* #5F6F8A */
+  --text-on-primary:      var(--raw-white);
+  --text-role-active:     var(--raw-dark-text-1);      /* #E7ECF5 */
+  --text-role-inactive:   var(--raw-dark-text-3);      /* #8A9AB6 */
+  --text-online:          #2FBF71;
+  --text-reviewed:        var(--raw-positive-dark);    /* #4ED199 */
+  --text-not-reviewed:    var(--raw-dark-text-4);      /* #5F6F8A */
+  --text-warning:         var(--raw-warning-dark);     /* #FFDA8A */
+  --text-alert:           var(--raw-negative-dark);    /* #F7A3A8 */
+
+  /* ── Borders ── */
+  --border-default:       1px solid var(--raw-dark-surface-4);
+  --border-subtle:        1px solid var(--raw-dark-surface-3);
+  --border-active:        1px solid var(--raw-primary);
+  --border-chip:          1px solid var(--raw-dark-surface-5);
+  --border-input:         1px solid var(--raw-dark-surface-5);
+  --border-card:          1px solid var(--raw-dark-surface-4);
+  --border-sidebar:       1px solid var(--raw-dark-surface-4);
+  --border-checkbox:      1px solid var(--raw-dark-surface-5);
+  --border-warning:       1px solid var(--raw-warning-dark);
+  --border-alert:         var(--raw-negative-dark);
+  --role-active-border:   3px solid var(--raw-primary);
+
+  /* ── Status ── */
+  --color-positive:       var(--raw-positive-dark);
+  --color-warning:        var(--raw-warning-dark);
+  --color-negative:       var(--raw-negative-dark);
+  --color-info:           var(--raw-info-dark);
+  --color-positive-bg:    var(--raw-positive-bg-dark);
+  --color-error-bg:       var(--raw-error-bg-dark);
+
+  /* ── Brand ── */
+  --color-brand:          var(--raw-primary);
+  --color-brand-hover:    var(--raw-primary-2);
+
+  /* ── Shadows ── */
+  --shadow-card:          0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-dropdown:      0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-modal:         0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow-error:    0 0 20px rgba(247, 163, 168, 0.2);
+
+  /* ── Transitions ── */
+  --transition-theme:     background-color 0.2s ease,
+                          color 0.2s ease,
+                          border-color 0.2s ease;
+}
+
+
+/* ------------------------------------------------------------
+   LAYER 2 — SEMANTIC TOKENS: LIGHT MODE
+   Sourced directly from Figma CSS + Image 2 screenshots
+   ------------------------------------------------------------ */
+[data-theme="light"] {
+
+  /* ── Backgrounds ── */
+  --bg-page:              var(--raw-light-surface-1);  /* #F0F4FA */
+  --bg-header:            var(--raw-white);            /* #FFFFFF */
+  --bg-context-bar:       var(--raw-white);            /* #FFFFFF */
+  --bg-card:              var(--raw-white);            /* #FFFFFF */
+  --bg-sidebar:           var(--raw-white);            /* #FFFFFF */
+  --bg-input:             var(--raw-white);            /* #FFFFFF */
+  --bg-hover:             var(--raw-light-surface-2);  /* #E0E8F4 */
+  --bg-active:            var(--raw-light-surface-4);  /* #BAC8E4 */
+  --bg-bottom-bar:        var(--raw-white);            /* #FFFFFF */
+  --bg-chip:              var(--raw-light-surface-4);  /* #BAC8E4 */
+  --bg-button-secondary:  var(--raw-light-surface-2);  /* #E0E8F4 */
+  --bg-online-badge:      var(--raw-positive-bg-light);/* #DFF7ED */
+
+  /* ── Text ── */
+  --text-primary:         var(--raw-light-text-1);     /* #0E141F */
+  --text-secondary:       var(--raw-light-text-2);     /* #2A3A5C */
+  --text-tertiary:        var(--raw-light-text-3);     /* #4A5A7A */
+  --text-muted:           var(--raw-light-text-4);     /* #6A7A9A */
+  --text-on-primary:      var(--raw-white);
+  --text-role-active:     var(--raw-light-text-1);     /* #0E141F */
+  --text-role-inactive:   var(--raw-light-text-3);     /* #4A5A7A */
+  --text-online:          var(--raw-positive-light);   /* #116844 */
+  --text-reviewed:        var(--raw-positive-light);   /* #116844 */
+  --text-not-reviewed:    var(--raw-light-text-4);     /* #6A7A9A */
+  --text-warning:         var(--raw-warning-light);    /* #93461D */
+  --text-alert:           var(--raw-negative-light);   /* #B62531 */
+
+  /* ── Borders ── */
+  --border-default:       1px solid var(--raw-light-surface-3);  /* #CDD8EE */
+  --border-subtle:        1px solid var(--raw-light-surface-3);  /* #CDD8EE */
+  --border-active:        1px solid var(--raw-primary);
+  --border-chip:          1px solid var(--raw-light-surface-5);  /* #A6B6D8 */
+  --border-input:         1px solid var(--raw-light-surface-5);  /* #A6B6D8 */
+  --border-card:          1px solid var(--raw-light-surface-3);  /* #CDD8EE */
+  --border-sidebar:       1px solid var(--raw-light-surface-3);  /* #CDD8EE */
+  --border-checkbox:      1px solid var(--raw-light-surface-5);  /* #A6B6D8 */
+  --border-warning:       1px solid var(--raw-warning-light);    /* #93461D */
+  --border-alert:         var(--raw-negative-light);             /* #B62531 */
+  --role-active-border:   3px solid var(--raw-primary);
+
+  /* ── Status ── */
+  --color-positive:       var(--raw-positive-light);
+  --color-warning:        var(--raw-warning-light);
+  --color-negative:       var(--raw-negative-light);
+  --color-info:           var(--raw-info-light);
+  --color-positive-bg:    var(--raw-positive-bg-light);
+  --color-error-bg:       var(--raw-error-bg-light);
+
+  /* ── Brand — unchanged ── */
+  --color-brand:          var(--raw-primary);
+  --color-brand-hover:    var(--raw-secondary);
+
+  /* ── Shadows — lighter for light mode ── */
+  --shadow-card:          0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-dropdown:      0 4px 12px rgba(0, 0, 0, 0.12);
+  --shadow-modal:         0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-glow-error:    0 0 20px rgba(182, 37, 49, 0.12);
+
+  /* ── Transitions ── */
+  --transition-theme:     background-color 0.2s ease,
+                          color 0.2s ease,
+                          border-color 0.2s ease;
+}

@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+/* Custom scrollbar for RigSafe */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-page);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-hover);
+  border-radius: 3px;
+}
+
+/* Placeholder color */
+::placeholder {
+  color: var(--text-muted) !important;
+}
+
+/* Select option styling */
+select option {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+}

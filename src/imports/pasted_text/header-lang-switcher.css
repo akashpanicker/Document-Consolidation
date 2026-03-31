@@ -1,0 +1,104 @@
+On all 3 screens, update the header bar to add a language switcher.
+
+---
+
+## DESIGN TOKENS
+
+First, ensure these CSS variables are defined at the :root level and used 
+throughout — do not use hardcoded hex values inline anywhere:
+
+--color-surface-1: #0E141F
+--color-surface-2: #182235
+--color-surface-3: #121A28
+--color-surface-4: #1F2B42
+--color-surface-5: #253552
+
+--color-brand: #2B5597
+--color-brand-hover: #5E7FC8
+
+--color-text-primary: #E7ECF5
+--color-text-secondary: #B6C2D9
+--color-text-tertiary: #8A9AB6
+--color-text-muted: #5F6F8A
+
+--color-success: #4ED199
+--color-warning: #FFDA8A
+--color-error: #F7A3A8
+--color-info: #6F8FD9
+
+--border-default: 1px solid #1F2B42
+--border-active: 1px solid var(--color-brand)
+--border-radius-sm: 4px
+--border-radius-md: 6px
+--border-radius-lg: 8px
+
+--shadow-dropdown: 0 4px 12px rgba(0,0,0,0.4)
+
+---
+
+## HEADER UPDATE
+
+In the header bar, add a language icon button to the LEFT of the 
+avatar/user chip. Position: between the "BRIEFING IN PROGRESS" 
+badge (on screen 3) and the avatar circle.
+
+Language icon button:
+- Icon: globe icon
+- Size: 32px square
+- border-radius: var(--border-radius-md)
+- bg: transparent
+- Icon color: var(--color-text-tertiary)
+- Hover: bg var(--color-surface-4), icon color var(--color-text-primary)
+- Active/selected state: icon color var(--color-brand)
+
+---
+
+## LANGUAGE SWITCHER DROPDOWN
+
+On click, a small dropdown panel appears directly below the globe icon:
+- bg: var(--color-surface-2)
+- border: var(--border-default)
+- border-radius: var(--border-radius-lg)
+- box-shadow: var(--shadow-dropdown)
+- width: 160px
+- padding: 6px 0
+
+Dropdown header:
+- Text "LANGUAGE" in var(--color-text-tertiary), uppercase
+- padding: 8px 12px
+- border-bottom: var(--border-default)
+
+Two option rows:
+
+Row 1 — English:
+- Left: "EN" badge — bg var(--color-surface-5), 
+  border var(--border-active), border-radius var(--border-radius-sm), 
+  padding 2px 6px, text var(--color-text-primary)
+- Right of badge: "English" in var(--color-text-primary)
+- padding: 10px 12px
+- Hover: bg var(--color-surface-4)
+- Active/selected: bg var(--color-surface-4), 
+  border-left 3px solid var(--color-brand)
+
+Row 2 — Spanish:
+- Left: "ES" badge — same styling as EN badge
+- Right of badge: "Español" in var(--color-text-secondary)
+- padding: 10px 12px
+- Hover: bg var(--color-surface-4)
+- Active/selected: bg var(--color-surface-4), 
+  border-left 3px solid var(--color-brand)
+
+Currently active language shows a checkmark icon on the far right 
+of its row in var(--color-success).
+
+Clicking a language option:
+- Closes the dropdown
+- Switches all visible text on the page to the selected language
+- Globe icon shows the active language code as a small label 
+  beneath it in var(--color-text-tertiary)
+
+Clicking outside the dropdown closes it without changing language.
+
+---
+
+Apply this to all 3 screens. Keep everything else exactly as-is.
