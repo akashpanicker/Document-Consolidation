@@ -9,21 +9,21 @@ import { Checkbox } from "../components/ui/checkbox";
 import { MapPin, Info, ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch, Loader2, CheckCircle2 } from "lucide-react";
 
 const ACTIVITIES = [
-  { id: "life-critical", name: "Life-Critical Controls" },
-  { id: "hse-governance", name: "HSE Governance" },
-  { id: "drilling-ops", name: "Drilling Operations" },
-  { id: "well-control", name: "Well Control" },
-  { id: "pipe-tubular", name: "Pipe & Tubular Handling" },
-  { id: "mud-solids", name: "Mud System & Solids Control" },
-  { id: "pressure-drilling-line", name: "Pressure Systems & Drilling Line" },
-  { id: "rig-move", name: "Rig Move & Structural" },
-  { id: "lifting-hoisting", name: "Lifting & Hoisting" },
-  { id: "tools-equipment", name: "Tools & Equipment" },
-  { id: "maintenance-electrical", name: "Maintenance & Electrical" },
-  { id: "non-drilling", name: "Non-Drilling Operations" },
-  { id: "emergency-response", name: "Emergency Response" },
-  { id: "environmental-logistics", name: "Environmental & Logistics" },
-  { id: "loto", name: "LOTO" },
+  { id: "life-critical", name: "Life-Critical Controls", image: "/assets/site-conditions/inspection.png" },
+  { id: "hse-governance", name: "HSE Governance", image: "/assets/site-conditions/normal.png" },
+  { id: "drilling-ops", name: "Drilling Operations", image: "/assets/site-conditions/drilling.png" },
+  { id: "well-control", name: "Well Control", image: "/assets/site-conditions/inspection.png" },
+  { id: "pipe-tubular", name: "Pipe & Tubular Handling", image: "/assets/site-conditions/maintenance.png" },
+  { id: "mud-solids", name: "Mud System & Solids Control", image: "/assets/site-conditions/muddy.png" },
+  { id: "pressure-drilling-line", name: "Pressure Systems & Drilling Line", image: "/assets/site-conditions/drilling.png" },
+  { id: "rig-move", name: "Rig Move & Structural", image: "/assets/site-conditions/normal.png" },
+  { id: "lifting-hoisting", name: "Lifting & Hoisting", image: "/assets/site-conditions/inspection.png" },
+  { id: "tools-equipment", name: "Tools & Equipment", image: "/assets/site-conditions/maintenance.png" },
+  { id: "maintenance-electrical", name: "Maintenance & Electrical", image: "/assets/site-conditions/maintenance.png" },
+  { id: "non-drilling", name: "Non-Drilling Operations", image: "/assets/site-conditions/normal.png" },
+  { id: "emergency-response", name: "Emergency Response", image: "/assets/site-conditions/inspection.png" },
+  { id: "environmental-logistics", name: "Environmental & Logistics", image: "/assets/site-conditions/wet-surfaces.png" },
+  { id: "loto", name: "LOTO", image: "/assets/site-conditions/maintenance.png" },
 ];
 
 const STATUS_MESSAGES = [
@@ -274,13 +274,9 @@ export function ScopeScreen() {
                       style={{ height: 90 }}
                     >
                       <img
-                        src="/assets/site-conditions/activity-placeholder.png"
+                        src={activity.image}
                         alt={activity.name}
-                        className="absolute inset-0 w-full h-full object-cover"
-                        style={{
-                          opacity: isSelected ? 0.85 : 0.55,
-                          transition: "opacity 150ms ease-in-out",
-                        }}
+                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-150"
                       />
                       {isSelected && (
                         <div
@@ -307,15 +303,6 @@ export function ScopeScreen() {
                 );
               })}
             </div>
-          </div>
-
-          {/* Separator */}
-          <div className="mx-6" style={{ height: 1, backgroundColor: "var(--color-surface-3, var(--bg-hover))" }} />
-
-          {/* AI Note */}
-          <div className="px-6 py-[14px] flex items-center gap-[12px]">
-            <Info className="w-[16px] h-[16px] text-[var(--text-muted)]" />
-            <span className="text-[13px] font-medium text-[var(--text-secondary)] tracking-tight">AI will generate the document</span>
           </div>
 
         </div>

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, MouseEvent } from "react";
 import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
-import { ArrowLeft, Check, FileSearch } from "lucide-react";
+import { ArrowLeft, Check, FileSearch, Pencil } from "lucide-react";
 import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
 import { useNavigate } from "react-router";
 
@@ -212,6 +212,11 @@ export function ReviewScreen() {
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
   const [calloutTopPx, setCalloutTopPx] = useState(0);
 
+  // Editing state
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const editAreaRef = useRef<HTMLTextAreaElement>(null);
+
   // Connector line coordinates
   const [lineCoords, setLineCoords] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
   const [lineVisible, setLineVisible] = useState(false);
@@ -339,6 +344,59 @@ export function ReviewScreen() {
   const handleReject = (id: string, reason?: string) => {
     setParagraphs(prev => prev.map(p => p.id === id ? { ...p, status: 'rejected', rejectReason: reason } : p));
     setActiveId(null);
+  };
+
+  const startEditing = (p: ParagraphData, e: MouseEvent) => {
+    e.stopPropagation();
+    if (editingId && editingId !== p.id) {
+      if (!window.confirm("You have unsaved changes. Discard them?")) return;
+    }
+    setEditingId(p.id);
+    setEditingText(p.text);
+    setActiveId(p.id);
+
+    // Give react a tick to render text area, then auto resize
+    requestAnimationFrame(() => {
+      if (editAreaRef.current) {
+        editAreaRef.current.style.height = "auto";
+        editAreaRef.current.style.height = editAreaRef.current.scrollHeight + "px";
+        const len = editAreaRef.current.value.length;
+        editAreaRef.current.setSelectionRange(len, len);
+      }
+    });
+  };
+
+  const saveEdit = () => {
+    if (!editingId) return;
+    setParagraphs(prev => prev.map(p => {
+      if (p.id === editingId) {
+        return {
+          ...p,
+          text: editingText,
+          isEdited: true,
+          originalText: p.originalText ?? p.text
+        };
+      }
+      return p;
+    }));
+    setEditingId(null);
+  };
+
+  const discardEdit = () => {
+    setEditingId(null);
+  };
+
+  const handleRevert = (id: string) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id === id && p.isEdited) {
+        return {
+          ...p,
+          text: p.originalText || p.text,
+          isEdited: false
+        };
+      }
+      return p;
+    }));
   };
 
   const selectedParagraph = paragraphs.find(p => p.id === activeId);
@@ -591,7 +649,7 @@ export function ReviewScreen() {
                         key={p.id}
                         ref={(el) => { paragraphRefs.current[p.id] = el; }}
                         onClick={(e) => handleParagraphClick(p.id, e)}
-                        className="cursor-pointer relative group"
+                        className="relative group"
                         style={{
                           padding: "16px 24px 16px 20px",
                           borderLeft: `4px solid ${leftBorderColor}`,
@@ -612,22 +670,87 @@ export function ReviewScreen() {
                           }
                         }}
                       >
-                        <div className="flex items-start gap-2">
-                          {isApproved && (
-                            <Check
-                              className="w-[16px] h-[16px] shrink-0 mt-0.5"
-                              style={{
-                                color: "var(--color-positive)",
-                                animation: "fadeIn 200ms ease-out",
-                              }}
-                            />
-                          )}
-                          <span
-                            className="text-[15px] leading-relaxed"
-                            style={{ color: "var(--text-primary)" }}
+                        {/* Edit Button */}
+                        {editingId !== p.id && (
+                          <button
+                            onClick={(e) => startEditing(p, e)}
+                            className="absolute right-4 top-4 p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            style={{ color: "var(--text-muted)", backgroundColor: "var(--bg-hover)" }}
                           >
-                            {p.text}
-                          </span>
+                            <Pencil className="w-[14px] h-[14px]" />
+                          </button>
+                        )}
+
+                        <div className="flex flex-col gap-1.5 w-full pr-10">
+                          {p.isEdited && (
+                            <span 
+                              className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] self-start" 
+                              style={{ backgroundColor: "var(--bg-hover)", color: "var(--text-muted)" }}
+                            >
+                              Edited
+                            </span>
+                          )}
+
+                          <div className="flex items-start gap-2 w-full">
+                            {isApproved && (
+                              <Check
+                                className="w-[16px] h-[16px] shrink-0 mt-0.5"
+                                style={{
+                                  color: "var(--color-positive)",
+                                  animation: "fadeIn 200ms ease-out",
+                                }}
+                              />
+                            )}
+
+                            {editingId === p.id ? (
+                              <div className="flex flex-col w-full gap-3">
+                                <textarea
+                                  ref={editAreaRef}
+                                  value={editingText}
+                                  onChange={(e) => {
+                                    setEditingText(e.target.value);
+                                    e.target.style.height = "auto";
+                                    e.target.style.height = e.target.scrollHeight + "px";
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Escape") discardEdit();
+                                  }}
+                                  className="w-full text-[15px] leading-relaxed bg-transparent resize-none overflow-hidden outline-none animate-in fade-in duration-150"
+                                  style={{
+                                    color: "var(--text-primary)",
+                                    border: "1px solid var(--color-brand)",
+                                    borderRadius: "6px",
+                                    padding: "8px 12px",
+                                    marginLeft: "-13px",
+                                    marginTop: "-9px",
+                                    boxShadow: "0 0 0 2px rgba(43,85,151,0.15)",
+                                  }}
+                                  autoFocus
+                                />
+                                <div className="flex gap-2 animate-in fade-in duration-150">
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); saveEdit(); }}
+                                    className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-[var(--color-brand)] text-[var(--text-on-primary)]"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); discardEdit(); }}
+                                    className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
+                                  >
+                                    Discard
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <span
+                                className="text-[15px] leading-relaxed flex-1"
+                                style={{ color: "var(--text-primary)" }}
+                              >
+                                {p.text}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         {isRejected && p.rejectReason && (
@@ -679,6 +802,7 @@ export function ReviewScreen() {
                   data={selectedParagraph}
                   onApprove={() => handleApprove(selectedParagraph.id)}
                   onReject={(reason) => handleReject(selectedParagraph.id, reason)}
+                  onRevert={() => handleRevert(selectedParagraph.id)}
                   onClose={() => setActiveId(null)}
                 />
               </div>

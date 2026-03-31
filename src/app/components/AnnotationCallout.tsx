@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles } from "lucide-react";
+import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw } from "lucide-react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -21,6 +21,8 @@ export interface ParagraphData {
   rejectReason?: string;
   hpPercent: number;
   kcadPercent: number;
+  isEdited?: boolean;
+  originalText?: string;
 }
 
 /* ──────────────────────────────────────────────
@@ -150,10 +152,11 @@ interface AnnotationCalloutProps {
   data: ParagraphData;
   onApprove: () => void;
   onReject: (reason: string) => void;
+  onRevert?: () => void;
   onClose: () => void;
 }
 
-export function AnnotationCallout({ data, onApprove, onReject, onClose }: AnnotationCalloutProps) {
+export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose }: AnnotationCalloutProps) {
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState(data.rejectReason || "");
   const [entered, setEntered] = useState(false);
@@ -371,6 +374,22 @@ export function AnnotationCallout({ data, onApprove, onReject, onClose }: Annota
                 </div>
               </div>
             </div>
+
+            {/* Revert Original block */}
+            {data.isEdited && onRevert && (
+              <>
+                <div className="h-px w-full my-1" style={{ backgroundColor: "var(--bg-hover)" }} />
+                <Button
+                  variant="ghost"
+                  className="w-full text-[12px] h-8 transition-colors duration-150 justify-start px-2"
+                  style={{ color: "var(--text-secondary)" }}
+                  onClick={onRevert}
+                >
+                  <RotateCcw className="w-[14px] h-[14px] mr-2" />
+                  Revert to original text
+                </Button>
+              </>
+            )}
           </div>
         </div>
 
