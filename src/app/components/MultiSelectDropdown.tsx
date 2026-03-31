@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, X } from "lucide-react";
 
 interface MultiSelectDropdownProps {
   label: string;
@@ -38,13 +38,9 @@ export function MultiSelectDropdown({
     }
   };
 
-  const getDisplayText = () => {
-    if (values.length === 0) return placeholder;
-    if (values.length === 1) {
-      const selected = options.find((opt) => opt.value === values[0]);
-      return selected?.label || "";
-    }
-    return `${values.length} selected`;
+  const removeValue = (optionValue: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    onChange(values.filter((v) => v !== optionValue));
   };
 
   return (
@@ -73,23 +69,76 @@ export function MultiSelectDropdown({
           backgroundColor: "var(--color-surface-2)",
           border: `1px solid ${isOpen ? "var(--color-brand)" : "var(--color-surface-5)"}`,
           borderRadius: 4,
-          height: 40,
+          minHeight: 40,
           display: "flex",
           alignItems: "center",
           cursor: "pointer",
-          padding: "0 12px",
+          padding: values.length > 0 ? "4px 12px 4px 6px" : "0 12px",
+          flexWrap: "wrap",
+          gap: 4,
         }}
       >
-        <span
-          style={{
-            flex: 1,
-            color: values.length > 0 ? "var(--color-text-primary)" : "var(--color-text-tertiary)",
-            fontSize: 14,
-            fontFamily: "Inter, sans-serif",
-          }}
-        >
-          {getDisplayText()}
-        </span>
+        {values.length === 0 ? (
+          <span
+            style={{
+              flex: 1,
+              color: "var(--color-text-tertiary)",
+              fontSize: 14,
+              fontFamily: "Inter, sans-serif",
+            }}
+          >
+            {placeholder}
+          </span>
+        ) : (
+          <>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 4, flex: 1 }}>
+              {values.map((val) => {
+                const opt = options.find((o) => o.value === val);
+                return (
+                  <span
+                    key={val}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      backgroundColor: "rgba(43,85,151,0.12)",
+                      color: "var(--color-brand)",
+                      fontSize: 12,
+                      fontWeight: 600,
+                      fontFamily: "Inter, sans-serif",
+                      padding: "2px 6px 2px 8px",
+                      borderRadius: 4,
+                      lineHeight: "20px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {opt?.label || val}
+                    <span
+                      onClick={(e) => removeValue(val, e)}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        borderRadius: 3,
+                        width: 16,
+                        height: 16,
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "rgba(43,85,151,0.15)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                      }}
+                    >
+                      <X size={11} />
+                    </span>
+                  </span>
+                );
+              })}
+            </div>
+          </>
+        )}
 
         <ChevronDown
           size={16}
@@ -97,6 +146,7 @@ export function MultiSelectDropdown({
             color: "var(--color-text-tertiary)",
             transition: "transform 0.2s",
             transform: isOpen ? "rotate(180deg)" : "rotate(0deg)",
+            flexShrink: 0,
           }}
         />
       </div>

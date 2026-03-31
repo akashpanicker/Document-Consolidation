@@ -51,7 +51,7 @@ export default function Form({ onNavigate }: FormProps) {
         <div className="bg-[var(--border-default)] h-px shrink-0 w-[322.4px]" data-name="Container" />
         <div className="h-[19.5px] relative shrink-0 w-[221.338px]" data-name="Text">
           <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-            <p className="absolute font-['Inter:Medium',sans-serif] font-medium leading-[19.5px] left-[calc(50%-100px)] not-italic text-[var(--text-tertiary)] text-[13px] top-[0.6px] tracking-[1.5px] uppercase whitespace-nowrap">Document Consolidation</p>
+            <p className="absolute left-1/2 -translate-x-1/2 font-['Inter:Bold',sans-serif] font-bold leading-[19.5px] not-italic text-[var(--text-tertiary)] text-[16px] top-[0.6px] tracking-[1.5px] uppercase whitespace-nowrap">Document Consolidation</p>
           </div>
         </div>
       </div>

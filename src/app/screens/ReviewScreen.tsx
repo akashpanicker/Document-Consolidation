@@ -17,9 +17,9 @@ const REVIEW_STYLES = `
 `;
 
 const REVIEWERS = [
-  { name: "John Doe", role: "Rig Mgr", status: "completed" as const },
-  { name: "Marcos", role: "Drilling Mgr", status: "active" as const },
-  { name: "Sarah Smith", role: "HSE", status: "pending" as const },
+  { name: "Reviewer 1", role: "Mgr", status: "completed" as const },
+  { name: "Reviewer 2", role: "Sr. QHSC Mgr", status: "active" as const },
+  { name: "Reviewer 3", role: "Mgr", status: "pending" as const },
 ];
 
 const SECTIONS = [
@@ -124,7 +124,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
   },
   {
     id: "p10", sectionId: "s2",
-    text: "Drilling fluid weight must be maintained within the approved mud weight window at all times. Any deviation of more than 0.2 ppg from the planned mud weight requires immediate notification to the Drilling Engineer and Drilling Manager before operations continue.",
+    text: "Drilling fluid weight must be maintained within the approved mud weight window at all times. Any deviation of more than 0.2 ppg from the planned mud weight requires immediate notification to the Drilling Engineer and Sr. QHSC Manager before operations continue.",
     sourceDocument: "H&P Operations Manual", origin: "H&P",
     applicability: "Applies to: All Land Rigs",
     lastVerified: "Reviewed by A. Lewis on Jan 14, 2026",

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
 import { SearchableSelect } from "../components/SearchableSelect";
+import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
 import { Badge } from "../components/ui/badge";
 import { MapPin, Info, ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch } from "lucide-react";
 
@@ -58,18 +59,16 @@ export function ScopeScreen() {
   const navigate = useNavigate();
   const [selectedJobType, setSelectedJobType] = useState<string>("inspection");
 
-  const [country, setCountry] = useState("");
-  const [region, setRegion] = useState("");
-  const [rig, setRig] = useState("");
+  const [regions, setRegions] = useState<string[]>([]);
+  const [rigTypes, setRigTypes] = useState<string[]>([]);
 
   const filteredDocs = useMemo(() => {
     return SOURCE_DOCUMENTS.filter(doc => {
-      if (country && doc.country !== country) return false;
-      if (region && doc.region !== region) return false;
-      if (rig && doc.rig !== rig) return false;
+      if (regions.length > 0 && !regions.includes(doc.region)) return false;
+      if (rigTypes.length > 0 && !rigTypes.includes(doc.rig)) return false;
       return true;
     });
-  }, [country, region, rig]);
+  }, [regions, rigTypes]);
 
   const hpDocs = filteredDocs.filter(d => d.origin === "H&P");
   const kcadDocs = filteredDocs.filter(d => d.origin === "KCAD");
@@ -106,41 +105,46 @@ export function ScopeScreen() {
 
         {/* Dropdowns Card */}
         <div className="bg-[var(--bg-card)] rounded-[8px] p-6 mb-4 shadow-sm" style={{ border: "var(--border-default)" }}>
-          <div className="grid grid-cols-3 gap-6">
-            <SearchableSelect
-              label="Country"
-              value={country}
-              onChange={setCountry}
-              options={[
-                { value: "us", label: "United States" },
-                { value: "ca", label: "Canada" },
-                { value: "uk", label: "United Kingdom" },
-              ]}
-              placeholder="Select Country"
-            />
-
-            <SearchableSelect
+          <div className="grid grid-cols-2 gap-6">
+            <MultiSelectDropdown
               label="Region"
-              value={region}
-              onChange={setRegion}
+              values={regions}
+              onChange={setRegions}
               options={[
-                { value: "tx", label: "Texas" },
-                { value: "pa", label: "Pennsylvania" },
-                { value: "nd", label: "North Dakota" },
+                { value: "algeria", label: "Algeria" },
+                { value: "australia", label: "Australia" },
+                { value: "azerbaijan", label: "Azerbaijan" },
+                { value: "canada", label: "Canada" },
+                { value: "europe", label: "Europe" },
+                { value: "european-union", label: "European Union" },
+                { value: "germany", label: "Germany" },
+                { value: "iraq", label: "Iraq" },
+                { value: "kuwait", label: "Kuwait" },
+                { value: "netherlands", label: "Netherlands" },
+                { value: "oman", label: "Oman" },
+                { value: "pakistan", label: "Pakistan" },
+                { value: "russia", label: "Russia" },
+                { value: "saudi-arabia", label: "Saudi Arabia" },
+                { value: "united-kingdom", label: "United Kingdom" },
+                { value: "united-states", label: "United States" },
               ]}
-              placeholder="Select Region"
+              placeholder="Select Regions"
             />
 
-            <SearchableSelect
-              label="Rig"
-              value={rig}
-              onChange={setRig}
+            <MultiSelectDropdown
+              label="Rig Type"
+              values={rigTypes}
+              onChange={setRigTypes}
               options={[
-                { value: "rig-1", label: "Rig 104" },
-                { value: "rig-2", label: "Rig 205" },
-                { value: "rig-3", label: "Rig 308" },
+                { value: "land-rig", label: "Land Rig" },
+                { value: "offshore-rig", label: "Offshore Rig" },
+                { value: "workover-rig", label: "Workover Rig" },
+                { value: "drilling-rig", label: "Drilling Rig" },
+                { value: "completion-rig", label: "Completion Rig" },
+                { value: "coiled-tubing-rig", label: "Coiled Tubing Rig" },
+                { value: "snubbing-unit", label: "Snubbing Unit" },
               ]}
-              placeholder="Select Rig"
+              placeholder="Select Rig Types"
             />
           </div>
         </div>

@@ -17,8 +17,8 @@ interface HeaderProps {
 
 export function Header({
   breadcrumb = "Site Conditions",
-  userName = "Marcos",
-  userRole = "Drilling Manager",
+  userName = "Josh",
+  userRole = "Sr. QHSC Manager",
   userInitials = "DM",
   showOnlineStatus = true,
   showUser = true,
