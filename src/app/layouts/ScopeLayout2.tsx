@@ -1,189 +1,59 @@
-import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router";
 import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
 import { SearchableSelect } from "../components/SearchableSelect";
 import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
 import { Badge } from "../components/ui/badge";
 import { Checkbox } from "../components/ui/checkbox";
-import { MapPin, Info, ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch, Loader2, CheckCircle2 } from "lucide-react";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
+import { useState } from "react";
+import { MapPin, Info, ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-const ACTIVITIES = [
-  { id: "life-critical", name: "Life-Critical Controls", image: "/assets/site-conditions/inspection.png" },
-  { id: "hse-governance", name: "HSE Governance", image: "/assets/site-conditions/normal.png" },
-  { id: "drilling-ops", name: "Drilling Operations", image: "/assets/site-conditions/drilling.png" },
-  { id: "well-control", name: "Well Control", image: "/assets/site-conditions/inspection.png" },
-  { id: "pipe-tubular", name: "Pipe & Tubular Handling", image: "/assets/site-conditions/maintenance.png" },
-  { id: "mud-solids", name: "Mud System & Solids Control", image: "/assets/site-conditions/muddy.png" },
-  { id: "pressure-drilling-line", name: "Pressure Systems & Drilling Line", image: "/assets/site-conditions/drilling.png" },
-  { id: "rig-move", name: "Rig Move & Structural", image: "/assets/site-conditions/normal.png" },
-  { id: "lifting-hoisting", name: "Lifting & Hoisting", image: "/assets/site-conditions/inspection.png" },
-  { id: "tools-equipment", name: "Tools & Equipment", image: "/assets/site-conditions/maintenance.png" },
-  { id: "maintenance-electrical", name: "Maintenance & Electrical", image: "/assets/site-conditions/maintenance.png" },
-  { id: "non-drilling", name: "Non-Drilling Operations", image: "/assets/site-conditions/normal.png" },
-  { id: "emergency-response", name: "Emergency Response", image: "/assets/site-conditions/inspection.png" },
-  { id: "environmental-logistics", name: "Environmental & Logistics", image: "/assets/site-conditions/wet-surfaces.png" },
-  { id: "loto", name: "LOTO", image: "/assets/site-conditions/maintenance.png" },
-];
+import { ScopeLayoutProps, SourceDocument } from "../types/ScopeLayoutProps";
 
 const STATUS_MESSAGES_COUNT = 7;
 
-/* ── Mock Document Data ── */
-interface SourceDocument {
-  id: string;
-  origin: "H&P" | "KCAD";
-  name: string;
-  code: string;
-  revision: string;
-  category: string;
-  activities: string[];   // matches ACTIVITIES ids
-  lastUpdated: string;
-  country: string;
-  region: string;
-  rig: string;
-  url: string;
-}
-
-const SOURCE_DOCUMENTS: SourceDocument[] = [
-  // ── H&P Documents ──
-  { id: "hp-1", origin: "H&P", name: "Hot Work Procedure", code: "HSE-005", revision: "Rev. 06", category: "HSE", activities: ["life-critical", "hse-governance"], lastUpdated: "05 Jan 2025", country: "us", region: "united-states", rig: "rig-1", url: "https://example.com/hse-005" },
-  { id: "hp-2", origin: "H&P", name: "H₂S Monitoring and Response", code: "HSE-012", revision: "Rev. 03", category: "HSE", activities: ["life-critical", "hse-governance", "emergency-response"], lastUpdated: "14 Mar 2024", country: "us", region: "united-states", rig: "rig-1", url: "https://example.com/hse-012" },
-  { id: "hp-3", origin: "H&P", name: "Well Control Manual", code: "WC-001", revision: "Rev. 04", category: "Well Control", activities: ["well-control", "drilling-ops"], lastUpdated: "01 Nov 2024", country: "us", region: "united-states", rig: "rig-2", url: "https://example.com/wc-001" },
-  { id: "hp-4", origin: "H&P", name: "Emergency Response Plan", code: "EM-003", revision: "Rev. 02", category: "Emergency Response", activities: ["emergency-response", "life-critical"], lastUpdated: "22 Aug 2024", country: "sa", region: "saudi-arabia", rig: "rig-3", url: "https://example.com/em-003" },
-  { id: "hp-5", origin: "H&P", name: "Rig Floor Safety Procedures", code: "RM-007", revision: "Rev. 05", category: "Rig Management", activities: ["drilling-ops", "pipe-tubular", "tools-equipment"], lastUpdated: "10 Jun 2024", country: "kw", region: "kuwait", rig: "rig-3", url: "https://example.com/rm-007" },
-  { id: "hp-6", origin: "H&P", name: "BOP Testing & Maintenance", code: "WC-004", revision: "Rev. 03", category: "Well Control", activities: ["well-control", "pressure-drilling-line", "maintenance-electrical"], lastUpdated: "28 Sep 2024", country: "ca", region: "canada", rig: "rig-1", url: "https://example.com/wc-004" },
-  { id: "hp-7", origin: "H&P", name: "Confined Space Entry", code: "HSE-018", revision: "Rev. 02", category: "HSE", activities: ["life-critical", "loto", "non-drilling"], lastUpdated: "03 Feb 2025", country: "om", region: "oman", rig: "rig-2", url: "https://example.com/hse-018" },
-  { id: "hp-8", origin: "H&P", name: "Crane Operations Manual", code: "RM-011", revision: "Rev. 04", category: "Rig Management", activities: ["lifting-hoisting", "rig-move"], lastUpdated: "19 Apr 2024", country: "uk", region: "united-kingdom", rig: "rig-1", url: "https://example.com/rm-011" },
-  // ── KCAD Documents ──
-  { id: "kc-1", origin: "KCAD", name: "Global HSE Standard", code: "KCAD-HSE-001", revision: "Rev. 08", category: "HSE", activities: ["hse-governance", "life-critical"], lastUpdated: "12 Dec 2024", country: "us", region: "united-states", rig: "rig-1", url: "https://example.com/kcad-hse-001" },
-  { id: "kc-2", origin: "KCAD", name: "Environmental Compliance Guide", code: "KCAD-ENV-003", revision: "Rev. 05", category: "Environmental", activities: ["environmental-logistics", "hse-governance"], lastUpdated: "20 Nov 2024", country: "us", region: "united-states", rig: "rig-2", url: "https://example.com/kcad-env-003" },
-  { id: "kc-3", origin: "KCAD", name: "Well Integrity Management", code: "KCAD-WI-002", revision: "Rev. 03", category: "Well Control", activities: ["well-control", "pressure-drilling-line"], lastUpdated: "15 Jul 2024", country: "sa", region: "saudi-arabia", rig: "rig-3", url: "https://example.com/kcad-wi-002" },
-  { id: "kc-4", origin: "KCAD", name: "Emergency Equipment Requirements", code: "KCAD-EM-004", revision: "Rev. 06", category: "Emergency Response", activities: ["emergency-response", "tools-equipment"], lastUpdated: "01 Oct 2024", country: "ca", region: "canada", rig: "rig-1", url: "https://example.com/kcad-em-004" },
-  { id: "kc-5", origin: "KCAD", name: "Personnel Safety Handbook", code: "KCAD-HSE-009", revision: "Rev. 04", category: "HSE", activities: ["hse-governance", "life-critical", "loto"], lastUpdated: "08 May 2024", country: "om", region: "oman", rig: "rig-2", url: "https://example.com/kcad-hse-009" },
-  { id: "kc-6", origin: "KCAD", name: "Rotating Equipment Safeguards", code: "KCAD-RM-006", revision: "Rev. 02", category: "Rig Management", activities: ["tools-equipment", "maintenance-electrical", "mud-solids"], lastUpdated: "30 Jan 2025", country: "uk", region: "united-kingdom", rig: "rig-1", url: "https://example.com/kcad-rm-006" },
-];
-
-
-
-export function ScopeScreen() {
-  const navigate = useNavigate();
+export function ScopeLayout2(props: ScopeLayoutProps) {
   const { t } = useTranslation();
-  const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
+  const {
+    selectedRegions,
+    selectedRigTypes,
+    selectedActivities,
+    selectedDocuments,
+    documents,
+    activities,
+    onRegionChange,
+    onRigTypeChange,
+    onActivityChange,
+    onDocumentSelect,
+    onToggleAllDocuments,
+    onClearSelection,
+    onProceed,
+    onBack,
+    isGenerating,
+    progress,
+    statusIndex,
+    isSuccess,
+    layoutSwitcher
+  } = props;
 
-  const [regions, setRegions] = useState<string[]>([]);
-  const [rigTypes, setRigTypes] = useState<string[]>([]);
-  const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
-
-  // AI Modal States
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [statusIndex, setStatusIndex] = useState(0);
-  const [isSuccess, setIsSuccess] = useState(false);
-
-  const toggleActivity = (id: string) => {
-    setSelectedActivities(prev =>
-      prev.includes(id) ? prev.filter(a => a !== id) : [...prev, id]
-    );
-  };
-
-  const { hpDocs, kcadDocs } = useMemo(() => {
-    const rawFiltered = SOURCE_DOCUMENTS.filter(doc => {
-      if (regions.length > 0 && !regions.includes(doc.region)) return false;
-      if (rigTypes.length > 0 && !rigTypes.includes(doc.rig)) return false;
-      if (selectedActivities.length > 0 && !doc.activities.some(a => selectedActivities.includes(a))) return false;
-      return true;
-    });
-
-    // Ensure at least 5 documents per column for demo purposes
-    let hp = rawFiltered.filter(d => d.origin === "H&P");
-    if (hp.length < 5) {
-      const allHp = SOURCE_DOCUMENTS.filter(d => d.origin === "H&P");
-      const missing = allHp.filter(d => !hp.includes(d));
-      hp = [...hp, ...missing].slice(0, Math.max(5, hp.length));
-    }
-
-    let kc = rawFiltered.filter(d => d.origin === "KCAD");
-    if (kc.length < 5) {
-      const allKc = SOURCE_DOCUMENTS.filter(d => d.origin === "KCAD");
-      const missing = allKc.filter(d => !kc.includes(d));
-      kc = [...kc, ...missing].slice(0, Math.max(5, kc.length));
-    }
-
-    return { hpDocs: hp, kcadDocs: kc };
-  }, [regions, rigTypes, selectedActivities]);
-
-  const hpSelectedCount = hpDocs.filter(d => selectedDocs.includes(d.id)).length;
-  const kcadSelectedCount = kcadDocs.filter(d => selectedDocs.includes(d.id)).length;
+  const hpSelectedCount = selectedDocuments.hp.length;
+  const kcadSelectedCount = selectedDocuments.kcad.length;
   const totalSelectedCount = hpSelectedCount + kcadSelectedCount;
-
-  const toggleDoc = (id: string) => {
-    setSelectedDocs(prev => prev.includes(id) ? prev.filter(d => d !== id) : [...prev, id]);
-  };
-
-  const toggleAll = (docs: SourceDocument[]) => {
-    const allIds = docs.map(d => d.id);
-    const allSelected = allIds.every(id => selectedDocs.includes(id));
-    if (allSelected) {
-      setSelectedDocs(prev => prev.filter(id => !allIds.includes(id)));
-    } else {
-      setSelectedDocs(prev => Array.from(new Set([...prev, ...allIds])));
-    }
-  };
-
-  useEffect(() => {
-    if (!isGenerating) return;
-
-    let progressInterval: ReturnType<typeof setInterval>;
-    let statusInterval: ReturnType<typeof setInterval>;
-    let successTimeout: ReturnType<typeof setTimeout>;
-
-    const duration = 4000;
-    const intervalTime = 50;
-    const increment = 100 / (duration / intervalTime);
-    let currentProgress = 0;
-
-    progressInterval = setInterval(() => {
-      currentProgress += increment;
-      if (currentProgress >= 100) {
-        currentProgress = 100;
-        clearInterval(progressInterval);
-        setIsSuccess(true);
-        successTimeout = setTimeout(() => {
-          navigate("/review");
-        }, 600);
-      }
-      setProgress(Math.min(currentProgress, 100));
-    }, intervalTime);
-
-    statusInterval = setInterval(() => {
-      setStatusIndex(prev => (prev + 1) % STATUS_MESSAGES_COUNT);
-    }, 2000);
-
-    return () => {
-      clearInterval(progressInterval);
-      clearInterval(statusInterval);
-      if (successTimeout) clearTimeout(successTimeout);
-    };
-  }, [isGenerating, navigate]);
-
-  const handleNext = () => {
-    setIsGenerating(true);
-    setProgress(0);
-    setStatusIndex(0);
-    setIsSuccess(false);
-  };
-
-  const handleBack = () => {
-    navigate("/");
-  };
+  
+  // We need flat array of selected IDs for DocumentColumn
+  const selectedDocs = [...selectedDocuments.hp, ...selectedDocuments.kcad];
 
   return (
     <div
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      <Header breadcrumb={t("scope.title")} showOnlineStatus={true} showUser={true} />
+      {/* Header should probably be managed by Page or we can render it here. The prompt says "Add a layout switcher icon button to the Scope screen header". So Header is rendered here. 
+          Actually wait, if Header is in layout, then state for switcher needs to be passed down. But orchestrator ScopePage can pass header? Let's just render inner main content?
+          Wait, existing UI has Header inside ScopeScreen.tsx. I'll keep it here, or we can move Header to ScopePage. 
+          Prompt says: "Add a layout switcher... placed immediately left of the dark/light mode toggle". I will modify Header directly.
+      */}
+      <Header breadcrumb={t("scope.title")} showOnlineStatus={true} showUser={true} layoutSwitcher={layoutSwitcher} />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 overflow-y-auto">
         {/* Title row */}
@@ -201,8 +71,8 @@ export function ScopeScreen() {
             <div className="grid grid-cols-2 gap-6">
               <MultiSelectDropdown
                 label={t("scope.region")}
-                values={regions}
-                onChange={setRegions}
+                values={selectedRegions}
+                onChange={onRegionChange}
                 options={[
                   { value: "algeria", label: "Algeria" },
                   { value: "australia", label: "Australia" },
@@ -226,8 +96,8 @@ export function ScopeScreen() {
 
               <MultiSelectDropdown
                 label={t("scope.rigType")}
-                values={rigTypes}
-                onChange={setRigTypes}
+                values={selectedRigTypes}
+                onChange={onRigTypeChange}
                 options={[
                   { value: "land-rig", label: "Land Rig" },
                   { value: "offshore-rig", label: "Offshore Rig" },
@@ -247,14 +117,17 @@ export function ScopeScreen() {
 
           {/* Filter by Activity Section */}
           <div className="p-6">
-            <h2 className="text-[14px] font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">{t("scope.filterByActivity")}</h2>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="text-[14px] font-bold text-[var(--text-secondary)] uppercase tracking-wide">{t("scope.filterByActivity")}</h2>
+              <span className="text-[12px] font-normal" style={{ color: "var(--text-muted)", fontFamily: "Inter, sans-serif" }}>Optional</span>
+            </div>
             <div className="grid grid-cols-8 gap-3">
-              {ACTIVITIES.map(activity => {
+              {activities.map(activity => {
                 const isSelected = selectedActivities.includes(activity.id);
                 return (
                   <div
                     key={activity.id}
-                    onClick={() => toggleActivity(activity.id)}
+                    onClick={() => onActivityChange(activity.id)}
                     className="flex flex-col cursor-pointer rounded-[8px] overflow-hidden"
                     style={{
                       border: isSelected ? "2px solid var(--color-brand)" : "1px solid var(--color-surface-5, rgba(255,255,255,0.08))",
@@ -316,25 +189,19 @@ export function ScopeScreen() {
           {/* ── H&P Column ── */}
           <DocumentColumn
             origin="H&P"
-            docs={hpDocs}
+            docs={documents.hp}
             selectedDocs={selectedDocs}
-            onToggleDoc={toggleDoc}
-            onToggleAll={() => toggleAll(hpDocs)}
-            badgeBg="rgba(43,85,151,0.1)"
-            badgeColor="var(--color-brand)"
-            badgeBorder="rgba(43,85,151,0.25)"
+            onToggleDoc={onDocumentSelect}
+            onToggleAll={() => onToggleAllDocuments("H&P", documents.hp)}
           />
 
           {/* ── KCAD Column ── */}
           <DocumentColumn
             origin="KCAD"
-            docs={kcadDocs}
+            docs={documents.kcad}
             selectedDocs={selectedDocs}
-            onToggleDoc={toggleDoc}
-            onToggleAll={() => toggleAll(kcadDocs)}
-            badgeBg="var(--bg-hover)"
-            badgeColor="var(--text-secondary)"
-            badgeBorder="var(--bg-hover)"
+            onToggleDoc={onDocumentSelect}
+            onToggleAll={() => onToggleAllDocuments("KCAD", documents.kcad)}
           />
         </div>
       </main>
@@ -353,7 +220,7 @@ export function ScopeScreen() {
             {t("scope.documentsSelected", { count: totalSelectedCount, hp: hpSelectedCount, kcad: kcadSelectedCount })}
           </span>
           <button 
-            onClick={() => setSelectedDocs([])}
+            onClick={onClearSelection}
             className="text-[var(--color-brand)] font-semibold hover:underline bg-transparent border-none cursor-pointer p-0"
           >
             {t("scope.clearSelection")}
@@ -366,13 +233,13 @@ export function ScopeScreen() {
           label={t("common.back")}
           icon={<ArrowLeft className="w-[14px] h-[14px]" />}
           variant="secondary"
-          onClick={handleBack}
+          onClick={onBack}
         />
         <FooterButton
           label={totalSelectedCount > 0 ? t("scope.proceedSelected", { count: totalSelectedCount }) : t("common.proceed")}
           icon={<Sparkles className="w-[14px] h-[14px]" />}
           variant="primary"
-          onClick={handleNext}
+          onClick={onProceed}
         />
       </StickyFooter>
 
@@ -449,70 +316,98 @@ function DocumentColumn({
   selectedDocs,
   onToggleDoc,
   onToggleAll,
-  badgeBg,
-  badgeColor,
-  badgeBorder,
 }: {
   origin: "H&P" | "KCAD";
   docs: SourceDocument[];
   selectedDocs: string[];
   onToggleDoc: (id: string) => void;
   onToggleAll: () => void;
-  badgeBg: string;
-  badgeColor: string;
-  badgeBorder: string;
 }) {
   const { t } = useTranslation();
+  const [search, setSearch] = useState("");
+
+  const filtered = search.trim()
+    ? docs.filter(d =>
+        d.name.toLowerCase().includes(search.toLowerCase()) ||
+        d.code.toLowerCase().includes(search.toLowerCase())
+      )
+    : docs;
+
   const columnSelectedCount = docs.filter(d => selectedDocs.includes(d.id)).length;
   const allSelected = docs.length > 0 && columnSelectedCount === docs.length;
   const isIndeterminate = columnSelectedCount > 0 && columnSelectedCount < docs.length;
 
   return (
-    <div
-      className="rounded-[10px] flex flex-col overflow-hidden"
-      style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}
-    >
-      {/* Column Header */}
-      <div
-        className="flex items-center gap-3 px-5 py-3.5"
-        style={{ borderBottom: "var(--border-default)" }}
-      >
-        <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
-          <Checkbox 
-            checked={allSelected ? true : isIndeterminate ? "indeterminate" : false}
-            onCheckedChange={onToggleAll}
-          />
-        </div>
-        <Badge
-          variant="outline"
-          className="text-[12px] font-semibold h-6 px-2.5"
+    <div className="flex flex-col gap-2">
+      {/* Title above table */}
+      <h3 className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+        {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
+      </h3>
+
+      {/* Search bar */}
+      <div style={{ position: "relative" }}>
+        <Search
+          className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ left: 10, width: 13, height: 13, color: "var(--text-muted)" }}
+        />
+        <input
+          type="text"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search documents..."
           style={{
-            backgroundColor: badgeBg,
-            color: badgeColor,
-            borderColor: badgeBorder,
+            width: "100%",
+            paddingLeft: 30,
+            paddingRight: 12,
+            paddingTop: 7,
+            paddingBottom: 7,
+            fontSize: 13,
+            fontFamily: "Inter, sans-serif",
+            borderRadius: 6,
+            backgroundColor: "var(--color-surface-2)",
+            border: "1px solid var(--color-surface-5)",
+            color: "var(--color-text-primary)",
+            outline: "none",
           }}
-        >
-          {origin}
-        </Badge>
-        <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
-          {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
-        </span>
-        <span className="text-[12px] font-medium ml-auto" style={{ color: "var(--text-muted)" }}>
-          ({docs.length})
-        </span>
+        />
       </div>
 
-      {/* Document List — max-height with scroll */}
-      <div className="flex flex-col overflow-y-auto" style={{ maxHeight: 6 * 68 }}>
-        {docs.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
-            <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
-            <p className="text-[13px] text-center" style={{ color: "var(--text-muted)" }}>
-              {t("scope.noDocuments", { origin })}
-            </p>
+      {/* Card */}
+      <div
+        className="rounded-[10px] flex flex-col overflow-hidden"
+        style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}
+      >
+        {/* Column Header */}
+        <div
+          className="flex items-center gap-3 px-5 py-3.5"
+          style={{ borderBottom: "var(--border-default)" }}
+        >
+          <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+            <Checkbox
+              checked={allSelected ? true : isIndeterminate ? "indeterminate" : false}
+              onCheckedChange={onToggleAll}
+              className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)] data-[state=indeterminate]:bg-[var(--color-brand)] data-[state=indeterminate]:border-[var(--color-brand)]"
+            />
           </div>
-        ) : (
-          docs.map((doc) => {
+          <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
+            Document Name
+          </span>
+          <span className="text-[12px] font-medium ml-auto" style={{ color: "var(--text-muted)" }}>
+            ({filtered.length})
+          </span>
+        </div>
+
+        {/* Document List */}
+        <div className="flex flex-col">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
+              <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
+              <p className="text-[13px] text-center" style={{ color: "var(--text-muted)" }}>
+                {search.trim() ? "No documents match your search." : t("scope.noDocuments", { origin })}
+              </p>
+            </div>
+          ) : (
+          filtered.map((doc) => {
             const isSelected = selectedDocs.includes(doc.id);
             return (
               <div
@@ -529,9 +424,10 @@ function DocumentColumn({
               >
                 {/* Checkbox */}
                 <div onClick={(e) => e.stopPropagation()}>
-                  <Checkbox 
+                  <Checkbox
                     checked={isSelected}
                     onCheckedChange={() => onToggleDoc(doc.id)}
+                    className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)]"
                   />
                 </div>
 
@@ -585,26 +481,27 @@ function DocumentColumn({
                 </div>
 
                 {/* View Button */}
-                <a
-                  href={doc.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 shrink-0 text-[12px] font-semibold rounded-[5px] px-2.5 py-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                  style={{
-                    color: "var(--color-brand)",
-                    backgroundColor: "rgba(43,85,151,0.08)",
-                  }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {t("common.view", "View")}
-                  <ExternalLink className="w-[12px] h-[12px]" />
-                </a>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <a
+                      href={doc.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center justify-center shrink-0 rounded-[5px] w-[28px] h-[28px]"
+                      style={{ color: "var(--color-brand)", backgroundColor: "rgba(43,85,151,0.08)" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <ExternalLink className="w-[13px] h-[13px]" />
+                    </a>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">View document in new tab</TooltipContent>
+                </Tooltip>
               </div>
             );
           })
         )}
+        </div>
       </div>
     </div>
   );
 }
-

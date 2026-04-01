@@ -46,20 +46,24 @@ export function MultiSelectDropdown({
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
       {label && (
-        <label
-          style={{
-            color: "var(--color-text-secondary)",
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: "1px",
-            textTransform: "uppercase",
-            fontFamily: "Inter, sans-serif",
-            display: "block",
-            paddingBottom: 6,
-          }}
-        >
-          {label}
-        </label>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", paddingBottom: 6 }}>
+          <label
+            style={{
+              color: "var(--color-text-secondary)",
+              fontSize: 14,
+              fontWeight: 600,
+              letterSpacing: "1px",
+              textTransform: "uppercase",
+              fontFamily: "Inter, sans-serif",
+              display: "block",
+            }}
+          >
+            {label}
+          </label>
+          <span style={{ fontSize: 12, fontWeight: 400, fontFamily: "Inter, sans-serif", color: "var(--color-text-tertiary, #888)" }}>
+            Optional
+          </span>
+        </div>
       )}
 
       <div

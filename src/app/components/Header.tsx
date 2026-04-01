@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Globe, Check, Video, LogOut, LayoutGrid } from "lucide-react";
+import { Globe, Check, Video, LogOut, LayoutGrid, ListFilter } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "./ThemeToggle";
 import { useNavigate, useLocation } from "react-router";
@@ -13,6 +13,10 @@ interface HeaderProps {
   userInitials?: string;
   showOnlineStatus?: boolean;
   showUser?: boolean;
+  layoutSwitcher?: {
+    activeLayout: 1 | 2;
+    onLayoutChange: (layout: 1 | 2) => void;
+  };
 }
 
 export function Header({
@@ -22,21 +26,25 @@ export function Header({
   userInitials = "DM",
   showOnlineStatus = true,
   showUser = true,
+  layoutSwitcher,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const language = i18n.language?.startsWith('es') ? 'es' : 'en';
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
+  const [showScopeLayoutDropdown, setShowScopeLayoutDropdown] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isBreadcrumbHovered, setIsBreadcrumbHovered] = useState(false);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
   const [isLayoutHovered, setIsLayoutHovered] = useState(false);
+  const [isScopeLayoutHovered, setIsScopeLayoutHovered] = useState(false);
   const [isUserHovered, setIsUserHovered] = useState(false);
   const { theme } = useTheme();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
   const layoutDropdownRef = useRef<HTMLDivElement>(null);
+  const scopeLayoutDropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -50,6 +58,9 @@ export function Header({
       }
       if (layoutDropdownRef.current && !layoutDropdownRef.current.contains(event.target as Node)) {
         setShowLayoutDropdown(false);
+      }
+      if (scopeLayoutDropdownRef.current && !scopeLayoutDropdownRef.current.contains(event.target as Node)) {
+        setShowScopeLayoutDropdown(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -352,6 +363,180 @@ export function Header({
                   }}
                 />
               </button>
+            </div>
+          )}
+
+          {/* Layout Switcher for Scope Screen */}
+          {layoutSwitcher && (
+            <div ref={scopeLayoutDropdownRef} className="relative flex items-center shrink-0">
+              <button
+                type="button"
+                onClick={() => setShowScopeLayoutDropdown(!showScopeLayoutDropdown)}
+                onMouseEnter={() => setIsScopeLayoutHovered(true)}
+                onMouseLeave={() => setIsScopeLayoutHovered(false)}
+                className="flex items-center justify-center cursor-pointer mr-1"
+                style={{
+                  width: 32,
+                  height: 32,
+                  borderRadius: "var(--border-radius-md)",
+                  backgroundColor: isScopeLayoutHovered || showScopeLayoutDropdown ? "var(--bg-hover)" : "transparent",
+                  border: "none",
+                  padding: 0,
+                }}
+              >
+                {layoutSwitcher.activeLayout === 1 ? (
+                  <ListFilter
+                    size={18}
+                    style={{
+                      color: showScopeLayoutDropdown
+                        ? "var(--color-brand)"
+                        : isScopeLayoutHovered
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-tertiary)",
+                    }}
+                  />
+                ) : (
+                  <LayoutGrid
+                    size={18}
+                    style={{
+                      color: showScopeLayoutDropdown
+                        ? "var(--color-brand)"
+                        : isScopeLayoutHovered
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-tertiary)",
+                    }}
+                  />
+                )}
+              </button>
+
+              {/* Scope Layout Dropdown */}
+              {showScopeLayoutDropdown && (
+                <div
+                  style={{
+                    position: "absolute",
+                    top: "100%",
+                    right: 0,
+                    marginTop: 6,
+                    width: 160,
+                    backgroundColor: "var(--bg-card)",
+                    border: "var(--border-default)",
+                    borderRadius: "var(--border-radius-lg)",
+                    boxShadow: "var(--shadow-dropdown)",
+                    padding: "6px 0",
+                    zIndex: 1000,
+                  }}
+                >
+                  <div
+                    style={{
+                      padding: "8px 12px",
+                      borderBottom: "var(--border-default)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "var(--color-text-tertiary)",
+                        fontSize: 11,
+                        fontWeight: 600,
+                        letterSpacing: "1px",
+                        textTransform: "uppercase",
+                        fontFamily: "Inter, sans-serif",
+                      }}
+                    >
+                      LAYOUTS
+                    </span>
+                  </div>
+
+                  {/* Layout 1 Option */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      layoutSwitcher.onLayoutChange(1);
+                      setShowScopeLayoutDropdown(false);
+                    }}
+                    className="w-full cursor-pointer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 12px",
+                      backgroundColor: layoutSwitcher.activeLayout === 1 ? "var(--bg-active)" : "transparent",
+                      border: "none",
+                      borderLeft: layoutSwitcher.activeLayout === 1 ? "3px solid var(--color-brand)" : "3px solid transparent",
+                      textAlign: "left",
+                      fontFamily: "Inter, sans-serif",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (layoutSwitcher.activeLayout !== 1) e.currentTarget.style.backgroundColor = "var(--bg-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (layoutSwitcher.activeLayout !== 1) e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        color: layoutSwitcher.activeLayout === 1 ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                        fontSize: 13,
+                        fontWeight: 400,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <ListFilter size={16} />
+                      Layout 1
+                    </span>
+                    {layoutSwitcher.activeLayout === 1 && (
+                      <Check size={14} style={{ color: "var(--color-success)", flexShrink: 0 }} />
+                    )}
+                  </button>
+
+                  {/* Layout 2 Option */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      layoutSwitcher.onLayoutChange(2);
+                      setShowScopeLayoutDropdown(false);
+                    }}
+                    className="w-full cursor-pointer"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "10px 12px",
+                      backgroundColor: layoutSwitcher.activeLayout === 2 ? "var(--bg-active)" : "transparent",
+                      border: "none",
+                      borderLeft: layoutSwitcher.activeLayout === 2 ? "3px solid var(--color-brand)" : "3px solid transparent",
+                      textAlign: "left",
+                      fontFamily: "Inter, sans-serif",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (layoutSwitcher.activeLayout !== 2) e.currentTarget.style.backgroundColor = "var(--bg-hover)";
+                    }}
+                    onMouseLeave={(e) => {
+                      if (layoutSwitcher.activeLayout !== 2) e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <span
+                      style={{
+                        flex: 1,
+                        color: layoutSwitcher.activeLayout === 2 ? "var(--color-text-primary)" : "var(--color-text-secondary)",
+                        fontSize: 13,
+                        fontWeight: 400,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                      }}
+                    >
+                      <LayoutGrid size={16} />
+                      Layout 2
+                    </span>
+                    {layoutSwitcher.activeLayout === 2 && (
+                      <Check size={14} style={{ color: "var(--color-success)", flexShrink: 0 }} />
+                    )}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
