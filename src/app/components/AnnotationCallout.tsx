@@ -4,6 +4,7 @@ import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import { useTranslation } from "react-i18next";
 
 export interface ParagraphData {
   id: string;
@@ -33,6 +34,7 @@ interface AIConfidenceCardProps {
 }
 
 export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
+  const { t } = useTranslation();
   const [barAnimated, setBarAnimated] = useState(false);
   const prevIdRef = useRef<string | null>(null);
 
@@ -57,11 +59,11 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
           <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
-            AI Confidence
+            {t("review.aiConfidence")}
           </span>
         </div>
         <p className="text-[12px]" style={{ color: "var(--text-muted)" }}>
-          Select a paragraph to view confidence
+          {t("review.selectParagraph")}
         </p>
       </div>
     );
@@ -84,7 +86,7 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
           <AlertTriangle className="w-[16px] h-[16px] shrink-0 mt-0.5" style={{ color: "var(--color-negative)" }} />
           <div className="flex flex-col gap-0.5">
             <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--color-negative)" }}>
-              Origin Conflict
+              {t("review.originConflict")}
             </span>
             <span className="text-[12px] font-medium leading-snug" style={{ color: "var(--color-negative)" }}>
               {data.conflict}
@@ -96,7 +98,7 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
       <div className="flex items-center gap-2">
         <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--color-brand)" }} />
         <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-          AI Confidence
+          {t("review.aiConfidence")}
         </span>
       </div>
 
@@ -157,6 +159,7 @@ interface AnnotationCalloutProps {
 }
 
 export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose }: AnnotationCalloutProps) {
+  const { t } = useTranslation();
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState(data.rejectReason || "");
   const [entered, setEntered] = useState(false);
@@ -207,7 +210,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
             <div className="flex items-center gap-2">
               <FileText className="w-[14px] h-[14px]" style={{ color: "var(--color-brand)" }} />
               <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                Source
+                {t("review.source")}
               </span>
               <Badge
                 variant="outline"
@@ -218,7 +221,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                   borderColor: data.origin === 'H&P' ? "rgba(43,85,151,0.25)" : "rgba(17,104,68,0.25)",
                 }}
               >
-                {data.origin} Origin
+                {data.origin} {t("review.origin")}
               </Badge>
             </div>
             <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
@@ -229,7 +232,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
           {/* ── Applicability ── */}
           <div className="flex flex-col gap-1">
             <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-              Applicability
+              {t("review.applicability")}
             </span>
             <span className="text-[12px]" style={{ color: "var(--text-primary)" }}>{data.applicability}</span>
           </div>
@@ -238,7 +241,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
           {data.regulatoryReferences.length > 0 && (
             <div className="flex flex-col gap-2">
               <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                Regulatory References
+                {t("review.regulatoryReferences")}
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {data.regulatoryReferences.map((ref, idx) => (
@@ -262,7 +265,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
           {/* ── Last Verified ── */}
           <div className="flex flex-col gap-1">
             <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-              Last Verified
+              {t("review.lastVerified")}
             </span>
             <span className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{data.lastVerified}</span>
           </div>
@@ -285,7 +288,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                       onClick={onApprove}
                     >
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
-                      Approve
+                      {t("review.approveButton")}
                     </Button>
                     <Button
                       className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
@@ -296,7 +299,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                       onClick={() => setRejectMode(true)}
                     >
                       <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                      Reject
+                      {t("review.rejectButton")}
                     </Button>
                   </>
                 ) : (
@@ -310,7 +313,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                       onClick={onApprove}
                     >
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
-                      Approve
+                      {t("review.approveButton")}
                     </Button>
                     <Button
                       variant="outline"
@@ -322,7 +325,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                       onClick={() => setRejectMode(true)}
                     >
                       <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                      Reject
+                      {t("review.rejectButton")}
                     </Button>
                   </>
                 )}
@@ -341,12 +344,12 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
             >
               <div className="flex flex-col gap-3 pt-1">
                 <span className="text-[13px] font-semibold" style={{ color: "var(--color-negative)" }}>
-                  Reason for Rejection (Required)
+                  {t("review.rejectionReason")}
                 </span>
                 <Textarea
                   value={rejectReasonText}
                   onChange={(e) => setRejectReasonText(e.target.value)}
-                  placeholder="Enter rejection details or required modifications..."
+                  placeholder={t("review.rejectionPlaceholder")}
                   className="text-[13px] bg-transparent"
                   style={{ border: "var(--border-input)" }}
                   rows={3}
@@ -358,7 +361,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                     className="text-[13px] h-8"
                     style={{ border: "var(--border-default)" }}
                   >
-                    Cancel
+                    {t("review.cancel")}
                   </Button>
                   <Button
                     onClick={handleRejectSubmit}
@@ -369,7 +372,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                     }}
                     disabled={!rejectReasonText.trim()}
                   >
-                    Submit Rejection
+                    {t("review.submitRejection")}
                   </Button>
                 </div>
               </div>
@@ -386,7 +389,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                   onClick={onRevert}
                 >
                   <RotateCcw className="w-[14px] h-[14px] mr-2" />
-                  Revert to original text
+                  {t("review.revertButton")}
                 </Button>
               </>
             )}

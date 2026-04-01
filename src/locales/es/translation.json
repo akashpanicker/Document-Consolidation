@@ -1,0 +1,101 @@
+{
+  "common": {
+    "proceed": "Continuar",
+    "back": "Atrás"
+  },
+  "login": {
+    "emailLabel": "Correo Electrónico",
+    "emailPlaceholder": "Ingrese su correo electrónico",
+    "passwordLabel": "Contraseña",
+    "passwordPlaceholder": "Ingrese su contraseña",
+    "forgotPassword": "¿Olvidó sus credenciales?",
+    "signIn": "INICIAR SESIÓN",
+    "signInSSO": "Iniciar sesión con SSO",
+    "title": "Consolidación de Documentos",
+    "subtitle": "RigSafe Consolidación de Documentos",
+    "footer": "Sistema de Operaciones de Campo H&P",
+    "systemOnline": "Sistema En Línea"
+  },
+  "scope": {
+    "title": "Alcance",
+    "autoDetectGps": "Auto-detectar por GPS",
+    "selectRegions": "Seleccionar Región",
+    "selectRigTypes": "Seleccionar Equipo",
+    "region": "Región",
+    "rigType": "Tipo de Equipo",
+    "filterByActivity": "Filtrar por Actividad",
+    "sourceDocuments": "Documentos Fuente",
+    "sourceDocumentsSubtitle": "Documentos que se utilizarán para generar el documento de seguridad consolidado para este alcance.",
+    "documentsSelected": "{{count}} documentos seleccionados — H&P: {{hp}} · KCAD: {{kcad}}",
+    "clearSelection": "Borrar selección",
+    "proceedSelected": "Continuar con {{count}} seleccionados",
+    "activities": {
+      "life-critical": "Controles Críticos para la Vida",
+      "hse-governance": "Gobernanza HSE",
+      "drilling-ops": "Operaciones de Perforación",
+      "well-control": "Control de Pozos",
+      "pipe-tubular": "Manejo de Tuberías y Tubulares",
+      "mud-solids": "Sistema de Lodos y Control de Sólidos",
+      "pressure-drilling-line": "Sistemas de Presión y Línea de Perforación",
+      "rig-move": "Movimiento de Equipo y Estructural",
+      "lifting-hoisting": "Izaje y Elevación",
+      "tools-equipment": "Herramientas y Equipos",
+      "maintenance-electrical": "Mantenimiento y Eléctrico",
+      "non-drilling": "Operaciones No Relacionadas a Perforación",
+      "emergency-response": "Respuesta a Emergencias",
+      "environmental-logistics": "Medio Ambiente y Logística",
+      "loto": "LOTO (Bloqueo/Etiquetado)"
+    },
+    "column": {
+      "hpDocuments": "Documentos H&P",
+      "kcadDocuments": "Documentos KCAD"
+    },
+    "modal": {
+      "consolidating": "Consolidando Documentos",
+      "subtitle": "La IA está escaneando los documentos seleccionados y generando su documento de seguridad consolidado.",
+      "ready": "Documento Listo",
+      "status0": "Escaneando documentos fuente H&P...",
+      "status1": "Escaneando documentos fuente KCAD...",
+      "status2": "Emparejando fragmentos por tema...",
+      "status3": "Resolviendo conflictos entre fuentes...",
+      "status4": "Calculando puntajes de confianza...",
+      "status5": "Construyendo documento consolidado...",
+      "status6": "Finalizando estructura de revisión..."
+    }
+  },
+  "review": {
+    "title": "Revisar Documento",
+    "reviewPipeline": "Flujo de Revisión",
+    "rigTitan": "Rig Titan — Houston, TX — Pre-Job Drilling",
+    "inThisDocument": "En Este Documento",
+    "selectParagraph": "Seleccione un párrafo para ver sus detalles de origen",
+    "aiConfidence": "Confianza de IA",
+    "originConflict": "Conflicto de Origen",
+    "approveButton": "Aprobar",
+    "rejectButton": "Rechazar",
+    "revertButton": "Revertir al texto original",
+    "rejectionReason": "Motivo de Rechazo (Requerido)",
+    "rejectionPlaceholder": "Ingrese detalles del rechazo o modificaciones requeridas...",
+    "cancel": "Cancelar",
+    "submitRejection": "Enviar Rechazo",
+    "source": "Documento Fuente",
+    "origin": "Origen",
+    "applicability": "Aplicabilidad",
+    "regulatoryReferences": "Referencias Regulatorias",
+    "lastVerified": "Última Verificación",
+    "edited": "Editado",
+    "reviewer1": "Revisor 1",
+    "reviewer2": "Revisor 2",
+    "reviewer3": "Revisor 3",
+    "roleMgr": "Gerente",
+    "roleSrMgr": "Gerente Sr. de QHSC"
+  },
+  "header": {
+    "preJobPlanning": "Consolidación de Documentos",
+    "online": "En Línea",
+    "language": "IDIOMA"
+  },
+  "user": {
+    "logout": "Cerrar Sesión"
+  }
+}

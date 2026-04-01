@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Globe, Check, Video, LogOut, LayoutGrid } from "lucide-react";
-import { useLanguage } from "./LanguageContext";
+import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "./ThemeToggle";
 import { useNavigate, useLocation } from "react-router";
 import { useTheme } from "./ThemeContext";
@@ -23,7 +23,8 @@ export function Header({
   showOnlineStatus = true,
   showUser = true,
 }: HeaderProps) {
-  const { language, setLanguage, t } = useLanguage();
+  const { t, i18n } = useTranslation();
+  const language = i18n.language?.startsWith('es') ? 'es' : 'en';
   const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
@@ -433,7 +434,7 @@ export function Header({
                       fontFamily: "Inter, sans-serif",
                     }}
                   >
-                    {t("lang.language")}
+                    {t("header.language")}
                   </span>
                 </div>
 
@@ -445,7 +446,7 @@ export function Header({
                       key={lang.code}
                       type="button"
                       onClick={() => {
-                        setLanguage(lang.code);
+                        i18n.changeLanguage(lang.code);
                         setShowLangDropdown(false);
                       }}
                       className="w-full cursor-pointer"

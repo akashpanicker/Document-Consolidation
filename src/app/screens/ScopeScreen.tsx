@@ -7,6 +7,7 @@ import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
 import { Badge } from "../components/ui/badge";
 import { Checkbox } from "../components/ui/checkbox";
 import { MapPin, Info, ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch, Loader2, CheckCircle2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const ACTIVITIES = [
   { id: "life-critical", name: "Life-Critical Controls", image: "/assets/site-conditions/inspection.png" },
@@ -26,15 +27,7 @@ const ACTIVITIES = [
   { id: "loto", name: "LOTO", image: "/assets/site-conditions/maintenance.png" },
 ];
 
-const STATUS_MESSAGES = [
-  "Scanning H&P source documents...",
-  "Scanning KCAD source documents...",
-  "Matching document chunks by topic...",
-  "Resolving conflicts between sources...",
-  "Calculating confidence scores...",
-  "Building consolidated document...",
-  "Finalising review structure..."
-];
+const STATUS_MESSAGES_COUNT = 7;
 
 /* ── Mock Document Data ── */
 interface SourceDocument {
@@ -75,6 +68,7 @@ const SOURCE_DOCUMENTS: SourceDocument[] = [
 
 export function ScopeScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
 
   const [regions, setRegions] = useState<string[]>([]);
@@ -163,7 +157,7 @@ export function ScopeScreen() {
     }, intervalTime);
 
     statusInterval = setInterval(() => {
-      setStatusIndex(prev => (prev + 1) % STATUS_MESSAGES.length);
+      setStatusIndex(prev => (prev + 1) % STATUS_MESSAGES_COUNT);
     }, 2000);
 
     return () => {
@@ -189,13 +183,13 @@ export function ScopeScreen() {
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      <Header breadcrumb="Scope" showOnlineStatus={true} showUser={true} />
+      <Header breadcrumb={t("scope.title")} showOnlineStatus={true} showUser={true} />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 overflow-y-auto">
         {/* Title row */}
         <div className="flex items-center justify-between mt-8 mb-[6px]">
           <h1 className="text-[14px] font-bold text-[var(--text-primary)] uppercase tracking-wide">
-            Scope
+            {t("scope.title")}
           </h1>
         </div>
 
@@ -206,7 +200,7 @@ export function ScopeScreen() {
           <div className="p-6">
             <div className="grid grid-cols-2 gap-6">
               <MultiSelectDropdown
-                label="Region"
+                label={t("scope.region")}
                 values={regions}
                 onChange={setRegions}
                 options={[
@@ -227,11 +221,11 @@ export function ScopeScreen() {
                   { value: "united-kingdom", label: "United Kingdom" },
                   { value: "united-states", label: "United States" },
                 ]}
-                placeholder="Select Regions"
+                placeholder={t("scope.selectRegions")}
               />
 
               <MultiSelectDropdown
-                label="Rig Type"
+                label={t("scope.rigType")}
                 values={rigTypes}
                 onChange={setRigTypes}
                 options={[
@@ -243,7 +237,7 @@ export function ScopeScreen() {
                   { value: "coiled-tubing-rig", label: "Coiled Tubing Rig" },
                   { value: "snubbing-unit", label: "Snubbing Unit" },
                 ]}
-                placeholder="Select Rig Types"
+                placeholder={t("scope.selectRigTypes")}
               />
             </div>
           </div>
@@ -253,7 +247,7 @@ export function ScopeScreen() {
 
           {/* Filter by Activity Section */}
           <div className="p-6">
-            <h2 className="text-[14px] font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">Filter by Activity</h2>
+            <h2 className="text-[14px] font-bold text-[var(--text-secondary)] uppercase tracking-wide mb-2">{t("scope.filterByActivity")}</h2>
             <div className="grid grid-cols-8 gap-3">
               {ACTIVITIES.map(activity => {
                 const isSelected = selectedActivities.includes(activity.id);
@@ -296,7 +290,7 @@ export function ScopeScreen() {
                           transition: "color 150ms ease-in-out",
                         }}
                       >
-                        {activity.name}
+                        {t(`scope.activities.${activity.id}`, activity.name)}
                       </span>
                     </div>
                   </div>
@@ -310,10 +304,10 @@ export function ScopeScreen() {
         {/* ══════ Source Documents Section ══════ */}
         <div className="flex flex-col gap-1 mt-8 mb-4">
           <h2 className="text-[14px] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--text-secondary)" }}>
-            Source Documents
+            {t("scope.sourceDocuments")}
           </h2>
           <p className="text-[13px]" style={{ color: "var(--text-muted)" }}>
-            Documents that will be used to generate the consolidated safety document for this scope.
+            {t("scope.sourceDocumentsSubtitle")}
           </p>
         </div>
 
@@ -356,26 +350,26 @@ export function ScopeScreen() {
       >
         <div className="bg-[var(--bg-card)] shadow-[0_4px_24px_rgba(0,0,0,0.12)] rounded-full px-6 py-2.5 flex items-center gap-6 text-[13px] font-medium" style={{ border: "1px solid var(--border-default)" }}>
           <span style={{ color: "var(--text-primary)" }}>
-            {totalSelectedCount} documents selected — H&P: {hpSelectedCount} · KCAD: {kcadSelectedCount}
+            {t("scope.documentsSelected", { count: totalSelectedCount, hp: hpSelectedCount, kcad: kcadSelectedCount })}
           </span>
           <button 
             onClick={() => setSelectedDocs([])}
             className="text-[var(--color-brand)] font-semibold hover:underline bg-transparent border-none cursor-pointer p-0"
           >
-            Clear selection
+            {t("scope.clearSelection")}
           </button>
         </div>
       </div>
 
       <StickyFooter justify="between">
         <FooterButton
-          label="Back"
+          label={t("common.back")}
           icon={<ArrowLeft className="w-[14px] h-[14px]" />}
           variant="secondary"
           onClick={handleBack}
         />
         <FooterButton
-          label={totalSelectedCount > 0 ? `Proceed with ${totalSelectedCount} selected` : "Proceed"}
+          label={totalSelectedCount > 0 ? t("scope.proceedSelected", { count: totalSelectedCount }) : t("common.proceed")}
           icon={<Sparkles className="w-[14px] h-[14px]" />}
           variant="primary"
           onClick={handleNext}
@@ -398,17 +392,17 @@ export function ScopeScreen() {
 
             {/* Title */}
             <h2 className="text-[18px] font-bold mb-2 transition-colors duration-300" style={{ color: "var(--text-primary)" }}>
-              {isSuccess ? "Document Ready" : "Consolidating Documents"}
+              {isSuccess ? t("scope.modal.ready") : t("scope.modal.consolidating")}
             </h2>
 
             {/* Subtitle */}
             <p className="text-[14px] leading-relaxed mb-6" style={{ color: "var(--text-muted)" }}>
-              AI is scanning selected documents and generating your consolidated safety document.
+              {t("scope.modal.subtitle")}
             </p>
 
             {/* Rotating Status */}
             <div className="h-[20px] mb-4 w-full relative flex items-center justify-center overflow-hidden">
-              {STATUS_MESSAGES.map((msg, idx) => (
+              {Array.from({ length: STATUS_MESSAGES_COUNT }).map((_, idx) => (
                 <span
                   key={idx}
                   className="absolute text-[13px] font-medium"
@@ -419,7 +413,7 @@ export function ScopeScreen() {
                     transition: "opacity 300ms ease, transform 300ms ease"
                   }}
                 >
-                  {msg}
+                  {t(`scope.modal.status${idx}`)}
                 </span>
               ))}
             </div>
@@ -468,6 +462,7 @@ function DocumentColumn({
   badgeColor: string;
   badgeBorder: string;
 }) {
+  const { t } = useTranslation();
   const columnSelectedCount = docs.filter(d => selectedDocs.includes(d.id)).length;
   const allSelected = docs.length > 0 && columnSelectedCount === docs.length;
   const isIndeterminate = columnSelectedCount > 0 && columnSelectedCount < docs.length;
@@ -500,7 +495,7 @@ function DocumentColumn({
           {origin}
         </Badge>
         <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
-          {origin} Documents
+          {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
         </span>
         <span className="text-[12px] font-medium ml-auto" style={{ color: "var(--text-muted)" }}>
           ({docs.length})
@@ -513,7 +508,7 @@ function DocumentColumn({
           <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
             <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
             <p className="text-[13px] text-center" style={{ color: "var(--text-muted)" }}>
-              No {origin} documents found for this scope.
+              {t("scope.noDocuments", { origin })}
             </p>
           </div>
         ) : (
@@ -566,7 +561,7 @@ function DocumentColumn({
                 {/* Activity Tags */}
                 <div className="flex items-center gap-1.5 shrink-0">
                   {doc.activities.slice(0, 3).map(actId => {
-                    const actName = ACTIVITIES.find(a => a.id === actId)?.name || actId;
+                    const actName = t(`scope.activities.${actId}`);
                     return (
                       <Badge
                         key={actId}
@@ -601,7 +596,7 @@ function DocumentColumn({
                   }}
                   onClick={(e) => e.stopPropagation()}
                 >
-                  View
+                  {t("common.view", "View")}
                   <ExternalLink className="w-[12px] h-[12px]" />
                 </a>
               </div>

@@ -1,0 +1,101 @@
+{
+  "common": {
+    "proceed": "Proceed",
+    "back": "Back"
+  },
+  "login": {
+    "emailLabel": "Email ID",
+    "emailPlaceholder": "Enter your Email ID",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Enter your password",
+    "forgotPassword": "Forgot credentials?",
+    "signIn": "SIGN IN",
+    "signInSSO": "Sign in with SSO",
+    "title": "Document Consolidation",
+    "subtitle": "RigSafe Document Consolidation",
+    "footer": "H&P Field Operations System",
+    "systemOnline": "System Online"
+  },
+  "scope": {
+    "title": "Scope",
+    "autoDetectGps": "Auto-detect from GPS",
+    "selectRegions": "Select Regions",
+    "selectRigTypes": "Select Rig Types",
+    "region": "Region",
+    "rigType": "Rig Type",
+    "filterByActivity": "Filter by Activity",
+    "sourceDocuments": "Source Documents",
+    "sourceDocumentsSubtitle": "Documents that will be used to generate the consolidated safety document for this scope.",
+    "documentsSelected": "{{count}} documents selected — H&P: {{hp}} · KCAD: {{kcad}}",
+    "clearSelection": "Clear selection",
+    "proceedSelected": "Proceed with {{count}} selected",
+    "activities": {
+      "life-critical": "Life-Critical Controls",
+      "hse-governance": "HSE Governance",
+      "drilling-ops": "Drilling Operations",
+      "well-control": "Well Control",
+      "pipe-tubular": "Pipe & Tubular Handling",
+      "mud-solids": "Mud System & Solids Control",
+      "pressure-drilling-line": "Pressure Systems & Drilling Line",
+      "rig-move": "Rig Move & Structural",
+      "lifting-hoisting": "Lifting & Hoisting",
+      "tools-equipment": "Tools & Equipment",
+      "maintenance-electrical": "Maintenance & Electrical",
+      "non-drilling": "Non-Drilling Operations",
+      "emergency-response": "Emergency Response",
+      "environmental-logistics": "Environmental & Logistics",
+      "loto": "LOTO"
+    },
+    "column": {
+      "hpDocuments": "H&P Documents",
+      "kcadDocuments": "KCAD Documents"
+    },
+    "modal": {
+      "consolidating": "Consolidating Documents",
+      "subtitle": "AI is scanning selected documents and generating your consolidated safety document.",
+      "ready": "Document Ready",
+      "status0": "Scanning H&P source documents...",
+      "status1": "Scanning KCAD source documents...",
+      "status2": "Matching document chunks by topic...",
+      "status3": "Resolving conflicts between sources...",
+      "status4": "Calculating confidence scores...",
+      "status5": "Building consolidated document...",
+      "status6": "Finalising review structure..."
+    }
+  },
+  "review": {
+    "title": "Review Document",
+    "reviewPipeline": "Review Pipeline",
+    "rigTitan": "Rig Titan — Houston, TX — Pre-Job Drilling",
+    "inThisDocument": "In This Document",
+    "selectParagraph": "Select a paragraph to see its source details",
+    "aiConfidence": "AI Confidence",
+    "originConflict": "Origin Conflict",
+    "approveButton": "Approve",
+    "rejectButton": "Reject",
+    "revertButton": "Revert to original text",
+    "rejectionReason": "Reason for Rejection (Required)",
+    "rejectionPlaceholder": "Enter rejection details or required modifications...",
+    "cancel": "Cancel",
+    "submitRejection": "Submit Rejection",
+    "source": "Source",
+    "origin": "Origin",
+    "applicability": "Applicability",
+    "regulatoryReferences": "Regulatory References",
+    "lastVerified": "Last Verified",
+    "edited": "Edited",
+    "reviewer1": "Reviewer 1",
+    "reviewer2": "Reviewer 2",
+    "reviewer3": "Reviewer 3",
+    "roleMgr": "Mgr",
+    "roleSrMgr": "Sr. QHSC Mgr"
+  },
+  "header": {
+    "preJobPlanning": "Document Consolidation",
+    "online": "Online",
+    "language": "LANGUAGE"
+  },
+  "user": {
+    "logout": "Logout"
+  }
+}

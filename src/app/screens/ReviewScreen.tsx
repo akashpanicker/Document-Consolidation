@@ -4,6 +4,7 @@ import { StickyFooter, FooterButton } from "../components/StickyFooter";
 import { ArrowLeft, Check, FileSearch, Pencil } from "lucide-react";
 import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 /* ── Custom keyframe styles injected via a <style> tag ── */
 const REVIEW_STYLES = `
@@ -17,9 +18,9 @@ const REVIEW_STYLES = `
 `;
 
 const REVIEWERS = [
-  { name: "Reviewer 1", role: "Mgr", status: "completed" as const },
-  { name: "Reviewer 2", role: "Sr. QHSC Mgr", status: "active" as const },
-  { name: "Reviewer 3", role: "Mgr", status: "pending" as const },
+  { nameKey: "reviewer1", roleKey: "roleMgr", status: "completed" as const },
+  { nameKey: "reviewer2", roleKey: "roleSrMgr", status: "active" as const },
+  { nameKey: "reviewer3", roleKey: "roleMgr", status: "pending" as const },
 ];
 
 const SECTIONS = [
@@ -207,6 +208,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
 
 export function ReviewScreen() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [paragraphs, setParagraphs] = useState<ParagraphData[]>(INITIAL_PARAGRAPHS);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
@@ -426,7 +428,7 @@ export function ReviewScreen() {
     >
       <style>{REVIEW_STYLES}</style>
 
-      <Header breadcrumb="Review Document" showOnlineStatus={true} showUser={true} />
+      <Header breadcrumb={t("review.title")} showOnlineStatus={true} showUser={true} />
 
       {/* ═══ Stepper Bar ═══ */}
       <div
@@ -441,10 +443,10 @@ export function ReviewScreen() {
             className="text-[12px] font-bold uppercase tracking-wider"
             style={{ color: "var(--text-tertiary)" }}
           >
-            Review Pipeline
+            {t("review.reviewPipeline")}
           </span>
           <span className="text-[12px] font-medium" style={{ color: "var(--text-tertiary)" }}>
-            Rig Titan — Houston, TX — Pre-Job Drilling
+            {t("review.rigTitan")}
           </span>
         </div>
 
@@ -455,7 +457,7 @@ export function ReviewScreen() {
             const isPending = reviewer.status === "pending";
 
             return (
-              <div key={reviewer.name} className="flex items-center">
+              <div key={reviewer.nameKey} className="flex items-center">
                 {idx > 0 && (
                   <div className="relative mx-3" style={{ width: 48, height: 2 }}>
                     <div className="absolute inset-0 rounded-full" style={{ backgroundColor: "var(--bg-hover)" }} />
@@ -502,7 +504,7 @@ export function ReviewScreen() {
                         fontWeight: isActive ? 700 : 600,
                       }}
                     >
-                      {reviewer.name}
+                      {t(`review.${reviewer.nameKey}`)}
                     </span>
                     <span
                       className="text-[12px] leading-tight"
@@ -511,7 +513,7 @@ export function ReviewScreen() {
                         opacity: isPending ? 0.5 : 1,
                       }}
                     >
-                      {reviewer.role}
+                      {t(`review.${reviewer.roleKey}`)}
                     </span>
                   </div>
                 </div>
@@ -560,7 +562,7 @@ export function ReviewScreen() {
             className="text-[12px] font-bold uppercase tracking-[0.1em] mb-5"
             style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}
           >
-            In This Document
+            {t("review.inThisDocument")}
           </span>
 
           <nav className="flex flex-col gap-1">
@@ -687,7 +689,7 @@ export function ReviewScreen() {
                               className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] self-start" 
                               style={{ backgroundColor: "var(--bg-hover)", color: "var(--text-muted)" }}
                             >
-                              Edited
+                              {t("review.edited")}
                             </span>
                           )}
 
@@ -732,13 +734,13 @@ export function ReviewScreen() {
                                     onClick={(e) => { e.stopPropagation(); saveEdit(); }}
                                     className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-[var(--color-brand)] text-[var(--text-on-primary)]"
                                   >
-                                    Save
+                                    {t("common.save", "Save")}
                                   </button>
                                   <button
                                     onClick={(e) => { e.stopPropagation(); discardEdit(); }}
                                     className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
                                   >
-                                    Discard
+                                    {t("common.discard", "Discard")}
                                   </button>
                                 </div>
                               </div>
@@ -762,7 +764,7 @@ export function ReviewScreen() {
                               border: "1px solid var(--color-negative)",
                             }}
                           >
-                            <span className="font-bold">Rejection Reason: </span>
+                            <span className="font-bold">{t("review.rejectionReason", "Rejection Reason")}: </span>
                             {p.rejectReason}
                           </div>
                         )}
@@ -816,7 +818,7 @@ export function ReviewScreen() {
                   className="text-[13px] text-center leading-relaxed"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Select a paragraph to see its source details
+                  {t("review.selectParagraph")}
                 </p>
               </div>
             )}
@@ -827,7 +829,7 @@ export function ReviewScreen() {
 
       <StickyFooter justify="between">
         <FooterButton
-          label="Back"
+          label={t("common.back")}
           icon={<ArrowLeft className="w-[14px] h-[14px]" />}
           variant="secondary"
           onClick={() => navigate("/scope")}

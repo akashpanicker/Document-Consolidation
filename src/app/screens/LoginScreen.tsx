@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import Form from "../../imports/Form";
 import { Header } from "../components/Header";
-import { useLanguage } from "../components/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 export function LoginScreen() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
@@ -34,7 +34,7 @@ export function LoginScreen() {
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
       {/* Header */}
-      <Header breadcrumb={t("header.login")} showOnlineStatus={false} showUser={false} />
+      <Header breadcrumb={t("login.title")} showOnlineStatus={false} showUser={false} />
 
       {/* Grid texture overlay */}
       <div

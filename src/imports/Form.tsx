@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "../app/components/ThemeContext";
 import svgPaths from "./svg-9ccboph6c2";
+import { useTranslation } from "react-i18next";
 
 interface FormProps {
   onNavigate: (path: string) => void;
@@ -8,6 +9,7 @@ interface FormProps {
 
 export default function Form({ onNavigate }: FormProps) {
   const { theme } = useTheme();
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -51,7 +53,7 @@ export default function Form({ onNavigate }: FormProps) {
         <div className="bg-[var(--border-default)] h-px shrink-0 w-[322.4px]" data-name="Container" />
         <div className="h-[19.5px] relative shrink-0 w-[221.338px]" data-name="Text">
           <div className="bg-clip-padding border-0 border-[transparent] border-solid relative size-full">
-            <p className="absolute left-1/2 -translate-x-1/2 font-['Inter:Bold',sans-serif] font-bold leading-[19.5px] not-italic text-[var(--text-tertiary)] text-[16px] top-[0.6px] tracking-[1.5px] uppercase whitespace-nowrap">Document Consolidation</p>
+            <p className="absolute left-1/2 -translate-x-1/2 font-['Inter:Bold',sans-serif] font-bold leading-[19.5px] not-italic text-[var(--text-tertiary)] text-[16px] top-[0.6px] tracking-[1.5px] uppercase whitespace-nowrap">{t('login.title')}</p>
           </div>
         </div>
       </div>
@@ -61,7 +63,7 @@ export default function Form({ onNavigate }: FormProps) {
         {/* Email Field */}
         <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
           <div className="h-[16.5px] relative shrink-0 w-full" data-name="Label">
-            <p className="absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[16.5px] left-0 not-italic text-[var(--text-secondary)] text-[14px] top-[0.6px] whitespace-nowrap">Email ID</p>
+            <p className="absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[16.5px] left-0 not-italic text-[var(--text-secondary)] text-[14px] top-[0.6px] whitespace-nowrap">{t('login.emailLabel')}</p>
           </div>
           <div className="h-[40px] relative shrink-0 w-full" data-name="Container">
             <div className="absolute bg-[var(--bg-input)] h-[40px] left-0 rounded-[6px] top-0 w-full" data-name="Text Input">
@@ -69,7 +71,7 @@ export default function Form({ onNavigate }: FormProps) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your Email ID"
+                placeholder={t('login.emailPlaceholder')}
                 className="content-stretch flex items-center overflow-clip pl-[36px] pr-[12px] relative rounded-[inherit] size-full bg-transparent border-none outline-none font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic text-[14px] w-full"
                 style={{
                   color: email ? "var(--text-primary)" : "var(--text-tertiary)",
@@ -92,7 +94,7 @@ export default function Form({ onNavigate }: FormProps) {
         <div className="content-stretch flex flex-col gap-[15px] items-start relative shrink-0 w-full">
           <div className="content-stretch flex flex-col gap-[4px] items-start relative shrink-0 w-full">
             <div className="h-[16.5px] relative shrink-0 w-full" data-name="Label">
-              <p className="absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[16.5px] left-0 not-italic text-[var(--text-secondary)] text-[14px] top-[0.6px] whitespace-nowrap">Password</p>
+              <p className="absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[16.5px] left-0 not-italic text-[var(--text-secondary)] text-[14px] top-[0.6px] whitespace-nowrap">{t('login.passwordLabel')}</p>
             </div>
             <div className="h-[40px] relative shrink-0 w-full" data-name="Container">
               <div className="absolute bg-[var(--bg-input)] h-[40px] left-0 rounded-[6px] top-0 w-full" data-name="Password Input">
@@ -100,7 +102,7 @@ export default function Form({ onNavigate }: FormProps) {
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
+                  placeholder={t('login.passwordPlaceholder')}
                   className="content-stretch flex items-center overflow-clip pl-[36px] pr-[40px] relative rounded-[inherit] size-full bg-transparent border-none outline-none font-['Inter:Regular',sans-serif] font-normal leading-[normal] not-italic text-[14px] w-full"
                   style={{
                     color: password ? "var(--text-primary)" : "var(--text-tertiary)",
@@ -165,7 +167,7 @@ export default function Form({ onNavigate }: FormProps) {
               type="button"
               className="absolute font-['Inter:Medium',sans-serif] font-medium leading-[18px] right-0 not-italic text-[var(--color-brand)] text-[12px] text-right top-[2.6px] whitespace-nowrap cursor-pointer bg-transparent border-none hover:underline"
             >
-              Forgot credentials?
+              {t('login.forgotPassword')}
             </button>
           </div>
         </div>
@@ -205,7 +207,7 @@ export default function Form({ onNavigate }: FormProps) {
               className="-translate-x-1/2 absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[19.5px] left-[172.49px] not-italic text-[13px] text-center top-[12.85px] tracking-[1px] whitespace-nowrap pointer-events-none"
               style={{ color: isFormValid ? "var(--text-on-primary)" : "var(--text-muted)" }}
             >
-              SIGN IN
+              {t('login.signIn')}
             </p>
           </button>
           
@@ -221,11 +223,11 @@ export default function Form({ onNavigate }: FormProps) {
             className="bg-[var(--color-brand)] h-[44px] relative rounded-[6px] shrink-0 w-full cursor-pointer border-none transition-all hover:bg-[var(--color-brand-hover)]"
             data-name="Button"
           >
-            <p className="-translate-x-1/2 absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[19.5px] left-[calc(50%+0.3px)] not-italic text-[13px] text-center text-[var(--text-on-primary)] top-[12.85px] tracking-[1px] whitespace-nowrap pointer-events-none">Sign in with SSO</p>
+            <p className="-translate-x-1/2 absolute font-['Inter:Semi_Bold',sans-serif] font-semibold leading-[19.5px] left-[calc(50%+0.3px)] not-italic text-[13px] text-center text-[var(--text-on-primary)] top-[12.85px] tracking-[1px] whitespace-nowrap pointer-events-none">{t('login.signInSSO')}</p>
           </button>
           
           <div className="h-[18px] relative shrink-0 w-full" data-name="Paragraph">
-            <p className="-translate-x-1/2 absolute font-['Inter:Regular',sans-serif] font-normal leading-[18px] left-[161.7px] not-italic text-[var(--text-muted)] text-[12px] text-center top-[-0.2px] whitespace-nowrap">{`H&P Field Operations System`}</p>
+            <p className="-translate-x-1/2 absolute font-['Inter:Regular',sans-serif] font-normal leading-[18px] left-[161.7px] not-italic text-[var(--text-muted)] text-[12px] text-center top-[-0.2px] whitespace-nowrap">{t('login.footer')}</p>
           </div>
         </div>
       </form>
