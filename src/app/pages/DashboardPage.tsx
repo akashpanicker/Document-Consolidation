@@ -1,3 +1,4 @@
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { FolderSearch } from "lucide-react";
 import { Header } from "../components/Header";
@@ -15,7 +16,8 @@ const STATS: DashboardStats = {
   completedThisMonth: 7,
 };
 
-const MY_TASKS: ConsolidationTask[] = [
+const TASK_LIST: ConsolidationTask[] = [
+  // My Review Queue (Current user tasks) - 5 items
   {
     id: "task-1",
     documentName: "Well Control Manual — MENA Region",
@@ -23,6 +25,7 @@ const MY_TASKS: ConsolidationTask[] = [
     reviewerPosition: 1,
     totalReviewers: 3,
     progressPercent: 33,
+    status: "pending",
   },
   {
     id: "task-2",
@@ -31,6 +34,7 @@ const MY_TASKS: ConsolidationTask[] = [
     reviewerPosition: 2,
     totalReviewers: 3,
     progressPercent: 67,
+    status: "pending",
   },
   {
     id: "task-3",
@@ -39,6 +43,7 @@ const MY_TASKS: ConsolidationTask[] = [
     reviewerPosition: 1,
     totalReviewers: 2,
     progressPercent: 50,
+    status: "pending",
   },
   {
     id: "task-4",
@@ -47,6 +52,7 @@ const MY_TASKS: ConsolidationTask[] = [
     reviewerPosition: 3,
     totalReviewers: 4,
     progressPercent: 75,
+    status: "pending",
   },
   {
     id: "task-5",
@@ -55,7 +61,71 @@ const MY_TASKS: ConsolidationTask[] = [
     reviewerPosition: 2,
     totalReviewers: 2,
     progressPercent: 90,
+    status: "pending",
   },
+
+  // In Progress (Completed by 1st or 2nd, but not last) - 12 items
+  {
+    id: "task-6",
+    documentName: "Offshore Drilling Guidelines",
+    documentType: "Standard",
+    reviewerPosition: 1,
+    totalReviewers: 3,
+    progressPercent: 33,
+    status: "in-progress",
+    completedAt: "2026-04-01 10:30 AM",
+    completedBy: "Sarah Chen",
+  },
+  {
+    id: "task-7",
+    documentName: "Spill Prevention Plan",
+    documentType: "Policy",
+    reviewerPosition: 2,
+    totalReviewers: 3,
+    progressPercent: 66,
+    status: "in-progress",
+    completedAt: "2026-04-01 02:15 PM",
+    completedBy: "James Okonkwo",
+  },
+  { id: "task-ip-3", documentName: "Blowout Preventer Inspection", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-29 11:20 AM", completedBy: "Wei Zhang" },
+  { id: "task-ip-4", documentName: "Mooring System Standards", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 09:45 AM", completedBy: "Lisa Park" },
+  { id: "task-ip-5", documentName: "Waste Management Protocol", documentType: "Policy", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 01:10 PM", completedBy: "Ahmed Al-Rashid" },
+  { id: "task-ip-6", documentName: "Confined Space Entry", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-27 10:00 AM", completedBy: "Carlos Rivera" },
+  { id: "task-ip-7", documentName: "Lifting Operations Guide", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-26 03:30 PM", completedBy: "Sarah Chen" },
+  { id: "task-ip-8", documentName: "Radiographic Testing Manual", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-26 11:15 AM", completedBy: "James Okonkwo" },
+  { id: "task-ip-9", documentName: "Contractor Safety Plan", documentType: "Policy", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-25 02:20 PM", completedBy: "Marcos Diaz" },
+  { id: "task-ip-10", documentName: "Equipment Maintenance Schedule", documentType: "Standard", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-25 09:10 AM", completedBy: "Wei Zhang" },
+  { id: "task-ip-11", documentName: "Fire Protection Standard", documentType: "Standard", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-24 04:50 PM", completedBy: "Lisa Park" },
+  { id: "task-ip-12", documentName: "Hazardous Materials Handling", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-24 10:30 AM", completedBy: "Ahmed Al-Rashid" },
+
+  // Completed (Completed by the last reviewer) - 7 items
+  {
+    id: "task-8",
+    documentName: "Safety Management System",
+    documentType: "Standard",
+    reviewerPosition: 3,
+    totalReviewers: 3,
+    progressPercent: 100,
+    status: "completed",
+    completedAt: "2026-03-30 09:00 AM",
+    completedBy: "Marcos Diaz",
+  },
+  {
+    id: "task-9",
+    documentName: "Personnel Transport Standard",
+    documentType: "Standard",
+    reviewerPosition: 2,
+    totalReviewers: 2,
+    progressPercent: 100,
+    status: "completed",
+    completedAt: "2026-03-29 04:45 PM",
+    completedBy: "Wei Zhang",
+  },
+  { id: "task-c-3", documentName: "Emergency Evacuation Plan", documentType: "Procedure", reviewerPosition: 3, totalReviewers: 3, progressPercent: 100, status: "completed", completedAt: "2026-03-28 11:30 AM", completedBy: "Sarah Chen" },
+  { id: "task-c-4", documentName: "Work Permit Policy", documentType: "Policy", reviewerPosition: 2, totalReviewers: 2, progressPercent: 100, status: "completed", completedAt: "2026-03-27 02:20 PM", completedBy: "James Okonkwo" },
+  { id: "task-c-5", documentName: "Pipe Handling Manual", documentType: "Standard", reviewerPosition: 3, totalReviewers: 3, progressPercent: 100, status: "completed", completedAt: "2026-03-26 09:15 AM", completedBy: "Lisa Park" },
+  { id: "task-c-6", documentName: "Hearing Conservation Program", documentType: "Policy", reviewerPosition: 4, totalReviewers: 4, progressPercent: 100, status: "completed", completedAt: "2026-03-25 03:40 PM", completedBy: "Ahmed Al-Rashid" },
+  { id: "task-c-7", documentName: "First Aid & Medical Protocol", documentType: "Procedure", reviewerPosition: 3, totalReviewers: 3, progressPercent: 100, status: "completed", completedAt: "2026-03-24 11:10 AM", completedBy: "Carlos Rivera" },
 ];
 
 const ACTIVITY_FEED: ActivityItemType[] = [
@@ -113,9 +183,14 @@ const ACTIVITY_FEED: ActivityItemType[] = [
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<"pending" | "in-progress" | "completed">("pending");
 
   const handleCreateNew = () => navigate("/scope");
   const handleReview = (_id: string) => navigate("/review");
+
+  const filteredTasks = useMemo(() => {
+    return TASK_LIST.filter(task => task.status === activeTab);
+  }, [activeTab]);
 
   return (
     <div
@@ -189,12 +264,21 @@ export function DashboardPage() {
         </div>
 
         {/* Row 2 — Task list + Activity feed */}
-        <div className="grid gap-5 flex-1 min-h-0" style={{ gridTemplateColumns: "3fr 2fr" }}>
+        <div className="grid grid-cols-4 gap-5 flex-1 min-h-0">
           {/* My Review Queue */}
-          <ReviewQueue tasks={MY_TASKS} onReview={handleReview} />
+          <div className="col-span-3 flex flex-col min-h-0">
+            <ReviewQueue
+              tasks={filteredTasks}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              onReview={handleReview}
+            />
+          </div>
 
           {/* Recent Activity */}
-          <ActivityFeed items={ACTIVITY_FEED} />
+          <div className="col-span-1 flex flex-col min-h-0">
+            <ActivityFeed items={ACTIVITY_FEED} />
+          </div>
         </div>
       </main>
     </div>
@@ -205,9 +289,13 @@ export function DashboardPage() {
 
 function ReviewQueue({
   tasks,
+  activeTab,
+  onTabChange,
   onReview,
 }: {
   tasks: ConsolidationTask[];
+  activeTab: "pending" | "in-progress" | "completed";
+  onTabChange: (tab: "pending" | "in-progress" | "completed") => void;
   onReview: (id: string) => void;
 }) {
   return (
@@ -219,25 +307,55 @@ function ReviewQueue({
         boxShadow: "var(--shadow-card)",
       }}
     >
-      {/* Section header */}
+      {/* Tabbed Header */}
       <div
-        className="flex items-center justify-between px-4 py-3 shrink-0"
+        className="flex items-center justify-between px-1 shrink-0"
         style={{ borderBottom: "var(--border-default)" }}
       >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase" as const,
-            color: "var(--text-muted)",
-            fontFamily: "Inter, sans-serif",
-          }}
-        >
-          My Review Queue
-        </span>
+        <div className="flex">
+          {[
+            { id: "pending", label: "My Review Queue" },
+            { id: "in-progress", label: "In Progress" },
+            { id: "completed", label: "Completed" },
+          ].map((tab, idx) => {
+            const isTabActive = activeTab === tab.id;
+            return (
+              <div key={tab.id} className="flex items-center">
+                <button
+                  type="button"
+                  onClick={() => onTabChange(tab.id as any)}
+                  className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider relative transition-colors duration-200"
+                  style={{
+                    color: isTabActive ? "var(--color-brand)" : "var(--text-muted)",
+                    fontFamily: "Inter, sans-serif",
+                    border: "none",
+                    background: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {tab.label}
+                  {isTabActive && (
+                    <div
+                      className="absolute bottom-0 left-0 right-0 h-[2px]"
+                      style={{ backgroundColor: "var(--color-brand)" }}
+                    />
+                  )}
+                </button>
+                {/* Vertical separator between tabs */}
+                {idx < 2 && (
+                  <div 
+                    className="h-4 w-[1px]" 
+                    style={{ backgroundColor: "var(--border-default)" }} 
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        
         <button
           type="button"
+          className="mr-4"
           style={{
             fontSize: 12,
             fontWeight: 500,

@@ -42,10 +42,9 @@ export interface ParagraphData {
  * ────────────────────────────────────────────── */
 interface AIConfidenceCardProps {
   data: ParagraphData | null;
-  threshold: number;
 }
 
-export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
+export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
   const { t } = useTranslation();
   const [barAnimated, setBarAnimated] = useState(false);
   const prevIdRef = useRef<string | null>(null);
@@ -81,13 +80,11 @@ export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
     );
   }
 
-  const confidenceScore = data.aiConfidenceScore;
-  const isAboveThreshold = confidenceScore >= threshold;
-  const isWarningZone = !isAboveThreshold && confidenceScore >= threshold - 10;
-
-  let confidenceColor = "var(--color-negative)";
-  if (isAboveThreshold) confidenceColor = "var(--color-positive)";
-  else if (isWarningZone) confidenceColor = "var(--color-warning)";
+  const confidenceValue = data.aiConfidence; // High, Medium, Low
+  let confidenceColor = "var(--text-muted)";
+  if (confidenceValue === "High") confidenceColor = "var(--color-positive)";
+  else if (confidenceValue === "Medium") confidenceColor = "var(--color-warning)";
+  else if (confidenceValue === "Low") confidenceColor = "var(--color-negative)";
 
   return (
     <div
@@ -115,14 +112,27 @@ export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
         </div>
       )}
 
-      <div className="flex items-center gap-2">
-        <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--color-brand)" }} />
-        <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-          {t("review.aiConfidence")}
-        </span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--color-brand)" }} />
+          <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+            {t("review.aiConfidence")}
+          </span>
+        </div>
+        <Badge 
+          variant="outline" 
+          className="text-[10px] font-bold px-2 py-0.5"
+          style={{ 
+            color: confidenceColor, 
+            borderColor: confidenceColor,
+            backgroundColor: `${confidenceColor}10` 
+          }}
+        >
+          {confidenceValue} Confidence
+        </Badge>
       </div>
 
-      {/* Segmented bar */}
+      {/* Segmented bar for provenance */}
       <div
         className="w-full h-[8px] rounded-full overflow-hidden flex"
         style={{ backgroundColor: "var(--bg-hover)" }}
@@ -145,7 +155,7 @@ export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
         />
       </div>
 
-      {/* Percentage labels */}
+      {/* Percentage labels for provenance */}
       <div className="flex items-center justify-between">
         <span className="text-[12px] font-semibold" style={{ color: "var(--color-brand)" }}>
           {data.hpPercent}% H&P
@@ -158,34 +168,23 @@ export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
         </span>
       </div>
 
-      {/* Confidence threshold bar */}
-      <div className="flex flex-col gap-1.5 mt-1">
-        <div 
-          className="w-full h-1.5 rounded-full overflow-hidden"
-          style={{ backgroundColor: "var(--bg-hover)" }}
-        >
-          <div 
-            style={{ 
-              width: `${confidenceScore}%`,
-              backgroundColor: confidenceColor,
-              height: "100%",
-              borderRadius: "999px",
-              transition: "width 400ms ease-out, background-color 200ms ease-in"
-            }}
-          />
-        </div>
-        <div className="flex items-center gap-1.5">
-          {isAboveThreshold ? (
+      {/* Manual review vs AI approved status line */}
+      <div className="flex items-center gap-1.5 pt-1">
+        {data.status === 'auto-approved' ? (
+          <>
             <CheckCircle className="w-3.5 h-3.5" style={{ color: "var(--color-positive)" }} />
-          ) : (
-            <ShieldAlert className="w-3.5 h-3.5" style={{ color: isWarningZone ? "var(--color-warning)" : "var(--color-negative)" }} />
-          )}
-          <span className="text-[11px] font-bold" style={{ color: confidenceColor }}>
-            {isAboveThreshold 
-              ? `Above auto-approval threshold (${confidenceScore}%) — approved automatically` 
-              : `Below threshold (${confidenceScore}%) — manual review required`}
-          </span>
-        </div>
+            <span className="text-[11px] font-bold" style={{ color: "var(--color-positive)" }}>
+              Auto-approved by AI
+            </span>
+          </>
+        ) : (
+          <>
+            <ShieldAlert className="w-3.5 h-3.5" style={{ color: confidenceColor }} />
+            <span className="text-[11px] font-bold" style={{ color: confidenceColor }}>
+              Requires Manual Review
+            </span>
+          </>
+        )}
       </div>
 
       {/* AI reason note */}

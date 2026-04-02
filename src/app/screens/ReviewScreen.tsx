@@ -417,34 +417,7 @@ export function ReviewScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // AI Auto-approval settings
-  const [aiThreshold, setAiThreshold] = useState<number>(() => {
-    const saved = localStorage.getItem("hp_doc_ai_threshold");
-    return saved ? JSON.parse(saved).threshold : 90;
-  });
-  const [isAutoApprovalEnabled, setIsAutoApprovalEnabled] = useState<boolean>(() => {
-    const saved = localStorage.getItem("hp_doc_ai_threshold");
-    return saved ? JSON.parse(saved).enabled : true;
-  });
-
   const [paragraphs, setParagraphs] = useState<ParagraphData[]>(INITIAL_PARAGRAPHS);
-
-  // Re-evaluate auto-approval when settings change
-  useEffect(() => {
-    setParagraphs(prev => prev.map(p => {
-      if (p.status === 'auto-approved') {
-        if (!isAutoApprovalEnabled || p.aiConfidenceScore < aiThreshold) {
-          return { ...p, status: 'pending' };
-        }
-      }
-      if (p.status === 'pending') {
-        if (isAutoApprovalEnabled && p.aiConfidenceScore >= aiThreshold) {
-          return { ...p, status: 'auto-approved' };
-        }
-      }
-      return p;
-    }));
-  }, [aiThreshold, isAutoApprovalEnabled]);
 
   const [activeId, setActiveId] = useState<string | null>(null);
   const isAllReviewed = paragraphs.length > 0 && paragraphs.every(p => p.status !== 'pending');
@@ -669,12 +642,6 @@ export function ReviewScreen() {
         breadcrumb={t("review.title")}
         showOnlineStatus={true}
         showUser={true}
-        aiApprovalSettings={{
-          threshold: aiThreshold,
-          setThreshold: setAiThreshold,
-          enabled: isAutoApprovalEnabled,
-          setEnabled: setIsAutoApprovalEnabled
-        }}
       />
 
       {/* ═══ Stepper Bar ═══ */}
@@ -1020,33 +987,49 @@ export function ReviewScreen() {
                                 {/* Inline Source Chips */}
                                 {p.sources && p.sources.length > 0 && (
                                   <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                                    {/* AI Confidence Tag */}
+                                    <div
+                                      className="inline-flex items-center px-2 py-0.5 rounded-[4px] border transition-all cursor-default select-none"
+                                      style={{
+                                        backgroundColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.08)" : 
+                                                         p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.08)" : 
+                                                         "rgba(247, 163, 168, 0.08)",
+                                        borderColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.3)" : 
+                                                     p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.3)" : 
+                                                     "rgba(247, 163, 168, 0.3)",
+                                        fontSize: "11px",
+                                        color: p.aiConfidence === 'High' ? "var(--color-positive)" : 
+                                               p.aiConfidence === 'Medium' ? "var(--text-warning)" : 
+                                               "var(--color-negative)",
+                                        fontWeight: 600,
+                                      }}
+                                    >
+                                      {p.aiConfidence} Confidence
+                                    </div>
+
                                     {p.sources.map((src, i) => (
                                       <div 
                                         key={i}
                                         title={`${src.documentName} (${src.origin})`}
                                         className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip"
                                         style={{
-                                          backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.03)" : "rgba(17,104,68,0.03)",
-                                          borderColor: isActive 
-                                            ? (src.origin === 'H&P' ? "rgba(43,85,151,0.4)" : "rgba(17,104,68,0.4)")
-                                            : (src.origin === 'H&P' ? "rgba(43,85,151,0.12)" : "rgba(17,104,68,0.12)"),
+                                          backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)",
+                                          borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.2)" : "rgba(111, 143, 217, 0.2)",
                                           fontSize: "11px",
-                                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
-                                          opacity: isActive ? 1 : 0.7,
-                                          transform: isActive ? "translateY(-1px)" : "none",
-                                          boxShadow: isActive ? "0 2px 4px rgba(0,0,0,0.04)" : "none",
+                                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)",
+                                          opacity: isActive ? 1 : 0.75,
                                         }}
                                       >
                                         <span 
-                                          className="font-black text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" 
+                                          className="font-bold text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" 
                                           style={{ 
-                                            backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(17,104,68,0.1)",
-                                            color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
+                                            backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(111,143,217,0.1)",
+                                            color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)",
                                           }}
                                         >
                                           {src.origin}
                                         </span>
-                                        <span className="max-w-[220px] truncate font-medium group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
+                                        <span className="max-w-[220px] truncate font-normal group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
                                         <span className="text-[10px] opacity-40 font-bold tabular-nums">· {src.percentage}%</span>
                                       </div>
                                     ))}
@@ -1088,12 +1071,12 @@ export function ReviewScreen() {
           style={{
             width: 320,
             borderLeft: "var(--border-default)",
-            backgroundColor: "var(--bg-page)",
+            backgroundColor: "var(--bg-card)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
           {/* ── Top Zone: AI Confidence (static, pinned) ── */}
-          <AIConfidenceCard data={selectedParagraph || null} threshold={aiThreshold} />
+          <AIConfidenceCard data={selectedParagraph || null} />
 
           {/* ── Bottom Zone: Annotation Details (flexible, scrollable) ── */}
           <div className="flex-1 overflow-y-auto relative">

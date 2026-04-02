@@ -75,45 +75,59 @@ export function TaskRow({ task, onReview }: TaskRowProps) {
             e.currentTarget.style.backgroundColor = "transparent";
           }}
         >
-          Review
+          {task.status === "completed" ? "View" : "Review"}
         </button>
       </div>
 
-      <div className="flex items-center gap-3">
-        <span
-          style={{
-            fontSize: 11,
-            color: "var(--text-muted)",
-            fontFamily: "Inter, sans-serif",
-            flexShrink: 0,
-          }}
-        >
-          Reviewer {task.reviewerPosition} of {task.totalReviewers}
-        </span>
-        <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-hover)" }}>
-          <div
-            className="h-full rounded-full"
+      {task.status === "completed" ? (
+        <div className="flex items-center gap-2 mt-1">
+          <span
             style={{
-              width: `${task.progressPercent}%`,
-              backgroundColor: "var(--color-brand)",
-              transition: "width 0.3s ease",
+              fontSize: 11,
+              color: "var(--text-muted)",
+              fontFamily: "Inter, sans-serif",
             }}
-          />
+          >
+            Completed by <strong>{task.completedBy}</strong> on {task.completedAt}
+          </span>
         </div>
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 600,
-            color: "var(--text-muted)",
-            fontFamily: "Inter, sans-serif",
-            flexShrink: 0,
-            minWidth: 32,
-            textAlign: "right",
-          }}
-        >
-          {task.progressPercent}%
-        </span>
-      </div>
+      ) : (
+        <div className="flex items-center gap-3">
+          <span
+            style={{
+              fontSize: 11,
+              color: "var(--text-muted)",
+              fontFamily: "Inter, sans-serif",
+              flexShrink: 0,
+            }}
+          >
+            Reviewer {task.reviewerPosition} of {task.totalReviewers}
+          </span>
+          <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-hover)" }}>
+            <div
+              className="h-full rounded-full"
+              style={{
+                width: `${task.progressPercent}%`,
+                backgroundColor: "var(--color-brand)",
+                transition: "width 0.3s ease",
+              }}
+            />
+          </div>
+          <span
+            style={{
+              fontSize: 11,
+              fontWeight: 600,
+              color: "var(--text-muted)",
+              fontFamily: "Inter, sans-serif",
+              flexShrink: 0,
+              minWidth: 32,
+              textAlign: "right",
+            }}
+          >
+            {task.progressPercent}%
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,6 +12,9 @@ export interface ConsolidationTask {
   reviewerPosition: number;
   totalReviewers: number;
   progressPercent: number;
+  status?: "pending" | "in-progress" | "completed";
+  completedAt?: string;
+  completedBy?: string;
 }
 
 export interface ActivityItem {
