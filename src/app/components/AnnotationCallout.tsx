@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw } from "lucide-react";
+import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw, ExternalLink, ChevronDown } from "lucide-react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -24,6 +24,8 @@ export interface ParagraphData {
   kcadPercent: number;
   isEdited?: boolean;
   originalText?: string;
+  sourceDocumentUrl?: string;
+  excludedExcerpts?: string[];
 }
 
 /* ──────────────────────────────────────────────
@@ -165,6 +167,9 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
   const [entered, setEntered] = useState(false);
   const [rejectAreaHeight, setRejectAreaHeight] = useState(0);
   const rejectRef = useRef<HTMLDivElement>(null);
+  const [excludedOpen, setExcludedOpen] = useState(false);
+  const [excludedHeight, setExcludedHeight] = useState(0);
+  const excludedRef = useRef<HTMLDivElement>(null);
 
   const hasConflict = !!data.conflict;
 
@@ -172,6 +177,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
     setRejectMode(false);
     setRejectReasonText(data.rejectReason || "");
     setEntered(false);
+    setExcludedOpen(false);
     const raf = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(raf);
   }, [data.id]);
@@ -181,6 +187,12 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
       setRejectAreaHeight(rejectRef.current.scrollHeight);
     }
   }, [rejectMode]);
+
+  useEffect(() => {
+    if (excludedOpen && excludedRef.current) {
+      setExcludedHeight(excludedRef.current.scrollHeight);
+    }
+  }, [excludedOpen]);
 
   const handleRejectSubmit = () => {
     onReject(rejectReasonText);
@@ -224,9 +236,18 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                 {data.origin} {t("review.origin")}
               </Badge>
             </div>
-            <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
+            <a
+              href={data.sourceDocumentUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-[13px] font-semibold"
+              style={{ color: "var(--color-brand)", textDecoration: "none" }}
+              onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+            >
               {data.sourceDocument}
-            </span>
+              <ExternalLink className="w-[12px] h-[12px] shrink-0" />
+            </a>
           </div>
 
           {/* ── Applicability ── */}
@@ -269,6 +290,57 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
             </span>
             <span className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{data.lastVerified}</span>
           </div>
+
+          {/* ── What Was Excluded ── */}
+          {data.excludedExcerpts && data.excludedExcerpts.length > 0 && (
+            <div className="flex flex-col gap-1">
+              <button
+                type="button"
+                onClick={() => setExcludedOpen(!excludedOpen)}
+                className="flex items-center justify-between w-full"
+                style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
+              >
+                <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+                  What Was Excluded
+                </span>
+                <ChevronDown
+                  className="w-[14px] h-[14px] shrink-0"
+                  style={{
+                    color: "var(--text-muted)",
+                    transform: excludedOpen ? "rotate(180deg)" : "rotate(0deg)",
+                    transition: "transform 200ms ease-out",
+                  }}
+                />
+              </button>
+              {!excludedOpen && (
+                <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
+                  Content from source documents not carried into this chunk
+                </span>
+              )}
+              <div
+                ref={excludedRef}
+                style={{
+                  maxHeight: excludedOpen ? excludedHeight + 16 : 0,
+                  overflow: "hidden",
+                  transition: "max-height 200ms ease-out",
+                }}
+              >
+                <div className="flex flex-col gap-2 pt-1">
+                  {data.excludedExcerpts.map((excerpt, idx) => (
+                    <div
+                      key={idx}
+                      className="pl-3 py-1"
+                      style={{ borderLeft: "2px solid var(--border-default)" }}
+                    >
+                      <span className="text-[12px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
+                        {excerpt}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="h-px w-full my-1" style={{ backgroundColor: "var(--bg-hover)" }} />
 

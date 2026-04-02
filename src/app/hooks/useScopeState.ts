@@ -372,7 +372,7 @@ export function useScopeState() {
   };
 
   const handleBack = () => {
-    navigate("/");
+    navigate("/dashboard");
   };
 
   useEffect(() => {

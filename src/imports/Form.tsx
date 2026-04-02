@@ -19,12 +19,12 @@ export default function Form({ onNavigate }: FormProps) {
   const handleSignIn = (e: React.FormEvent) => {
     e.preventDefault();
     if (isFormValid) {
-      onNavigate("/scope");
+      onNavigate("/dashboard");
     }
   };
 
   const handleSSO = () => {
-    onNavigate("/scope");
+    onNavigate("/dashboard");
   };
 
   return (

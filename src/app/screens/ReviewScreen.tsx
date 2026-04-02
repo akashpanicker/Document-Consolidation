@@ -29,6 +29,128 @@ const SECTIONS = [
   { id: "s3", title: "3. Emergency Response" },
 ];
 
+const PARAGRAPH_EXTRAS: Record<string, { sourceDocumentUrl: string; excludedExcerpts: string[] }> = {
+  p1: {
+    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    excludedExcerpts: [
+      "As an alternative to the procedures described herein, an Operator may use equivalent equipment or methods, provided such equivalency is demonstrated through documented risk assessment and approved by the Drilling Engineer of Record prior to deployment.",
+      "This document is subject to periodic review by the H&P Well Control Review Board and will be updated to reflect changes to API Recommended Practice 53, IADC Well Control Guidelines, and applicable governmental regulations.",
+    ],
+  },
+  p2: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    excludedExcerpts: [
+      "Legacy KCAD procedures from the K-CW 002 Health and Safety series shall remain in force for Kazakhstan operations until the transition period concludes on 31 December 2025, after which this consolidated document supersedes all predecessor documents.",
+      "Compliance verification shall be conducted by an independent third-party auditor not less than once every 24 months, and following any significant operational incident classified as Tier 1 or above under the KCAD Incident Classification Matrix.",
+    ],
+  },
+  p3: {
+    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    excludedExcerpts: [
+      "Operations conducted under temporary variance authorizations, including deviation from standard well control procedures during well testing or production testing phases, shall be governed by a separately approved site-specific well control plan.",
+      "Contractor personnel engaged in well control operations must hold current IADC WellCAP certification at the Supervisory level or equivalent as approved by the H&P Drilling Manager. Certification records shall be maintained in the crew competency register.",
+    ],
+  },
+  p4: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    excludedExcerpts: [
+      "Personnel classified as visitors or short-term site guests on-site for fewer than 4 hours are exempt from the full induction requirement but must receive a site-specific safety briefing not exceeding 15 minutes upon arrival.",
+      "Deviation from any mandatory compliance requirement contained herein requires formal Management of Change approval at the Regional HSE Director level and must be communicated to the relevant regulatory authority within 72 hours.",
+    ],
+  },
+  p5: {
+    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    excludedExcerpts: [
+      "For operations conducted under active production sharing agreements, any variance from this standard identified as potentially conflicting with the host government's mandatory well control regulations must be escalated to the Drilling Manager and Legal department for review prior to operations.",
+      "Where third-party clients impose supplementary well control requirements through their own Technical Standards, these shall be reviewed against the provisions of this document by a qualified Well Control Specialist and a bridging document prepared where necessary.",
+    ],
+  },
+  p6: {
+    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    excludedExcerpts: [
+      "In wells with elevated formation pressure gradients or where a SICP greater than 300 psi has been recorded within the preceding 48 hours, the trip sheet verification frequency shall be increased to every 3 stands rather than the standard 5-stand interval.",
+      "The Mud Engineer shall ensure that all trip tank volumes are recorded in real-time drilling data systems and that any manual override of automated fill-up calculations is documented with written justification in the drilling report.",
+    ],
+  },
+  p7: {
+    sourceDocumentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf",
+    excludedExcerpts: [
+      "The volumetric well control method may be applied where wellbore geometry or drill string configuration prevents circulation. Application of this method requires express authorization from the Drilling Engineer and shall be documented in the post-well kick report.",
+      "Surface shut-in pressure readings shall be taken no later than 30 minutes after initial well shut-in to establish stable SIDP and SICP values for kick analysis. Readings taken before pressure stabilization must be annotated as preliminary in the well control report.",
+    ],
+  },
+  p8: {
+    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    excludedExcerpts: [
+      "BOP function tests shall include both manual and remote operation of all available closing units. Where remote actuation equipment is found to be inoperative, drilling operations shall be suspended until full remote capability is restored and verified.",
+      "Accumulator pre-charge pressures shall be verified against the manufacturer's specifications at the start of each hitch. Any deviation from the specified pre-charge range shall result in immediate investigation by the Rig Mechanic before operations continue.",
+    ],
+  },
+  p9: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    excludedExcerpts: [
+      "Fixed-point H₂S monitoring sensors shall be calibrated in accordance with the manufacturer's schedule or a minimum of once per calendar quarter, whichever is more frequent. Calibration records must be maintained and available for regulatory inspection.",
+      "In the event of a continuous H₂S reading exceeding 10 ppm at any monitoring station, all non-essential personnel shall evacuate the affected zone immediately. Operations may only resume after H₂S readings return to below 1 ppm for a sustained period of 15 minutes.",
+    ],
+  },
+  p10: {
+    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    excludedExcerpts: [
+      "Mud weight adjustments of more than 0.5 ppg shall only be authorized by the Drilling Engineer and shall be preceded by a formal review of the current pore pressure prediction and wellbore stability analysis.",
+      "The Mud Engineer shall prepare a daily mud report summarizing actual versus planned mud weight, rheology data, and any chemical treatments applied. This report must be signed by the Company Man before being transmitted to the operations office.",
+    ],
+  },
+  p11: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    excludedExcerpts: [
+      "Permits to work for tasks within the rotating equipment exclusion zone must specifically identify the equipment involved, the nature of the task, and the isolation measures in place. Generic PTW templates that do not reference specific equipment are not acceptable.",
+      "Following any incident or near miss involving rotating equipment, the affected equipment shall be subject to a formal Post-Incident Inspection before being returned to service. A copy of the inspection report shall be forwarded to the KCAD Equipment Integrity team within 5 business days.",
+    ],
+  },
+  p12: {
+    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    excludedExcerpts: [
+      "Personnel with mobility restrictions or physical impairments requiring evacuation assistance shall be identified on the Emergency Accommodation List maintained by the Rig Manager. Designated personnel shall be assigned to assist these individuals during emergency mustering.",
+      "The Emergency Response Coordinator shall maintain a headcount until all personnel are accounted for at their designated muster station. No personnel may return to their work area until the Rig Manager issues an all-clear via the site PA system.",
+    ],
+  },
+  p13: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf",
+    excludedExcerpts: [
+      "Accumulator capacity calculations shall be performed using the actual BOP closing ratios verified during the most recent full BOP pressure test. Calculations based on nominal or design values without field verification are not acceptable.",
+      "A secondary hydraulic accumulator system with independent pressure supply must be installed and maintained at full operational status on all HPHT well operations where bottomhole pressures exceed 10,000 psi, regardless of rig vintage or existing equipment certification status.",
+    ],
+  },
+  p14: {
+    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    excludedExcerpts: [
+      "Tabletop emergency response exercises shall be conducted at the start of each hitch in addition to physical drills, covering well control, fire, and H₂S release scenarios on a rotating basis.",
+      "Records of emergency drills, including attendance sheets, observer notes, and corrective actions arising from drill debriefs, shall be retained in the site HSE file for a minimum of 24 months and be available for review during regulatory inspections.",
+    ],
+  },
+  p15: {
+    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    excludedExcerpts: [
+      "In facilities where a deluge or fixed suppression system is installed, activation of the ESD shall automatically trigger suppression system flow to the affected zone. Manual override of automatic suppression activation is only permitted by the Rig Manager in consultation with the HSE Representative.",
+      "Post-incident fire investigation reports shall be completed within 5 working days using the H&P Incident Investigation template (Form HSE-INV-001). Root cause analysis must identify contributing organizational factors in addition to immediate physical causes.",
+    ],
+  },
+  p16: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    excludedExcerpts: [
+      "Medevac authorization protocols shall include pre-designated decision trees specifying which injuries or medical conditions mandate immediate helicopter evacuation versus land transport. These protocols shall be reviewed by a qualified medical professional prior to each major drilling campaign.",
+      "Where satellite communication equipment is the primary means of emergency communication, a secondary method such as HF radio must be tested at least once per week and the test documented in the communication log.",
+    ],
+  },
+  p17: {
+    sourceDocumentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf",
+    excludedExcerpts: [
+      "Breathing apparatus inspection records shall include the unique serial number of each unit, the inspector's name and qualification, the test pressure achieved, and the estimated remaining service life of each component, countersigned by the HSE Representative.",
+      "Life raft and life ring inspections shall be conducted by a third-party marine safety specialist holding a current qualification recognized by the applicable flag state authority. Self-certification of life-saving appliances is not permitted on offshore operations.",
+    ],
+  },
+};
+
 const INITIAL_PARAGRAPHS: ParagraphData[] = [
   // ── Section 1: Purpose & Scope ──
   {
@@ -204,7 +326,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     aiConfidence: "High", aiReason: "Standard emergency equipment inspection requirement.",
     status: "pending", hpPercent: 18, kcadPercent: 82,
   },
-];
+].map(p => ({ ...p, ...(PARAGRAPH_EXTRAS[p.id] ?? {}) })) as ParagraphData[];
 
 export function ReviewScreen() {
   const navigate = useNavigate();
