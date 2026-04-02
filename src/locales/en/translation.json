@@ -1,6 +1,6 @@
 {
   "common": {
-    "proceed": "Proceed",
+    "proceed": "Consolidate",
     "back": "Back"
   },
   "login": {
@@ -28,7 +28,7 @@
     "sourceDocumentsSubtitle": "Documents that will be used to generate the consolidated safety document for this scope.",
     "documentsSelected": "{{count}} documents selected — H&P: {{hp}} · KCAD: {{kcad}}",
     "clearSelection": "Clear selection",
-    "proceedSelected": "Proceed with {{count}} selected",
+    "proceedSelected": "Consolidate with {{count}} selected",
     "activities": {
       "life-critical": "Life-Critical Controls",
       "hse-governance": "HSE Governance",

@@ -83,19 +83,19 @@ export function TaskRow({ task, onReview }: TaskRowProps) {
         <div className="flex items-center gap-2 mt-1">
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--text-muted)",
               fontFamily: "Inter, sans-serif",
             }}
           >
-            Completed by <strong>{task.completedBy}</strong> on {task.completedAt}
+            Completed by {task.completedBy} on {task.completedAt}
           </span>
         </div>
       ) : (
         <div className="flex items-center gap-3">
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               color: "var(--text-muted)",
               fontFamily: "Inter, sans-serif",
               flexShrink: 0,
@@ -115,7 +115,7 @@ export function TaskRow({ task, onReview }: TaskRowProps) {
           </div>
           <span
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 600,
               color: "var(--text-muted)",
               fontFamily: "Inter, sans-serif",

@@ -308,7 +308,7 @@ function DocumentColumn({
   // col widths
   const W = { cb: 40, type: 100, action: 40 };
   const hdrCell: React.CSSProperties = {
-    fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+    fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
     color: "var(--color-text-tertiary, var(--text-muted))", fontFamily: "Inter, sans-serif",
     whiteSpace: "nowrap", flexShrink: 0,
   };
@@ -427,13 +427,12 @@ function DocumentColumn({
                 <div style={{ flex: 1, minWidth: 0, paddingLeft: 8, display: "flex", alignItems: "center", gap: 4, overflow: "hidden" }}>
                   {visibleActs.map(actId => (
                     <span key={actId} style={{
-                      display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
-                      fontSize: 10, fontWeight: 600, fontFamily: "Inter, sans-serif",
-                      padding: "2px 6px", borderRadius: 4,
-                      backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
-                      border: "1px solid var(--border-default)",
-                      overflow: "hidden", textOverflow: "ellipsis", maxWidth: 76,
-                    }}>
+                        display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
+                        fontSize: 11, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                        padding: "2px 6px", borderRadius: 4,
+                        backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
+                        border: "1px solid var(--border-default)",
+                      }}>
                       {t(`scope.activities.${actId}`, actId)}
                     </span>
                   ))}

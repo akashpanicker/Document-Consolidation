@@ -201,7 +201,7 @@ export function DashboardPage() {
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-6 mt-2 overflow-y-auto">
         {/* Page title row */}
-        <div className="flex items-center justify-between mt-6 mb-6">
+        <div className="flex items-center justify-between mt-6 mb-3">
           <h1
             className="text-[20px] font-bold uppercase tracking-wide"
             style={{ color: "var(--text-primary)" }}
@@ -222,7 +222,7 @@ export function DashboardPage() {
               borderRadius: 6,
               backgroundColor: "var(--color-brand)",
               border: "none",
-              color: "#FFFFFF",
+              color: "var(--text-on-primary)",
               cursor: "pointer",
             }}
             onMouseEnter={(e) => {
@@ -254,6 +254,7 @@ export function DashboardPage() {
             label="In Progress"
             value={STATS.inProgress}
             supportingText="Consolidations under review"
+            valueColor="var(--color-brand)"
           />
           <StatCard
             label="Completed"

@@ -10,7 +10,7 @@
   --color-surface-4: #1F2B42;
   --color-surface-5: #253552;
 
-  --color-brand: #2B5597;
+  --color-brand: #6F8FD9;
   --color-brand-hover: #5E7FC8;
 
   --color-text-primary: #E7ECF5;
@@ -21,7 +21,7 @@
   --color-success: #4ED199;
   --color-warning: #FFDA8A;
   --color-error: #F7A3A8;
-  --color-info: #6F8FD9;
+  --color-info: #5E7FC8;
   --color-toggle-thumb: #0E141F;
 
   --border-default: 1px solid #1F2B42;
@@ -38,8 +38,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: #2B5597;
-  --primary-foreground: oklch(1 0 0);
+  --primary: #6F8FD9;
+  --primary-foreground: #0E141F;
   --secondary: oklch(0.95 0.0058 264.53);
   --secondary-foreground: #030213;
   --muted: #ececf0;

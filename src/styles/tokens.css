@@ -56,7 +56,7 @@
   --raw-positive-dark:    #4ED199;
   --raw-warning-dark:     #FFDA8A;
   --raw-negative-dark:    #F7A3A8;
-  --raw-info-dark:        #6F8FD9;
+  --raw-info-dark:        #5E7FC8;
   --raw-positive-bg-dark: #173D2F;
   --raw-error-bg-dark:    #502B2E;
 
@@ -102,7 +102,7 @@
   --text-secondary:       var(--raw-dark-text-2);      /* #B6C2D9 */
   --text-tertiary:        var(--raw-dark-text-3);      /* #8A9AB6 */
   --text-muted:           var(--raw-dark-text-4);      /* #5F6F8A */
-  --text-on-primary:      var(--raw-white);
+  --text-on-primary:      #0E141F;
   --text-role-active:     var(--raw-dark-text-1);      /* #E7ECF5 */
   --text-role-inactive:   var(--raw-dark-text-3);      /* #8A9AB6 */
   --text-online:          #2FBF71;
@@ -113,8 +113,8 @@
 
   /* ── Borders ── */
   --border-default:       1px solid var(--raw-dark-surface-4);
-  --border-subtle:        1px solid var(--raw-dark-surface-3);
-  --border-active:        1px solid var(--raw-primary);
+  --border-subtle:        1px solid var(--raw-dark-surface-4);
+  --border-active:        1px solid var(--color-brand);
   --border-chip:          1px solid var(--raw-dark-surface-5);
   --border-input:         1px solid var(--raw-dark-surface-5);
   --border-card:          1px solid var(--raw-dark-surface-4);
@@ -122,7 +122,7 @@
   --border-checkbox:      1px solid var(--raw-dark-surface-5);
   --border-warning:       1px solid var(--raw-warning-dark);
   --border-alert:         var(--raw-negative-dark);
-  --role-active-border:   3px solid var(--raw-primary);
+  --role-active-border:   3px solid var(--color-brand);
 
   /* ── Status ── */
   --color-positive:       var(--raw-positive-dark);
@@ -133,7 +133,7 @@
   --color-error-bg:       var(--raw-error-bg-dark);
 
   /* ── Brand ── */
-  --color-brand:          var(--raw-primary);
+  --color-brand:          #6F8FD9;
   --color-brand-hover:    var(--raw-primary-2);
 
   /* ── Shadows ── */

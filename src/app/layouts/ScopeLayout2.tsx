@@ -350,7 +350,7 @@ function DocumentColumn({
 
   const W = { cb: 40, type: 100, action: 40 };
   const hdrCell: React.CSSProperties = {
-    fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+    fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
     color: "var(--color-text-tertiary, var(--text-muted))", fontFamily: "Inter, sans-serif",
     whiteSpace: "nowrap", flexShrink: 0,
   };
@@ -468,11 +468,10 @@ function DocumentColumn({
                   {visibleActs.map(actId => (
                     <span key={actId} style={{
                       display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
-                      fontSize: 10, fontWeight: 600, fontFamily: "Inter, sans-serif",
-                      padding: "2px 6px", borderRadius: 4, maxWidth: 76,
+                      fontSize: 11, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                      padding: "2px 6px", borderRadius: 4,
                       backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
                       border: "1px solid var(--border-default)",
-                      overflow: "hidden", textOverflow: "ellipsis",
                     }}>
                       {t(`scope.activities.${actId}`, actId)}
                     </span>

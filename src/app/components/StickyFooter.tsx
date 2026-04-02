@@ -59,7 +59,7 @@ const PRIMARY: React.CSSProperties = {
   border: "none",
   borderRadius: 6,
   padding: "8px 16px",
-  color: "#FFFFFF",
+  color: "var(--text-on-primary)",
   fontSize: 14,
   fontWeight: 600,
   fontFamily: "Inter, sans-serif",
