@@ -46,7 +46,15 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      <Header breadcrumb={t("scope.title")} showOnlineStatus={true} showUser={true} layoutSwitcher={layoutSwitcher} />
+      <Header
+        breadcrumb={[
+          { label: "Dashboard", path: "/dashboard" },
+          { label: "Scope" }
+        ]}
+        showOnlineStatus={true}
+        showUser={true}
+        layoutSwitcher={layoutSwitcher}
+      />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 min-h-0">
         {/* Title row */}

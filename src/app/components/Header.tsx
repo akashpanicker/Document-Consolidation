@@ -6,8 +6,13 @@ import { useNavigate, useLocation } from "react-router";
 import { useTheme } from "./ThemeContext";
 import svgPaths from "../../imports/svg-ioq6ca64fj";
 
+interface BreadcrumbItem {
+  label: string;
+  path?: string;
+}
+
 interface HeaderProps {
-  breadcrumb?: string;
+  breadcrumb?: string | BreadcrumbItem[];
   userName?: string;
   userRole?: string;
   userInitials?: string;
@@ -35,7 +40,7 @@ export function Header({
   const [showLayoutDropdown, setShowLayoutDropdown] = useState(false);
   const [showScopeLayoutDropdown, setShowScopeLayoutDropdown] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const [isBreadcrumbHovered, setIsBreadcrumbHovered] = useState(false);
+  const [hoveredBreadcrumbIdx, setHoveredBreadcrumbIdx] = useState<number | null>(null);
   const [isVideoHovered, setIsVideoHovered] = useState(false);
   const [isLayoutHovered, setIsLayoutHovered] = useState(false);
   const [isScopeLayoutHovered, setIsScopeLayoutHovered] = useState(false);
@@ -119,39 +124,34 @@ export function Header({
                 color: "var(--color-text-secondary)",
               }}
             >
-              {location.pathname === "/safety-videos" ? (
-                <>
-                  <span
-                    style={{
-                      color: isBreadcrumbHovered ? "var(--color-text-primary)" : "var(--color-text-secondary)",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      transition: "color 0.2s",
-                    }}
-                    onMouseEnter={() => setIsBreadcrumbHovered(true)}
-                    onMouseLeave={() => setIsBreadcrumbHovered(false)}
-                    onClick={() => navigate("/briefing")}
-                  >
-                    {breadcrumb}
-                  </span>
-                  <span style={{ margin: "0 8px", color: "var(--color-text-tertiary)" }}>/</span>
-                  <span
-                    style={{
-                      color: isVideoHovered ? "var(--color-text-primary)" : "var(--color-text-secondary)",
-                      cursor: "pointer",
-                      textDecoration: "underline",
-                      transition: "color 0.2s",
-                    }}
-                    onMouseEnter={() => setIsVideoHovered(true)}
-                    onMouseLeave={() => setIsVideoHovered(false)}
-                    onClick={() => navigate("/safety-videos")}
-                  >
-                    Safety Videos
-                  </span>
-                </>
-              ) : (
-                breadcrumb
-              )}
+              {(() => {
+                if (typeof breadcrumb === "string") {
+                  return breadcrumb;
+                }
+                if (Array.isArray(breadcrumb)) {
+                  return breadcrumb.map((item, idx) => (
+                    <span key={idx} className="inline-flex items-center">
+                      <span
+                        style={{
+                          color: item.path && hoveredBreadcrumbIdx === idx ? "var(--text-primary)" : "var(--text-secondary)",
+                          cursor: item.path ? "pointer" : "default",
+                          transition: "color 0.2s",
+                          textDecoration: item.path && hoveredBreadcrumbIdx === idx ? "underline" : "none",
+                        }}
+                        onMouseEnter={() => item.path && setHoveredBreadcrumbIdx(idx)}
+                        onMouseLeave={() => setHoveredBreadcrumbIdx(null)}
+                        onClick={() => item.path && navigate(item.path)}
+                      >
+                        {item.label}
+                      </span>
+                      {idx < breadcrumb.length - 1 && (
+                        <span style={{ margin: "0 8px", color: "var(--text-tertiary)", opacity: 0.5 }}>/</span>
+                      )}
+                    </span>
+                  ));
+                }
+                return null;
+              })()}
             </p>
           </div>
         </div>

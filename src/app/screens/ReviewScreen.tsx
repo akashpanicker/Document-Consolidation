@@ -639,7 +639,11 @@ export function ReviewScreen() {
       <style>{REVIEW_STYLES}</style>
 
       <Header
-        breadcrumb={t("review.title")}
+        breadcrumb={[
+          { label: "Dashboard", path: "/dashboard" },
+          { label: "Scope", path: "/scope" },
+          { label: "Review" }
+        ]}
         showOnlineStatus={true}
         showUser={true}
       />

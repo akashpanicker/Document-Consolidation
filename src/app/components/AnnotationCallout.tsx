@@ -132,41 +132,6 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
         </Badge>
       </div>
 
-      {/* Segmented bar for provenance */}
-      <div
-        className="w-full h-[8px] rounded-full overflow-hidden flex"
-        style={{ backgroundColor: "var(--bg-hover)" }}
-      >
-        <div
-          style={{
-            width: barAnimated ? `${data.hpPercent}%` : "0%",
-            backgroundColor: "var(--color-brand)",
-            transition: "width 400ms ease-out",
-            borderRadius: data.hpPercent === 100 ? "9999px" : "9999px 0 0 9999px",
-          }}
-        />
-        <div
-          style={{
-            width: barAnimated ? `${data.kcadPercent}%` : "0%",
-            backgroundColor: hasConflict ? "var(--color-negative)" : "var(--text-muted)",
-            transition: "width 400ms ease-out 50ms",
-            borderRadius: data.kcadPercent === 100 ? "9999px" : "0 9999px 9999px 0",
-          }}
-        />
-      </div>
-
-      {/* Percentage labels for provenance */}
-      <div className="flex items-center justify-between">
-        <span className="text-[12px] font-semibold" style={{ color: "var(--color-brand)" }}>
-          {data.hpPercent}% H&P
-        </span>
-        <span
-          className="text-[12px] font-semibold"
-          style={{ color: hasConflict ? "var(--color-negative)" : "var(--text-muted)" }}
-        >
-          {data.kcadPercent}% KCAD
-        </span>
-      </div>
 
       {/* Manual review vs AI approved status line */}
       <div className="flex items-center gap-1.5 pt-1">

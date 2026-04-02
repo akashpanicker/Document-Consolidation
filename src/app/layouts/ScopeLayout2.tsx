@@ -53,7 +53,15 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
           Wait, existing UI has Header inside ScopeScreen.tsx. I'll keep it here, or we can move Header to ScopePage. 
           Prompt says: "Add a layout switcher... placed immediately left of the dark/light mode toggle". I will modify Header directly.
       */}
-      <Header breadcrumb={t("scope.title")} showOnlineStatus={true} showUser={true} layoutSwitcher={layoutSwitcher} />
+      <Header
+        breadcrumb={[
+          { label: "Dashboard", path: "/dashboard" },
+          { label: "Scope" }
+        ]}
+        showOnlineStatus={true}
+        showUser={true}
+        layoutSwitcher={layoutSwitcher}
+      />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 overflow-y-auto">
         {/* Title row */}
