@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from "react";
-import { Globe, Check, Video, LogOut, LayoutGrid, ListFilter } from "lucide-react";
+import { Globe, Check, Video, LogOut, LayoutGrid, ListFilter, Sliders } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "./ThemeToggle";
 import { useNavigate, useLocation } from "react-router";
 import { useTheme } from "./ThemeContext";
 import svgPaths from "../../imports/svg-ioq6ca64fj";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Slider } from "./ui/slider";
+import { Switch } from "./ui/switch";
+import { Button } from "./ui/button";
 
 interface HeaderProps {
   breadcrumb?: string;
@@ -17,6 +21,12 @@ interface HeaderProps {
     activeLayout: 1 | 2;
     onLayoutChange: (layout: 1 | 2) => void;
   };
+  aiApprovalSettings?: {
+    threshold: number;
+    setThreshold: (val: number) => void;
+    enabled: boolean;
+    setEnabled: (val: boolean) => void;
+  };
 }
 
 export function Header({
@@ -27,6 +37,7 @@ export function Header({
   showOnlineStatus = true,
   showUser = true,
   layoutSwitcher,
+  aiApprovalSettings,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
   const language = i18n.language?.startsWith('es') ? 'es' : 'en';
@@ -538,6 +549,91 @@ export function Header({
                 </div>
               )}
             </div>
+          )}
+
+          {/* AI Auto-Approval Settings */}
+          {aiApprovalSettings && (
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="flex items-center justify-center cursor-pointer"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--border-radius-md)",
+                    backgroundColor: "transparent",
+                    border: "none",
+                    padding: 0,
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--bg-hover)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
+                >
+                  <Sliders
+                    size={18}
+                    style={{ color: "var(--color-text-tertiary)" }}
+                  />
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-80 p-5 flex flex-col gap-6" align="end">
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="text-[14px] font-bold" style={{ color: "var(--text-primary)" }}>
+                    AI Auto-Approval Settings
+                  </h3>
+                  <p className="text-[12px] leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
+                    Paragraphs with AI confidence above this threshold will be automatically approved without manual review.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>
+                      Confidence Threshold
+                    </span>
+                    <span className="text-[18px] font-bold" style={{ color: "var(--color-brand)" }}>
+                      {aiApprovalSettings.threshold}%
+                    </span>
+                  </div>
+                  <Slider
+                    value={[aiApprovalSettings.threshold]}
+                    onValueChange={(vals) => aiApprovalSettings.setThreshold(vals[0])}
+                    min={50}
+                    max={100}
+                    step={5}
+                    className="py-2"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between py-2">
+                  <span className="text-[13px] font-semibold" style={{ color: "var(--text-secondary)" }}>
+                    Enable AI Auto-Approval
+                  </span>
+                  <Switch
+                    checked={aiApprovalSettings.enabled}
+                    onCheckedChange={aiApprovalSettings.setEnabled}
+                  />
+                </div>
+
+                <div className="flex gap-2 pt-2">
+                  <Button 
+                    className="flex-1 h-9 text-[13px] font-bold" 
+                    style={{ backgroundColor: "var(--color-brand)", color: "var(--text-on-primary)" }}
+                    onClick={() => {
+                      localStorage.setItem("hp_doc_ai_threshold", JSON.stringify({
+                        threshold: aiApprovalSettings.threshold,
+                        enabled: aiApprovalSettings.enabled
+                      }));
+                      // The popover closes automatically when clicking outside or we can force close if we had the state
+                    }}
+                  >
+                    Save Settings
+                  </Button>
+                  <Button variant="ghost" className="flex-1 h-9 text-[13px] font-bold" style={{ color: "var(--text-tertiary)" }}>
+                    Cancel
+                  </Button>
+                </div>
+              </PopoverContent>
+            </Popover>
           )}
 
           {/* Theme Toggle */}

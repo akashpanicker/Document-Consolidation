@@ -181,7 +181,7 @@ export function DashboardPage() {
             supportingText="Consolidations under review"
           />
           <StatCard
-            label="Completed This Month"
+            label="Completed"
             value={STATS.completedThisMonth}
             supportingText="Approved and published"
             valueColor="var(--color-success)"

@@ -5,6 +5,7 @@ import { ArrowLeft, Check, FileSearch, Pencil } from "lucide-react";
 import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { Badge } from "../components/ui/badge";
 
 /* ── Custom keyframe styles injected via a <style> tag ── */
 const REVIEW_STYLES = `
@@ -161,7 +162,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by J. Smith on Oct 12, 2025",
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P source with no conflicts.",
-    status: "pending", hpPercent: 98, kcadPercent: 2,
+    status: "auto-approved", hpPercent: 98, kcadPercent: 2,
+    aiConfidenceScore: 98,
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98 },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2 }
@@ -176,6 +178,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.119", "EPA 40 CFR 112"],
     aiConfidence: "High", aiReason: "Safely integrated multiple regulatory requirements from KCAD legacy standard.",
     status: "pending", hpPercent: 25, kcadPercent: 75,
+    aiConfidenceScore: 75,
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25 }
@@ -189,7 +192,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by J. Smith on Oct 12, 2025",
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P source with no conflicts.",
-    status: "pending", hpPercent: 100, kcadPercent: 0,
+    status: "auto-approved", hpPercent: 100, kcadPercent: 0,
+    aiConfidenceScore: 100,
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100 }
     ]
@@ -203,6 +207,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.119"],
     aiConfidence: "High", aiReason: "Standard compliance requirement inherited from KCAD.",
     status: "pending", hpPercent: 20, kcadPercent: 80,
+    aiConfidenceScore: 80,
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80 },
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20 }
@@ -217,6 +222,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Supersession clause — verify against any active third-party agreements.",
     status: "pending", hpPercent: 85, kcadPercent: 15,
+    aiConfidenceScore: 85,
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85 },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15 }
@@ -232,6 +238,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Synthesized from multiple regional guidelines; requires manual verification.",
     status: "pending", hpPercent: 72, kcadPercent: 28,
+    aiConfidenceScore: 72,
     sources: [
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72 },
       { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28 }
@@ -247,6 +254,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     aiConfidence: "Low", aiReason: "Conflicting legacy standards detected during AI merge.",
     conflict: "KCAD specifies 15 min threshold, H&P specifies 30 min",
     status: "pending", hpPercent: 45, kcadPercent: 55,
+    aiConfidenceScore: 55,
     sources: [
       { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45 }
@@ -260,7 +268,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by A. Lewis on Jan 14, 2026",
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P BOP verification protocols.",
-    status: "pending", hpPercent: 95, kcadPercent: 5,
+    status: "auto-approved", hpPercent: 95, kcadPercent: 5,
+    aiConfidenceScore: 95,
     sources: [
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95 },
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5 }
@@ -275,6 +284,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.1000", "API RP 49"],
     aiConfidence: "High", aiReason: "Standard H\u2082S monitoring requirement from KCAD.",
     status: "pending", hpPercent: 15, kcadPercent: 85,
+    aiConfidenceScore: 85,
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15 }
@@ -288,7 +298,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by A. Lewis on Jan 14, 2026",
     regulatoryReferences: [],
     aiConfidence: "High", aiReason: "Direct match to H&P mud weight management procedures.",
-    status: "pending", hpPercent: 97, kcadPercent: 3,
+    status: "auto-approved", hpPercent: 97, kcadPercent: 3,
+    aiConfidenceScore: 97,
     sources: [
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97 },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3 }
@@ -302,7 +313,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by M. Davis on Sep 01, 2025",
     regulatoryReferences: ["OSHA 1910.219"],
     aiConfidence: "High", aiReason: "Standard rotating equipment safety requirement.",
-    status: "pending", hpPercent: 10, kcadPercent: 90,
+    status: "auto-approved", hpPercent: 10, kcadPercent: 90,
+    aiConfidenceScore: 90,
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10 }
@@ -317,7 +329,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by E. Torres on Nov 22, 2025",
     regulatoryReferences: ["OSHA 1910.38"],
     aiConfidence: "High", aiReason: "Direct match to universal H&P emergency protocols.",
-    status: "pending", hpPercent: 96, kcadPercent: 4,
+    status: "auto-approved", hpPercent: 96, kcadPercent: 4,
+    aiConfidenceScore: 96,
     sources: [
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96 },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4 }
@@ -332,6 +345,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Standard equipment specification inherited from KCAD.",
     status: "pending", hpPercent: 12, kcadPercent: 88,
+    aiConfidenceScore: 88,
     sources: [
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88 },
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12 }
@@ -345,7 +359,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by E. Torres on Nov 22, 2025",
     regulatoryReferences: ["OSHA 1910.38", "API RP 75"],
     aiConfidence: "High", aiReason: "Direct match to H&P drill frequency requirements.",
-    status: "pending", hpPercent: 92, kcadPercent: 8,
+    status: "auto-approved", hpPercent: 92, kcadPercent: 8,
+    aiConfidenceScore: 92,
     sources: [
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92 },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8 }
@@ -359,7 +374,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     lastVerified: "Reviewed by E. Torres on Nov 22, 2025",
     regulatoryReferences: ["OSHA 1910.38"],
     aiConfidence: "High", aiReason: "Direct match to H&P fire emergency protocols.",
-    status: "pending", hpPercent: 100, kcadPercent: 0,
+    status: "auto-approved", hpPercent: 100, kcadPercent: 0,
+    aiConfidenceScore: 100,
     sources: [
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100 }
     ]
@@ -373,6 +389,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Medevac details vary by location — verify coordinates are current.",
     status: "pending", hpPercent: 30, kcadPercent: 70,
+    aiConfidenceScore: 70,
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 60 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30 },
@@ -388,6 +405,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.157", "API RP 14G"],
     aiConfidence: "High", aiReason: "Standard emergency equipment inspection requirement.",
     status: "pending", hpPercent: 18, kcadPercent: 82,
+    aiConfidenceScore: 82,
     sources: [
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82 },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18 }
@@ -398,7 +416,36 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
 export function ReviewScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+
+  // AI Auto-approval settings
+  const [aiThreshold, setAiThreshold] = useState<number>(() => {
+    const saved = localStorage.getItem("hp_doc_ai_threshold");
+    return saved ? JSON.parse(saved).threshold : 90;
+  });
+  const [isAutoApprovalEnabled, setIsAutoApprovalEnabled] = useState<boolean>(() => {
+    const saved = localStorage.getItem("hp_doc_ai_threshold");
+    return saved ? JSON.parse(saved).enabled : true;
+  });
+
   const [paragraphs, setParagraphs] = useState<ParagraphData[]>(INITIAL_PARAGRAPHS);
+
+  // Re-evaluate auto-approval when settings change
+  useEffect(() => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.status === 'auto-approved') {
+        if (!isAutoApprovalEnabled || p.aiConfidenceScore < aiThreshold) {
+          return { ...p, status: 'pending' };
+        }
+      }
+      if (p.status === 'pending') {
+        if (isAutoApprovalEnabled && p.aiConfidenceScore >= aiThreshold) {
+          return { ...p, status: 'auto-approved' };
+        }
+      }
+      return p;
+    }));
+  }, [aiThreshold, isAutoApprovalEnabled]);
+
   const [activeId, setActiveId] = useState<string | null>(null);
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
   const [calloutTopPx, setCalloutTopPx] = useState(0);
@@ -595,7 +642,7 @@ export function ReviewScreen() {
   // ── Per-section review progress ──
   const sectionProgress = (sectionId: string) => {
     const sectionParas = paragraphs.filter(p => p.sectionId === sectionId);
-    const reviewed = sectionParas.filter(p => p.status === 'approved' || p.status === 'rejected').length;
+    const reviewed = sectionParas.filter(p => p.status === 'approved' || p.status === 'rejected' || p.status === 'auto-approved').length;
     return { reviewed, total: sectionParas.length };
   };
 
@@ -617,7 +664,17 @@ export function ReviewScreen() {
     >
       <style>{REVIEW_STYLES}</style>
 
-      <Header breadcrumb={t("review.title")} showOnlineStatus={true} showUser={true} />
+      <Header
+        breadcrumb={t("review.title")}
+        showOnlineStatus={true}
+        showUser={true}
+        aiApprovalSettings={{
+          threshold: aiThreshold,
+          setThreshold: setAiThreshold,
+          enabled: isAutoApprovalEnabled,
+          setEnabled: setIsAutoApprovalEnabled
+        }}
+      />
 
       {/* ═══ Stepper Bar ═══ */}
       <div
@@ -824,15 +881,17 @@ export function ReviewScreen() {
                     const isActive = activeId === p.id;
                     const isApproved = p.status === "approved";
                     const isRejected = p.status === "rejected";
+                    const isAutoApproved = p.status === "auto-approved";
 
                     let leftBorderColor = "transparent";
                     if (isActive) leftBorderColor = "var(--color-brand)";
-                    else if (isApproved) leftBorderColor = "var(--color-positive)";
+                    else if (isApproved || isAutoApproved) leftBorderColor = "var(--color-positive)";
                     else if (isRejected) leftBorderColor = "var(--color-negative)";
 
                     let bgColor = "transparent";
                     if (isActive) bgColor = "var(--bg-hover)";
                     else if (isApproved) bgColor = "var(--color-positive-bg)";
+                    else if (isAutoApproved) bgColor = "transparent";
                     else if (isRejected) bgColor = "var(--color-error-bg)";
 
                     return (
@@ -849,13 +908,13 @@ export function ReviewScreen() {
                           transition: "background-color 150ms ease-in, border-color 200ms ease-out",
                         }}
                         onMouseEnter={(e) => {
-                          if (!isActive && !isApproved && !isRejected) {
+                          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
                             e.currentTarget.style.backgroundColor = "var(--bg-hover)";
                             e.currentTarget.style.borderLeftColor = "var(--color-brand)";
                           }
                         }}
                         onMouseLeave={(e) => {
-                          if (!isActive && !isApproved && !isRejected) {
+                          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
                             e.currentTarget.style.backgroundColor = "transparent";
                             e.currentTarget.style.borderLeftColor = "transparent";
                           }
@@ -873,6 +932,21 @@ export function ReviewScreen() {
                         )}
 
                         <div className="flex flex-col gap-1.5 w-full pr-10">
+                          {isAutoApproved && (
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] h-5 font-semibold px-2 mb-1 self-start"
+                              style={{
+                                backgroundColor: "transparent",
+                                color: "var(--color-positive)",
+                                borderColor: "rgba(17,104,68,0.25)",
+                                borderStyle: "dashed",
+                              }}
+                            >
+                              Auto-approved by AI
+                            </Badge>
+                          )}
+
                           {p.isEdited && (
                             <span 
                               className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] self-start" 
@@ -883,7 +957,7 @@ export function ReviewScreen() {
                           )}
 
                           <div className="flex items-start gap-2 w-full">
-                            {isApproved && (
+                            {(isApproved || isAutoApproved) && (
                               <Check
                                 className="w-[16px] h-[16px] shrink-0 mt-0.5"
                                 style={{
@@ -1018,7 +1092,7 @@ export function ReviewScreen() {
           onClick={(e) => e.stopPropagation()}
         >
           {/* ── Top Zone: AI Confidence (static, pinned) ── */}
-          <AIConfidenceCard data={selectedParagraph || null} />
+          <AIConfidenceCard data={selectedParagraph || null} threshold={aiThreshold} />
 
           {/* ── Bottom Zone: Annotation Details (flexible, scrollable) ── */}
           <div className="flex-1 overflow-y-auto relative">

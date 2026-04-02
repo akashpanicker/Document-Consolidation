@@ -23,9 +23,10 @@ export interface ParagraphData {
   lastVerified: string;
   regulatoryReferences: string[];
   aiConfidence: 'High' | 'Medium' | 'Low';
+  aiConfidenceScore: number;
   aiReason: string;
   conflict?: string;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'auto-approved';
   rejectReason?: string;
   hpPercent: number;
   kcadPercent: number;
@@ -41,9 +42,10 @@ export interface ParagraphData {
  * ────────────────────────────────────────────── */
 interface AIConfidenceCardProps {
   data: ParagraphData | null;
+  threshold: number;
 }
 
-export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
+export function AIConfidenceCard({ data, threshold }: AIConfidenceCardProps) {
   const { t } = useTranslation();
   const [barAnimated, setBarAnimated] = useState(false);
   const prevIdRef = useRef<string | null>(null);
@@ -78,6 +80,14 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
       </div>
     );
   }
+
+  const confidenceScore = data.aiConfidenceScore;
+  const isAboveThreshold = confidenceScore >= threshold;
+  const isWarningZone = !isAboveThreshold && confidenceScore >= threshold - 10;
+
+  let confidenceColor = "var(--color-negative)";
+  if (isAboveThreshold) confidenceColor = "var(--color-positive)";
+  else if (isWarningZone) confidenceColor = "var(--color-warning)";
 
   return (
     <div
@@ -148,8 +158,38 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
         </span>
       </div>
 
+      {/* Confidence threshold bar */}
+      <div className="flex flex-col gap-1.5 mt-1">
+        <div 
+          className="w-full h-1.5 rounded-full overflow-hidden"
+          style={{ backgroundColor: "var(--bg-hover)" }}
+        >
+          <div 
+            style={{ 
+              width: `${confidenceScore}%`,
+              backgroundColor: confidenceColor,
+              height: "100%",
+              borderRadius: "999px",
+              transition: "width 400ms ease-out, background-color 200ms ease-in"
+            }}
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          {isAboveThreshold ? (
+            <CheckCircle className="w-3.5 h-3.5" style={{ color: "var(--color-positive)" }} />
+          ) : (
+            <ShieldAlert className="w-3.5 h-3.5" style={{ color: isWarningZone ? "var(--color-warning)" : "var(--color-negative)" }} />
+          )}
+          <span className="text-[11px] font-bold" style={{ color: confidenceColor }}>
+            {isAboveThreshold 
+              ? `Above auto-approval threshold (${confidenceScore}%) — approved automatically` 
+              : `Below threshold (${confidenceScore}%) — manual review required`}
+          </span>
+        </div>
+      </div>
+
       {/* AI reason note */}
-      <p className="text-[12px] flex items-start gap-2 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+      <p className="text-[12px] flex items-start gap-2 leading-relaxed mt-1" style={{ color: "var(--text-secondary)" }}>
         <Info className="w-[14px] h-[14px] shrink-0 mt-0.5" style={{ color: "var(--text-tertiary)" }} />
         {data.aiReason}
       </p>
