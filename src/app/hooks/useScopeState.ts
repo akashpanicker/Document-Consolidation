@@ -382,8 +382,8 @@ export function useScopeState() {
     let statusInterval: ReturnType<typeof setInterval>;
     let successTimeout: ReturnType<typeof setTimeout>;
 
-    const duration = 4000;
-    const intervalTime = 50;
+    const duration = 1000;
+    const intervalTime = 40;
     const increment = 100 / (duration / intervalTime);
     let currentProgress = 0;
 
@@ -395,14 +395,14 @@ export function useScopeState() {
         setIsSuccess(true);
         successTimeout = setTimeout(() => {
           navigate("/review");
-        }, 600);
+        }, 200);
       }
       setProgress(Math.min(currentProgress, 100));
     }, intervalTime);
 
     statusInterval = setInterval(() => {
       setStatusIndex((prev) => (prev + 1) % STATUS_MESSAGES_COUNT);
-    }, 2000);
+    }, 150);
 
     return () => {
       clearInterval(progressInterval);

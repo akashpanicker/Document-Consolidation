@@ -447,6 +447,7 @@ export function ReviewScreen() {
   }, [aiThreshold, isAutoApprovalEnabled]);
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const isAllReviewed = paragraphs.length > 0 && paragraphs.every(p => p.status !== 'pending');
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
   const [calloutTopPx, setCalloutTopPx] = useState(0);
 
@@ -1134,6 +1135,13 @@ export function ReviewScreen() {
           icon={<ArrowLeft className="w-[14px] h-[14px]" />}
           variant="secondary"
           onClick={() => navigate("/scope")}
+        />
+        <FooterButton
+          label="Complete Review"
+          icon={<Check className="w-[14px] h-[14px]" />}
+          variant="primary"
+          disabled={!isAllReviewed}
+          onClick={() => navigate("/dashboard")}
         />
       </StickyFooter>
     </div>
