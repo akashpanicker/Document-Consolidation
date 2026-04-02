@@ -162,6 +162,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P source with no conflicts.",
     status: "pending", hpPercent: 98, kcadPercent: 2,
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98 },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2 }
+    ]
   },
   {
     id: "p2", sectionId: "s1",
@@ -172,6 +176,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.119", "EPA 40 CFR 112"],
     aiConfidence: "High", aiReason: "Safely integrated multiple regulatory requirements from KCAD legacy standard.",
     status: "pending", hpPercent: 25, kcadPercent: 75,
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25 }
+    ]
   },
   {
     id: "p3", sectionId: "s1",
@@ -182,6 +190,9 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P source with no conflicts.",
     status: "pending", hpPercent: 100, kcadPercent: 0,
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100 }
+    ]
   },
   {
     id: "p4", sectionId: "s1",
@@ -192,6 +203,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.119"],
     aiConfidence: "High", aiReason: "Standard compliance requirement inherited from KCAD.",
     status: "pending", hpPercent: 20, kcadPercent: 80,
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80 },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20 }
+    ]
   },
   {
     id: "p5", sectionId: "s1",
@@ -202,6 +217,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Supersession clause — verify against any active third-party agreements.",
     status: "pending", hpPercent: 85, kcadPercent: 15,
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85 },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15 }
+    ]
   },
   // ── Section 2: Hazard Identification & Controls ──
   {
@@ -213,6 +232,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Synthesized from multiple regional guidelines; requires manual verification.",
     status: "pending", hpPercent: 72, kcadPercent: 28,
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72 },
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28 }
+    ]
   },
   {
     id: "p7", sectionId: "s2",
@@ -224,6 +247,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     aiConfidence: "Low", aiReason: "Conflicting legacy standards detected during AI merge.",
     conflict: "KCAD specifies 15 min threshold, H&P specifies 30 min",
     status: "pending", hpPercent: 45, kcadPercent: 55,
+    sources: [
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45 }
+    ]
   },
   {
     id: "p8", sectionId: "s2",
@@ -234,6 +261,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Direct match to H&P BOP verification protocols.",
     status: "pending", hpPercent: 95, kcadPercent: 5,
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95 },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5 }
+    ]
   },
   {
     id: "p9", sectionId: "s2",
@@ -244,6 +275,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.1000", "API RP 49"],
     aiConfidence: "High", aiReason: "Standard H\u2082S monitoring requirement from KCAD.",
     status: "pending", hpPercent: 15, kcadPercent: 85,
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15 }
+    ]
   },
   {
     id: "p10", sectionId: "s2",
@@ -254,6 +289,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "High", aiReason: "Direct match to H&P mud weight management procedures.",
     status: "pending", hpPercent: 97, kcadPercent: 3,
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97 },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3 }
+    ]
   },
   {
     id: "p11", sectionId: "s2",
@@ -264,6 +303,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.219"],
     aiConfidence: "High", aiReason: "Standard rotating equipment safety requirement.",
     status: "pending", hpPercent: 10, kcadPercent: 90,
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10 }
+    ]
   },
   // ── Section 3: Emergency Response ──
   {
@@ -275,6 +318,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.38"],
     aiConfidence: "High", aiReason: "Direct match to universal H&P emergency protocols.",
     status: "pending", hpPercent: 96, kcadPercent: 4,
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96 },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4 }
+    ]
   },
   {
     id: "p13", sectionId: "s3",
@@ -285,6 +332,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["API RP 53"],
     aiConfidence: "High", aiReason: "Standard equipment specification inherited from KCAD.",
     status: "pending", hpPercent: 12, kcadPercent: 88,
+    sources: [
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88 },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12 }
+    ]
   },
   {
     id: "p14", sectionId: "s3",
@@ -295,6 +346,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.38", "API RP 75"],
     aiConfidence: "High", aiReason: "Direct match to H&P drill frequency requirements.",
     status: "pending", hpPercent: 92, kcadPercent: 8,
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92 },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8 }
+    ]
   },
   {
     id: "p15", sectionId: "s3",
@@ -305,6 +360,9 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.38"],
     aiConfidence: "High", aiReason: "Direct match to H&P fire emergency protocols.",
     status: "pending", hpPercent: 100, kcadPercent: 0,
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100 }
+    ]
   },
   {
     id: "p16", sectionId: "s3",
@@ -315,6 +373,11 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: [],
     aiConfidence: "Medium", aiReason: "Medevac details vary by location — verify coordinates are current.",
     status: "pending", hpPercent: 30, kcadPercent: 70,
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 60 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30 },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 10 }
+    ]
   },
   {
     id: "p17", sectionId: "s3",
@@ -325,6 +388,10 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     regulatoryReferences: ["OSHA 1910.157", "API RP 14G"],
     aiConfidence: "High", aiReason: "Standard emergency equipment inspection requirement.",
     status: "pending", hpPercent: 18, kcadPercent: 82,
+    sources: [
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82 },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18 }
+    ]
   },
 ].map(p => ({ ...p, ...(PARAGRAPH_EXTRAS[p.id] ?? {}) })) as ParagraphData[];
 
@@ -867,12 +934,50 @@ export function ReviewScreen() {
                                 </div>
                               </div>
                             ) : (
-                              <span
-                                className="text-[15px] leading-relaxed flex-1"
-                                style={{ color: "var(--text-primary)" }}
-                              >
-                                {p.text}
-                              </span>
+                              <div className="flex flex-col gap-2 flex-1 w-full">
+                                <span
+                                  className="text-[15px] leading-relaxed flex-1 font-medium"
+                                  style={{ color: "var(--text-primary)" }}
+                                >
+                                  {p.text}
+                                </span>
+
+                                {/* Inline Source Chips */}
+                                {p.sources && p.sources.length > 0 && (
+                                  <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                                    {p.sources.map((src, i) => (
+                                      <div 
+                                        key={i}
+                                        title={`${src.documentName} (${src.origin})`}
+                                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip"
+                                        style={{
+                                          backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.03)" : "rgba(17,104,68,0.03)",
+                                          borderColor: isActive 
+                                            ? (src.origin === 'H&P' ? "rgba(43,85,151,0.4)" : "rgba(17,104,68,0.4)")
+                                            : (src.origin === 'H&P' ? "rgba(43,85,151,0.12)" : "rgba(17,104,68,0.12)"),
+                                          fontSize: "11px",
+                                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
+                                          opacity: isActive ? 1 : 0.7,
+                                          transform: isActive ? "translateY(-1px)" : "none",
+                                          boxShadow: isActive ? "0 2px 4px rgba(0,0,0,0.04)" : "none",
+                                        }}
+                                      >
+                                        <span 
+                                          className="font-black text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" 
+                                          style={{ 
+                                            backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(17,104,68,0.1)",
+                                            color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
+                                          }}
+                                        >
+                                          {src.origin}
+                                        </span>
+                                        <span className="max-w-[220px] truncate font-medium group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
+                                        <span className="text-[10px] opacity-40 font-bold tabular-nums">· {src.percentage}%</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
                             )}
                           </div>
                         </div>

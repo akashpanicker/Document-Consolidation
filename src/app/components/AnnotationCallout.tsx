@@ -6,6 +6,13 @@ import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { useTranslation } from "react-i18next";
 
+export interface SourceContribution {
+  documentName: string;
+  origin: 'H&P' | 'KCAD';
+  percentage: number;
+  url?: string;
+}
+
 export interface ParagraphData {
   id: string;
   sectionId: string;
@@ -26,6 +33,7 @@ export interface ParagraphData {
   originalText?: string;
   sourceDocumentUrl?: string;
   excludedExcerpts?: string[];
+  sources?: SourceContribution[];
 }
 
 /* ──────────────────────────────────────────────
