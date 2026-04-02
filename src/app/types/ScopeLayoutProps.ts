@@ -11,6 +11,7 @@ export interface SourceDocument {
   region: string;
   rig: string;
   url: string;
+  hasMsBadge?: boolean;
 }
 
 export interface Activity {

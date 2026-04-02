@@ -45,243 +45,250 @@ const _DATES = [
   "27 Jan 2024","10 Feb 2024","23 Mar 2024","06 Apr 2023",
   "17 May 2023","29 Jun 2023","11 Jul 2023","24 Aug 2023",
 ];
-const _RIGS = ["rig-1","rig-2","rig-3","rig-4","rig-5"];
+const _RIGS = ["land-rig", "offshore-rig", "workover-rig", "drilling-rig", "completion-rig", "coiled-tubing-rig", "snubbing-unit"];
 const _ALL_ACTIVITY_IDS = [
   "life-critical","hse-governance","drilling-ops","well-control","pipe-tubular",
   "mud-solids","pressure-drilling-line","rig-move","lifting-hoisting","tools-equipment",
   "maintenance-electrical","non-drilling","emergency-response","environmental-logistics","loto",
 ];
 
-const _HP_TEMPLATES: Array<{ prefix: string; category: string; names: string[] }> = [
-  { prefix: "HSE", category: "HSE", names: [
-    "Hot Work Procedure","H₂S Monitoring and Response","Confined Space Entry",
-    "Permit to Work System","Job Safety Analysis","Chemical Handling Protocol",
-    "PPE Requirements Standard","Noise Exposure Control","Ergonomics Standard",
-    "Radiation Safety Procedure","Biological Hazard Control","Fatigue Risk Management",
-    "Alcohol and Drug Policy","Heat Stress Management","Cold Weather Operations",
-    "Dropped Objects Prevention","Hand Injury Prevention","Slip Trip and Fall Prevention",
-    "Eye and Face Protection","Respiratory Protection Program",
-  ]},
-  { prefix: "WC", category: "Well Control", names: [
-    "Well Control Manual","BOP Testing and Maintenance","Kick Detection Procedure",
-    "Blowout Prevention Plan","Pressure Control Operations","Diverter System Operations",
-    "Casing Design Standard","Cementing Procedure","Pore Pressure Prediction",
-    "Kill Sheet Preparation","Mud Weight Program","Annular Pressure Management",
-    "Choke Manifold Operations","Well Barrier Policy","Stripping Operations",
-    "Volumetric Well Control","Lubricate and Bleed Procedure","Gas Migration Monitoring",
-    "Underground Blowout Response","Well Control Drills and Exercises",
-  ]},
-  { prefix: "RM", category: "Rig Management", names: [
-    "Rig Floor Safety Procedures","Crane Operations Manual","Rig Move Procedure",
-    "Equipment Inspection Standard","Preventive Maintenance Schedule","Rig Commissioning Plan",
-    "Hoisting Operations Guide","Tubular Handling Procedure","Iron Roughneck Operations",
-    "Top Drive Maintenance","Drawworks Inspection","Crown Block Safety",
-    "Traveling Block Maintenance","Weight Indicator Calibration","Rotary Table Operations",
-    "Kelly Drive Maintenance","Mast and Substructure Inspection","Rig Floor Layout Standard",
-    "Mousehole and Rathole Procedures","Rig Down and Move Checklist",
-  ]},
-  { prefix: "DR", category: "Drilling", names: [
-    "Drilling Program Template","Directional Drilling Guide","Mud Program Design",
-    "Bit Selection Criteria","Drilling Hazards Manual","Lost Circulation Procedure",
-    "Stuck Pipe Prevention Guide","Wellbore Stability Analysis","Coring Operations",
-    "Logging Operations Manual","Underbalanced Drilling Procedure","Managed Pressure Drilling",
-    "Horizontal Drilling Guide","Extended Reach Drilling","Deepwater Drilling Standard",
-    "HPHT Drilling Procedure","Geothermal Drilling Standard","Coal Bed Methane Drilling",
-    "Air Drilling Operations","Foam Drilling Procedure",
-  ]},
-  { prefix: "ME", category: "Maintenance & Electrical", names: [
-    "Electrical Safety Standard","LOTO Procedure","Motor Control Center Maintenance",
-    "Generator Maintenance Guide","Instrumentation Calibration","Control System Procedure",
-    "Pressure Vessel Inspection","Pump Maintenance Schedule","Valve Testing Procedure",
-    "Cooling System Maintenance","Hydraulic System Maintenance","Pneumatic System Guide",
-    "Cathodic Protection Standard","Transformer Maintenance","UPS System Maintenance",
-    "Variable Frequency Drive Maintenance","PLC Programming Standard","SCADA System Procedure",
-    "Vibration Monitoring Program","Thermographic Inspection",
-  ]},
-  { prefix: "ENV", category: "Environmental", names: [
-    "Waste Management Plan","Spill Response Procedure","Environmental Monitoring Program",
-    "Water Discharge Standard","Air Emissions Control","Soil Contamination Response",
-    "Wildlife Protection Protocol","Carbon Emissions Reporting","Chemical Inventory Management",
-    "Environmental Audit Procedure","Noise Pollution Control","Light Pollution Standard",
-    "Biodiversity Assessment","Stormwater Management","Groundwater Monitoring",
-    "Oilfield Waste Disposal","Drilling Fluid Management","Reserve Pit Closure",
-    "Produced Water Management","Environmental Impact Reporting",
-  ]},
-  { prefix: "OPS", category: "Operations", names: [
-    "Operations Management Manual","Shift Handover Procedure","Daily Reporting Standard",
-    "Contractor Management Plan","Management of Change","Lessons Learned Process",
-    "KPI Monitoring Procedure","Operational Risk Assessment","Work Permit System",
-    "Critical Task Analysis","Simultaneous Operations Plan","Non-Routine Operations",
-    "Third Party Operations Guide","Remote Operations Procedure","Offshore Operations Manual",
-    "Night Operations Standard","Emergency Shutdown Procedure","Process Isolation",
-    "Line Breaking Procedure","Excavation and Ground Disturbance",
-  ]},
-  { prefix: "SF", category: "Safety", names: [
-    "Safety Management System","Incident Investigation Procedure","Emergency Drill Schedule",
-    "Safety Observation Program","Behavior Based Safety","Stop Work Authority Policy",
-    "Safety Leadership Framework","Near Miss Reporting","Safety Metrics Dashboard",
-    "Risk Register Management","Bowtie Analysis Guide","Safety Critical Roles",
-    "Safety Alert Distribution","Lessons Learned Integration","Process Hazard Analysis",
-    "Layer of Protection Analysis","Safety Integrity Level Assessment","Pre-Startup Safety Review",
-    "Management of Change Safety Review","Safety Case Development",
-  ]},
-  { prefix: "TR", category: "Training", names: [
-    "New Employee Orientation","Competency Assessment Framework","Skills Training Matrix",
-    "Refresher Training Schedule","On-the-Job Training Guide","Simulator Training Procedure",
-    "Certification Requirements","Training Record Management","Technical Training Standard",
-    "Leadership Development Program","Cross-Training Initiative","E-Learning Platform Guide",
-    "Safety Training Passport","Annual Training Plan","Onboarding Checklist",
-    "Toolbox Talk Program","Pre-Job Safety Meeting","Competency Verification",
-    "Mentoring Program","Knowledge Transfer Procedure",
-  ]},
-  { prefix: "EM", category: "Emergency Response", names: [
-    "Emergency Response Plan","Muster Station Procedure","Evacuation Drill Guide",
-    "Medical Emergency Response","Fire Fighting Procedure","Rescue Operations Manual",
-    "Crisis Communication Plan","Business Continuity Plan","Pandemic Response",
-    "Natural Disaster Response","Security Incident Response","Toxic Release Response",
-    "Mass Casualty Plan","Search and Rescue Procedure","Man Overboard Response",
-    "Helicopter Emergency Procedure","Structural Collapse Response","Explosion Response",
-    "Well Blowout Emergency Response","Spill Emergency Response",
-  ]},
+const _TITLES = [
+  "Environmental Management Plan", "Waste Disposal Procedure", "Spill Response Guide",
+  "HSE Risk Assessment", "Safety Induction Manual", "Drilling Operations Standard",
+  "BOP Maintenance Instruction", "Well Control Handover", "Emergency Muster Procedure",
+  "Chemical Handling Standard", "Rig Floor Safety Rules", "Lifting Operations Manual",
+  "Permit to Work Standard", "Incident Reporting Procedure", "Asset Integrity Guide",
+];
+const _KCAD_CODES = ["AZ", "CW", "KS", "AL", "SA", "OM", "CO", "PK", "EU", "AU"];
+const _KCAD_REGIONS = [
+  { label: "Americas", reg: "united-states", cnt: "us" },
+  { label: "Europe", reg: "europe", cnt: "eu" },
+  { label: "MENA", reg: "saudi-arabia", cnt: "sa" },
+  { label: "Asia Pacific", reg: "pakistan", cnt: "pk" },
+  { label: "Canada", reg: "canada", cnt: "ca" },
+  { label: "Australia", reg: "australia", cnt: "au" },
+  { label: "Oman", reg: "oman", cnt: "om" },
+  { label: "Algeria", reg: "algeria", cnt: "dz" },
+  { label: "Pakistan", reg: "pakistan", cnt: "pk" },
+  { label: "Colombia", reg: "brazil", cnt: "br" }, // using brazil as proxy
+  { label: "Kazakhstan", reg: "russia", cnt: "ru" }, // using russia as proxy
+  { label: "Corporate", reg: "united-kingdom", cnt: "gb" },
 ];
 
-const _KCAD_TEMPLATES: Array<{ prefix: string; category: string; names: string[] }> = [
-  { prefix: "KCAD-HSE", category: "HSE", names: [
-    "Global HSE Standard","HSE Management System","Risk Management Framework",
-    "Hazard Identification Process","Corporate Safety Rules","Life Saving Rules",
-    "HSE Performance Standard","Contractor HSE Requirements","Process Safety Management",
-    "Asset Integrity Standard","Safety Case Requirement","HSE Legal Register",
-    "Safety Critical Equipment","HSE Culture Assessment","Personal Safety Plan",
-    "Major Accident Hazard Register","Safety Critical Maintenance","HSE Audit Protocol",
-    "HSE Reporting Standard","Health Risk Assessment",
-  ]},
-  { prefix: "KCAD-WI", category: "Well Control", names: [
-    "Well Integrity Management System","Well Lifecycle Standard","Pressure Testing Protocol",
-    "Well Barrier Elements","Annulus Pressure Management","Tubing Integrity Monitoring",
-    "Christmas Tree Maintenance","Wellhead Inspection Standard","Downhole Safety Valve",
-    "Corrosion Management","Scale Management","Hydrate Prevention",
-    "Flow Assurance Standard","Production Optimization","Artificial Lift Standard",
-    "Well Abandonment Procedure","Plug and Abandonment Standard","Zonal Isolation Verification",
-    "Well Integrity Risk Assessment","Long-Term Well Monitoring",
-  ]},
-  { prefix: "KCAD-ENV", category: "Environmental", names: [
-    "Environmental Compliance Guide","ISO 14001 Implementation","Environmental Impact Assessment",
-    "Carbon Neutrality Roadmap","Scope 3 Emissions Reporting","Biodiversity Net Gain",
-    "Water Stewardship Standard","Circular Economy Standard","Plastic Reduction Policy",
-    "Deforestation-Free Standard","Methane Reduction Program","Flaring Reduction Policy",
-    "Environmental Liability Management","Remediation Standard","Site Decommissioning",
-    "ESIA Methodology","Environmental Permit Management","Air Quality Monitoring",
-    "Ecological Survey Standard","Cumulative Impact Assessment",
-  ]},
-  { prefix: "KCAD-RM", category: "Rig Management", names: [
-    "Rotating Equipment Safeguards","Mechanical Integrity Program","Equipment Reliability",
-    "Maintenance Management System","Spare Parts Management","Vendor Management",
-    "Equipment Life Extension","Fitness for Service Assessment","Inspection Frequency Matrix",
-    "Corrosion Under Insulation","Pressure Relief System","Safety Instrumented System",
-    "Alarm Management Standard","Control Valve Maintenance","Heat Exchanger Cleaning",
-    "Static Equipment Inspection","Dynamic Equipment Standard","Piping Integrity Management",
-    "Tank Inspection Standard","Subsea Equipment Maintenance",
-  ]},
-  { prefix: "KCAD-EM", category: "Emergency Response", names: [
-    "Emergency Equipment Requirements","Emergency Response Organization","Crisis Management",
-    "Business Resilience Standard","Incident Command System","Emergency Contact Directory",
-    "Mutual Aid Agreement","Emergency Communication Plan","Evacuation Route Planning",
-    "Emergency Resource Inventory","Post-Incident Review","Emergency Budget Planning",
-    "Tabletop Exercise Guide","Full-Scale Exercise Standard","Recovery Operations",
-    "Emergency Notification System","External Agency Coordination","Media Management",
-    "Emergency Command Center","Emergency Logistics Standard",
-  ]},
-  { prefix: "KCAD-DR", category: "Drilling", names: [
-    "Drilling Engineering Standard","Well Design Philosophy","Casing Program Design",
-    "Completion Design Standard","Drilling Contractor Selection","Well Cost Estimation",
-    "Drilling Performance Metrics","NPT Reduction Program","Technology Qualification",
-    "Digital Drilling Standard","Automated Drilling Guide","Drilling Data Management",
-    "Well Prognosis Template","Post-Well Review","Lessons Learned Integration",
-    "Drilling Risk Assessment","Technical Limit Drilling","Benchmarking Standard",
-    "Rig Selection Criteria","Drilling Tender Management",
-  ]},
-  { prefix: "KCAD-OPS", category: "Operations", names: [
-    "Operations Excellence Framework","Asset Management Standard","Operations Readiness",
-    "Startup and Shutdown Procedure","Abnormal Situation Management","Process Optimization",
-    "Operational Discipline","Field Operations Manual","Production Reporting",
-    "Energy Management System","Utility Optimization","Reliability-Centered Maintenance",
-    "Total Productive Maintenance","5S Workplace Standard","Visual Management",
-    "Operational Risk Control","Production Loss Management","Permit to Work Governance",
-    "Key Performance Indicator Framework","Operational Learning Standard",
-  ]},
-  { prefix: "KCAD-SF", category: "Safety", names: [
-    "Personnel Safety Handbook","Golden Rules of Safety","Critical Control Management",
-    "Safety Culture Maturity Model","Psychological Safety Framework","Human Factors Standard",
-    "Error Prevention Tools","Crew Resource Management","Safety Perception Survey",
-    "Leading Indicators Guide","Safety Recognition Program","Community Safety Standard",
-    "Road Safety Policy","Lone Worker Safety","Contractor Safety Management",
-    "Occupational Health Standard","Ergonomic Assessment","Manual Handling",
-    "Driver Safety Standard","Marine Safety Standard",
-  ]},
-  { prefix: "KCAD-ME", category: "Maintenance & Electrical", names: [
-    "Electrical Area Classification","Hazardous Area Equipment Standard","Intrinsic Safety Standard",
-    "High Voltage Operations","Lightning Protection","Grounding and Bonding",
-    "Power System Reliability","Electrical Isolation Standard","Arc Flash Protection",
-    "Thermal Imaging Program","Motor Management System","Variable Speed Drive",
-    "Battery System Maintenance","Solar Power Integration","Smart Grid Standard",
-    "Electrical Equipment Inspection","Switchgear Maintenance","Cable Management",
-    "Earthing and Bonding Verification","Electrical Safety Management",
-  ]},
-  { prefix: "KCAD-TR", category: "Training", names: [
-    "Global Training Standard","Learning Management System","Digital Learning Content",
-    "Competency Framework","Succession Planning","Knowledge Management",
-    "Expert Network Program","Mentoring Standard","Coaching Program",
-    "Cross-Functional Training","Leadership Training Program","Technical Excellence Program",
-    "Graduate Development Standard","Apprenticeship Standard","Continuous Learning Culture",
-    "Training Needs Analysis","Competency Assurance","Workforce Development Plan",
-    "Job Task Analysis","Performance Support Standard",
-  ]},
-];
+function _generateKcadDocs(): SourceDocument[] {
+  const real: SourceDocument[] = [
+    {
+      id: "kc-1", origin: "KCAD",
+      name: "K-AZ 012 Environmental Management Work Instruction.pdf",
+      code: "K-AZ-012", revision: "Rev. 02", category: "Checklist",
+      activities: ["environmental-logistics"], lastUpdated: "27 Jan 2024",
+      country: "az", region: "azerbaijan", rig: "land-rig",
+      url: "https://example.com/kc-012", hasMsBadge: true,
+    },
+    {
+      id: "kc-2", origin: "KCAD",
+      name: "K-CW 100 Environmental Management Guide.pdf",
+      code: "K-CW-100", revision: "Rev. 01", category: "Standard",
+      activities: ["environmental-logistics"], lastUpdated: "10 Feb 2024",
+      country: "dz", region: "algeria", rig: "land-rig",
+      url: "https://example.com/kc-100", hasMsBadge: true,
+    },
+    {
+      id: "kc-3", origin: "KCAD",
+      name: "K-CW 103 Environmental Management Guide — Corporate.pdf",
+      code: "K-CW-103", revision: "Rev. 03", category: "Standard",
+      activities: ["environmental-logistics"], lastUpdated: "23 Mar 2024",
+      country: "om", region: "oman", rig: "offshore-rig",
+      url: "https://example.com/kc-103", hasMsBadge: true,
+    },
+    {
+      id: "kc-4", origin: "KCAD",
+      name: "K-CW 023 Environmental Management Procedure.pdf",
+      code: "K-CW-023", revision: "Rev. 01", category: "Procedure",
+      activities: ["environmental-logistics"], lastUpdated: "06 Apr 2023",
+      country: "kw", region: "kuwait", rig: "land-rig",
+      url: "https://example.com/kc-023", hasMsBadge: true,
+    },
+    {
+      id: "kc-5", origin: "KCAD",
+      name: "K-CW 002 Health and Safety Procedure.pdf",
+      code: "K-CW-002", revision: "Rev. 02", category: "Procedure",
+      activities: ["hse-governance"], lastUpdated: "17 May 2023",
+      country: "iq", region: "iraq", rig: "land-rig",
+      url: "https://example.com/kc-002", hasMsBadge: true,
+    },
+    {
+      id: "kc-6", origin: "KCAD",
+      name: "K-KS 027 Health and Safety Procedure — Kazakhstan.pdf",
+      code: "K-KS-027", revision: "Rev. 01", category: "Procedure",
+      activities: ["hse-governance"], lastUpdated: "29 Jun 2023",
+      country: "ru", region: "russia", rig: "land-rig",
+      url: "https://example.com/kc-027", hasMsBadge: true,
+    },
+    {
+      id: "kc-7", origin: "KCAD",
+      name: "K-AL 056 Operations Work Instruction — Algeria.pdf",
+      code: "K-AL-056", revision: "Rev. 04", category: "Checklist",
+      activities: ["non-drilling"], lastUpdated: "11 Jul 2023",
+      country: "dz", region: "algeria", rig: "land-rig",
+      url: "https://example.com/kc-056", hasMsBadge: true,
+    },
+  ];
 
-function _generateDocs(
-  origin: "H&P" | "KCAD",
-  templates: typeof _HP_TEMPLATES,
-  idPrefix: string,
-): SourceDocument[] {
-  const docs: SourceDocument[] = [];
-  let seq = 1;
+  const generated: SourceDocument[] = [];
+  for (let i = 8; i <= 1000; i++) {
+    const codeExt = _KCAD_CODES[i % _KCAD_CODES.length];
+    const num = String(i).padStart(3, "0");
+    const title = _TITLES[i % _TITLES.length];
+    const regObj = _KCAD_REGIONS[i % _KCAD_REGIONS.length];
+    
+    let cat = "Standard";
+    if (title.includes("Procedure")) cat = "Procedure";
+    else if (title.includes("Instruction") || title.includes("Checklist")) cat = "Checklist";
 
-  for (const tpl of templates) {
-    for (let ni = 0; ni < tpl.names.length; ni++) {
-      // 5 region/rig variants per name → 10 templates × 20 names × 5 = 1000 per origin
-      for (let v = 0; v < 5; v++) {
-        const i = seq++;
-        const rc = _REGIONS[(i * 7 + v * 3) % _REGIONS.length];
-        const actCount = 1 + (i % 3);
-        const actStart = (i * 4 + v) % _ALL_ACTIVITY_IDS.length;
-        const activities = Array.from({ length: actCount }, (_, a) =>
-          _ALL_ACTIVITY_IDS[(actStart + a) % _ALL_ACTIVITY_IDS.length]
-        );
-        const codeNum = String(i).padStart(3, "0");
-        const name = v === 0 ? tpl.names[ni] : `${tpl.names[ni]} — ${rc.region.split("-").map(w => w[0].toUpperCase() + w.slice(1)).join(" ")}`;
-        docs.push({
-          id: `${idPrefix}-${i}`,
-          origin,
-          name,
-          code: `${tpl.prefix}-${codeNum}`,
-          revision: _REVISIONS[(i * 3) % _REVISIONS.length],
-          category: tpl.category,
-          activities,
-          lastUpdated: _DATES[(i * 11) % _DATES.length],
-          country: rc.country,
-          region: rc.region,
-          rig: _RIGS[(i * 2 + v) % _RIGS.length],
-          url: `https://example.com/${idPrefix}-${codeNum}`,
-        });
-      }
-    }
+    generated.push({
+      id: `kc-${i}`,
+      origin: "KCAD",
+      name: `K-${codeExt} ${num} ${title} — ${regObj.label}.pdf`,
+      code: `K-${codeExt}-${num}`,
+      revision: _REVISIONS[i % _REVISIONS.length],
+      category: cat,
+      activities: [_ALL_ACTIVITY_IDS[i % _ALL_ACTIVITY_IDS.length]],
+      lastUpdated: _DATES[i % _DATES.length],
+      country: regObj.cnt,
+      region: regObj.reg,
+      rig: _RIGS[i % _RIGS.length],
+      url: `https://example.com/kc-${i}`,
+    });
   }
-  return docs;
+  return [...real, ...generated];
+}
+
+function _generateHpDocs(): SourceDocument[] {
+  const real: SourceDocument[] = [
+    {
+      id: "hp-1", origin: "H&P",
+      name: "EM01 Scope of Environmental Management System.pdf",
+      code: "EM01", revision: "Rev. 04", category: "Standard",
+      activities: ["environmental-logistics"], lastUpdated: "12 Dec 2024",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-em01", hasMsBadge: true,
+    },
+    {
+      id: "hp-2", origin: "H&P",
+      name: "EM11 Calibration.pdf",
+      code: "EM11", revision: "Rev. 02", category: "Checklist",
+      activities: ["environmental-logistics"], lastUpdated: "15 Jan 2025",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-em11",
+    },
+    {
+      id: "hp-3", origin: "H&P",
+      name: "EM13 Internal EMS Audit.pdf",
+      code: "EM13", revision: "Rev. 03", category: "Checklist",
+      activities: ["environmental-logistics", "hse-governance"], lastUpdated: "22 Mar 2025",
+      country: "ca", region: "canada", rig: "offshore-rig",
+      url: "https://example.com/hp-em13",
+    },
+    {
+      id: "hp-4", origin: "H&P",
+      name: "HSE 003.pdf",
+      code: "HSE-003", revision: "Rev. 01", category: "Standard",
+      activities: ["hse-governance"], lastUpdated: "05 Apr 2025",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-hse003",
+    },
+    {
+      id: "hp-5", origin: "H&P",
+      name: "HSE 004 Confined Space Entry Procedure.pdf",
+      code: "HSE-004", revision: "Rev. 06", category: "Procedure",
+      activities: ["life-critical"], lastUpdated: "30 Jun 2024",
+      country: "gb", region: "united-kingdom", rig: "offshore-rig",
+      url: "https://example.com/hp-hse004",
+    },
+    {
+      id: "hp-6", origin: "H&P",
+      name: "HSE 005 Hot Work Procedure.pdf",
+      code: "HSE-005", revision: "Rev. 05", category: "Procedure",
+      activities: ["life-critical"], lastUpdated: "12 Jul 2024",
+      country: "gb", region: "united-kingdom", rig: "offshore-rig",
+      url: "https://example.com/hp-hse005",
+    },
+    {
+      id: "hp-7", origin: "H&P",
+      name: "HSE 008 Lock-out Tag-out Try-out Procedure.pdf",
+      code: "HSE-008", revision: "Rev. 04", category: "Procedure",
+      activities: ["loto"], lastUpdated: "25 Aug 2024",
+      country: "ca", region: "canada", rig: "land-rig",
+      url: "https://example.com/hp-hse008",
+    },
+    {
+      id: "hp-8", origin: "H&P",
+      name: "HSE 016 DROPS Manual.pdf",
+      code: "HSE-016", revision: "Rev. 08", category: "Standard",
+      activities: ["rig-move", "lifting-hoisting"], lastUpdated: "08 Sep 2024",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-hse016", hasMsBadge: true,
+    },
+    {
+      id: "hp-9", origin: "H&P",
+      name: "HSE 019 Hydrogen Sulfide H2S Policy.pdf",
+      code: "HSE-019", revision: "Rev. 03", category: "Policy",
+      activities: ["emergency-response"], lastUpdated: "19 Oct 2024",
+      country: "sa", region: "saudi-arabia", rig: "land-rig",
+      url: "https://example.com/hp-hse019",
+    },
+    {
+      id: "hp-10", origin: "H&P",
+      name: "HSE 025 Buffer Zones and Barricades Procedure.pdf",
+      code: "HSE-025", revision: "Rev. 02", category: "Procedure",
+      activities: ["rig-move"], lastUpdated: "01 Nov 2024",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-hse025",
+    },
+    {
+      id: "hp-11", origin: "H&P",
+      name: "GDE-PPHG-0001.pdf",
+      code: "GDE-PPHG-0001", revision: "Rev. 01", category: "Standard",
+      activities: ["drilling-ops"], lastUpdated: "15 Dec 2024",
+      country: "us", region: "united-states", rig: "land-rig",
+      url: "https://example.com/hp-gde0001", hasMsBadge: true,
+    },
+  ];
+
+  const generated: SourceDocument[] = [];
+  const prefixes = ["HSE", "EM", "GDE", "PPHG"];
+  for (let i = 12; i <= 1000; i++) {
+    const prefix = prefixes[i % prefixes.length];
+    const num = String(i).padStart(3, "0");
+    const title = _TITLES[i % _TITLES.length];
+    const rc = _REGIONS[i % _REGIONS.length];
+    
+    let cat = "Standard";
+    if (title.includes("Procedure")) cat = "Procedure";
+    else if (title.includes("Instruction") || title.includes("Checklist")) cat = "Checklist";
+
+    generated.push({
+      id: `hp-${i}`,
+      origin: "H&P",
+      name: `${prefix} ${num} ${title} — ${rc.region.split("-").map(w => w[0].toUpperCase() + w.slice(1)).join(" ")}.pdf`,
+      code: `${prefix}-${num}`,
+      revision: _REVISIONS[i % _REVISIONS.length],
+      category: cat,
+      activities: [_ALL_ACTIVITY_IDS[i % _ALL_ACTIVITY_IDS.length]],
+      lastUpdated: _DATES[i % _DATES.length],
+      country: rc.country,
+      region: rc.region,
+      rig: _RIGS[i % _RIGS.length],
+      url: `https://example.com/hp-${i}`,
+    });
+  }
+  return [...real, ...generated];
 }
 
 export const SOURCE_DOCUMENTS: SourceDocument[] = [
-  ..._generateDocs("H&P",  _HP_TEMPLATES,   "hp"),
-  ..._generateDocs("KCAD", _KCAD_TEMPLATES, "kc"),
+  ..._generateHpDocs(),
+  ..._generateKcadDocs(),
 ];
 
 export const STATUS_MESSAGES_COUNT = 7;
@@ -307,12 +314,29 @@ export function useScopeState() {
   };
 
   const { hpDocs, kcadDocs } = useMemo(() => {
-    const rawFiltered = SOURCE_DOCUMENTS.filter((doc) => {
+    let rawFiltered = SOURCE_DOCUMENTS.filter((doc) => {
       if (regions.length > 0 && !regions.includes(doc.region)) return false;
       if (rigTypes.length > 0 && !rigTypes.includes(doc.rig)) return false;
       if (selectedActivities.length > 0 && !doc.activities.some((a) => selectedActivities.includes(a))) return false;
       return true;
     });
+
+    // Fallback: If no results, show some "Suggested" documents instead of an empty screen
+    if (rawFiltered.length === 0) {
+      // Pick some documents that match at least ONE of the filters if possible
+      rawFiltered = SOURCE_DOCUMENTS.filter((doc) => {
+        if (regions.length > 0 && regions.includes(doc.region)) return true;
+        if (selectedActivities.length > 0 && doc.activities.some((a) => selectedActivities.includes(a))) return true;
+        return false;
+      });
+      
+      // If still empty (e.g. no regions/activities selected OR all mismatch), show a random selection
+      if (rawFiltered.length === 0) {
+        rawFiltered = SOURCE_DOCUMENTS.slice(0, 10);
+      } else {
+        rawFiltered = rawFiltered.slice(0, 15); // Limit fallback to 15 suggested items
+      }
+    }
 
     const hp = rawFiltered.filter((d) => d.origin === "H&P");
     const kc = rawFiltered.filter((d) => d.origin === "KCAD");

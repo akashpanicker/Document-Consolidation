@@ -1,11 +1,11 @@
 import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
 import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
-import { Badge } from "../components/ui/badge";
 import { Checkbox } from "../components/ui/checkbox";
 import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
+import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
 import { useState } from "react";
-import { ArrowLeft, Sparkles, FileText, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
+import { ArrowLeft, Sparkles, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ScopeLayoutProps, SourceDocument } from "../types/ScopeLayoutProps";
 
@@ -266,6 +266,17 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
   );
 }
 
+/* ── Doc type badge ── */
+const DOC_TYPE_MAP: Record<string, { label: string; bg: string; color: string }> = {
+  "Procedure": { label: "Procedure", bg: "rgba(16,185,129,0.12)", color: "#10b981" },
+  "Policy":    { label: "Policy",    bg: "rgba(139,92,246,0.12)", color: "#8b5cf6" },
+  "Standard":  { label: "Standard",  bg: "rgba(43,85,151,0.12)",  color: "var(--color-brand)" },
+  "Checklist": { label: "Checklist", bg: "rgba(245,158,11,0.12)", color: "#f59e0b" },
+};
+function docType(category: string) {
+  return DOC_TYPE_MAP[category] ?? { label: "Standard", bg: "rgba(43,85,151,0.12)", color: "var(--color-brand)" };
+}
+
 /* ── Document Column Component ── */
 function DocumentColumn({
   origin,
@@ -294,170 +305,182 @@ function DocumentColumn({
   const allSelected = docs.length > 0 && columnSelectedCount === docs.length;
   const isIndeterminate = columnSelectedCount > 0 && columnSelectedCount < docs.length;
 
+  // col widths
+  const W = { cb: 40, type: 100, action: 40 };
+  const hdrCell: React.CSSProperties = {
+    fontSize: 11, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
+    color: "var(--color-text-tertiary, var(--text-muted))", fontFamily: "Inter, sans-serif",
+    whiteSpace: "nowrap", flexShrink: 0,
+  };
+
   return (
-    <div className="flex flex-col gap-2 h-full min-h-0 overflow-hidden">
-      {/* Title above table */}
-      <h3 className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+    <div className="flex flex-col gap-2 h-full min-h-0">
+      {/* Title */}
+      <h3 className="text-[13px] font-bold uppercase tracking-wide shrink-0" style={{ color: "var(--text-secondary)" }}>
         {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
       </h3>
 
-      {/* Search bar */}
-      <div style={{ position: "relative" }}>
-        <Search
-          className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
-          style={{ left: 10, width: 13, height: 13, color: "var(--text-muted)" }}
-        />
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+      {/* Search */}
+      <div className="shrink-0" style={{ position: "relative" }}>
+        <Search className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ left: 10, width: 13, height: 13, color: "var(--text-muted)" }} />
+        <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
           placeholder="Search documents..."
           style={{
-            width: "100%",
-            paddingLeft: 30,
-            paddingRight: 12,
-            paddingTop: 7,
-            paddingBottom: 7,
-            fontSize: 13,
-            fontFamily: "Inter, sans-serif",
-            borderRadius: 6,
-            backgroundColor: "var(--color-surface-2)",
-            border: "1px solid var(--color-surface-5)",
-            color: "var(--color-text-primary)",
-            outline: "none",
-          }}
-        />
+            width: "100%", paddingLeft: 30, paddingRight: 12, paddingTop: 7, paddingBottom: 7,
+            fontSize: 13, fontFamily: "Inter, sans-serif", borderRadius: 6,
+            backgroundColor: "var(--color-surface-2)", border: "1px solid var(--color-surface-5)",
+            color: "var(--color-text-primary)", outline: "none",
+          }} />
       </div>
 
       {/* Card */}
-      <div
-        className="rounded-[10px] flex flex-col overflow-hidden flex-1 min-h-0"
-        style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}
-      >
-        {/* Column Header */}
-        <div
-          className="flex items-center gap-3 px-5 py-3.5"
-          style={{ borderBottom: "var(--border-default)" }}
-        >
-          <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+      <div className="rounded-[10px] flex flex-col overflow-hidden flex-1 min-h-0"
+        style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}>
+
+        {/* Header row */}
+        <div className="flex items-center px-3 shrink-0"
+          style={{ height: 40, borderBottom: "var(--border-default)", backgroundColor: "var(--color-surface-1, var(--bg-hover))" }}>
+          <div style={{ width: W.cb, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+            onClick={(e) => e.stopPropagation()}>
             <Checkbox
               checked={allSelected ? true : isIndeterminate ? "indeterminate" : false}
               onCheckedChange={onToggleAll}
               className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)] data-[state=indeterminate]:bg-[var(--color-brand)] data-[state=indeterminate]:border-[var(--color-brand)]"
             />
           </div>
-          <span className="text-[13px] font-semibold" style={{ color: "var(--text-primary)" }}>
-            Document Name
-          </span>
-          <span className="text-[12px] font-medium ml-auto" style={{ color: "var(--text-muted)" }}>
-            ({filtered.length})
-          </span>
+          <div style={{ width: 300, flexShrink: 0, display: "flex", alignItems: "center", gap: 6, paddingLeft: 6 }}>
+            <span style={hdrCell}>Document Name</span>
+            <span style={{ ...hdrCell, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>
+              ({filtered.length})
+            </span>
+          </div>
+          <div style={{ width: W.type, flexShrink: 0, paddingLeft: 8 }}><span style={hdrCell}>Type</span></div>
+          <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}><span style={hdrCell}>Activities</span></div>
+          <div style={{ width: W.action, flexShrink: 0 }} />
         </div>
 
-      {/* Document List */}
-      <div className="flex flex-col overflow-y-auto flex-1 min-h-0">
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
-            <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
-            <p className="text-[13px] text-center" style={{ color: "var(--text-muted)" }}>
-              {search.trim() ? "No documents match your search." : t("scope.noDocuments", { origin })}
-            </p>
-          </div>
-        ) : (
-          filtered.map((doc) => {
+        {/* Rows */}
+        <div className="flex flex-col overflow-y-auto flex-1 min-h-0">
+          {filtered.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
+              <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
+              <p className="text-[13px] text-center" style={{ color: "var(--text-muted)" }}>
+                {search.trim() ? "No documents match your search." : t("scope.noDocuments", { origin })}
+              </p>
+            </div>
+          ) : filtered.map((doc) => {
             const isSelected = selectedDocs.includes(doc.id);
+            const type = docType(doc.category);
+            const visibleActs = doc.activities.slice(0, 3);
+            const overflowActs = doc.activities.slice(3);
             return (
-              <div
-                key={doc.id}
-                onClick={() => onToggleDoc(doc.id)}
-                className="flex items-center gap-3 px-5 py-3 cursor-pointer group"
+              <div key={doc.id} onClick={() => onToggleDoc(doc.id)}
+                className="flex items-center px-3 cursor-pointer"
                 style={{
-                  borderBottom: "var(--border-subtle)",
+                  height: 52, flexShrink: 0, borderBottom: "var(--border-subtle)",
                   backgroundColor: isSelected ? "rgba(43,85,151,0.06)" : "transparent",
-                  transition: "background-color 150ms ease-in, opacity 200ms ease-out, max-height 200ms ease-out",
+                  transition: "background-color 150ms ease-in",
                 }}
                 onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "var(--bg-hover)"; }}
-                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}
-              >
-                {/* Checkbox */}
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    checked={isSelected}
-                    onCheckedChange={() => onToggleDoc(doc.id)}
-                    className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)]"
-                  />
+                onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = "transparent"; }}>
+
+                {/* Col 1 — Checkbox */}
+                <div style={{ width: W.cb, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}
+                  onClick={(e) => e.stopPropagation()}>
+                  <Checkbox checked={isSelected} onCheckedChange={() => onToggleDoc(doc.id)}
+                    className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)]" />
                 </div>
 
-                {/* Icon */}
-                <div
-                  className="w-[32px] h-[32px] rounded-[6px] flex items-center justify-center shrink-0"
-                  style={{ backgroundColor: isSelected ? "transparent" : "var(--bg-hover)" }}
-                >
-                  <FileText className="w-[16px] h-[16px]" style={{ color: isSelected ? "var(--color-brand)" : "var(--text-muted)" }} />
-                </div>
-
-                {/* Info */}
-                <div className="flex flex-col gap-0.5 flex-1 min-w-0">
-                  <span className="text-[13px] font-semibold truncate" style={{ color: "var(--text-primary)" }}>
-                    {doc.code.split("-")[0]} {doc.code.split("-")[1]} — {doc.name}
+                {/* Col 2 — Doc info */}
+                <div style={{ width: 300, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2, paddingLeft: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", fontFamily: "Inter, sans-serif",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
+                    {doc.name}
+                    {doc.hasMsBadge && (
+                      <span style={{ 
+                        fontSize: 8.5, fontWeight: 800, padding: "0 3px", borderRadius: 2, 
+                        backgroundColor: "var(--color-brand)", color: "#fff", marginLeft: 6,
+                        flexShrink: 0, height: 14, display: "flex", alignItems: "center"
+                      }}>MS</span>
+                    )}
                   </span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[12px]" style={{ color: "var(--text-muted)" }}>
-                      {doc.code} · {doc.revision}
-                    </span>
-                    <span className="text-[12px]" style={{ color: "var(--text-muted)" }}>
-                      · {doc.lastUpdated}
-                    </span>
-                  </div>
+                  <span style={{ fontSize: 11, color: "var(--text-muted)", fontFamily: "Inter, sans-serif",
+                    overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {doc.code} · {doc.revision} · {doc.lastUpdated}
+                  </span>
                 </div>
 
-                {/* Activity Tags */}
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {doc.activities.slice(0, 3).map(actId => {
-                    const actName = t(`scope.activities.${actId}`);
-                    return (
-                      <Badge
-                        key={actId}
-                        variant="secondary"
-                        className="text-[10px] font-semibold px-2 py-0.5"
-                        style={{
-                          backgroundColor: "var(--bg-hover)",
-                          color: "var(--text-secondary)",
-                          border: "1px solid var(--border-default)",
-                        }}
-                      >
-                        {actName}
-                      </Badge>
-                    );
-                  })}
-                  {doc.activities.length > 3 && (
-                    <span className="text-[11px] font-medium ml-0.5" style={{ color: "var(--text-muted)" }}>
-                      +{doc.activities.length - 3}
+                {/* Col 3 — Type badge */}
+                <div style={{ width: W.type, flexShrink: 0, paddingLeft: 8 }}>
+                  <span style={{
+                    display: "inline-flex", alignItems: "center",
+                    fontSize: 11, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                    padding: "2px 8px", borderRadius: 4,
+                    backgroundColor: type.bg, color: type.color, whiteSpace: "nowrap",
+                  }}>
+                    {type.label}
+                  </span>
+                </div>
+
+                {/* Col 4 — Category tags */}
+                <div style={{ flex: 1, minWidth: 0, paddingLeft: 8, display: "flex", alignItems: "center", gap: 4, overflow: "hidden" }}>
+                  {visibleActs.map(actId => (
+                    <span key={actId} style={{
+                      display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
+                      fontSize: 10, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                      padding: "2px 6px", borderRadius: 4,
+                      backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
+                      border: "1px solid var(--border-default)",
+                      overflow: "hidden", textOverflow: "ellipsis", maxWidth: 76,
+                    }}>
+                      {t(`scope.activities.${actId}`, actId)}
                     </span>
+                  ))}
+                  {overflowActs.length > 0 && (
+                    <Popover>
+                      <PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+                        <span style={{
+                          display: "inline-flex", alignItems: "center", cursor: "pointer", whiteSpace: "nowrap",
+                          fontSize: 10, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                          padding: "2px 6px", borderRadius: 4,
+                          backgroundColor: "var(--bg-hover)", color: "var(--text-muted)",
+                          border: "1px solid var(--border-default)", flexShrink: 0,
+                        }}>
+                          +{overflowActs.length}
+                        </span>
+                      </PopoverTrigger>
+                      <PopoverContent side="top" style={{ padding: "10px 12px", width: "auto", maxWidth: 240 }}>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {overflowActs.map(actId => (
+                            <span key={actId} style={{ fontSize: 12, fontFamily: "Inter, sans-serif", color: "var(--text-primary)" }}>
+                              {t(`scope.activities.${actId}`, actId)}
+                            </span>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                   )}
                 </div>
 
-                {/* View Button */}
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <a
-                      href={doc.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center shrink-0 rounded-[5px] w-[28px] h-[28px]"
-                      style={{ color: "var(--color-brand)", backgroundColor: "rgba(43,85,151,0.08)" }}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <ExternalLink className="w-[13px] h-[13px]" />
-                    </a>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">View document in new tab</TooltipContent>
-                </Tooltip>
+                {/* Col 5 — View */}
+                <div style={{ width: W.action, flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <a href={doc.url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center justify-center rounded-[5px] w-[28px] h-[28px]"
+                        style={{ color: "var(--color-brand)", backgroundColor: "rgba(43,85,151,0.08)" }}
+                        onClick={(e) => e.stopPropagation()}>
+                        <ExternalLink className="w-[13px] h-[13px]" />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">View document in new tab</TooltipContent>
+                  </Tooltip>
+                </div>
               </div>
             );
-          })
-        )}
-      </div>
+          })}
+        </div>
       </div>
     </div>
   );
