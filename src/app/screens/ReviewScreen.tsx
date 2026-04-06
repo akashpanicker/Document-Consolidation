@@ -1,11 +1,20 @@
 import { useState, useRef, useEffect, useCallback, MouseEvent } from "react";
 import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
-import { ArrowLeft, Check, FileSearch, Pencil } from "lucide-react";
-import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown } from "lucide-react";
+import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
 import { Badge } from "../components/ui/badge";
+import { Input } from "../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../components/ui/select";
 
 /* ── Custom keyframe styles injected via a <style> tag ── */
 const REVIEW_STYLES = `
@@ -30,7 +39,7 @@ const SECTIONS = [
   { id: "s3", title: "3. Emergency Response" },
 ];
 
-const PARAGRAPH_EXTRAS: Record<string, { sourceDocumentUrl: string; excludedExcerpts: string[] }> = {
+const PARAGRAPH_EXTRAS: Record<string, { sourceDocumentUrl?: string; excludedExcerpts?: string[]; suggestedForAppendix?: boolean; suggestedAppendixName?: string; }> = {
   p1: {
     sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
     excludedExcerpts: [
@@ -292,7 +301,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
   },
   {
     id: "p10", sectionId: "s2",
-    text: "Drilling fluid weight must be maintained within the approved mud weight window at all times. Any deviation of more than 0.2 ppg from the planned mud weight requires immediate notification to the Drilling Engineer and Sr. QHSC Manager before operations continue.",
+    text: "Drilling fluid weight must be maintained within the approved mud weight window at all times. Any deviation of more than 0.2 ppg from the planned mud weight requires immediate notification to the Drilling Engineer and Sr. QHSE Manager before operations continue.",
     sourceDocument: "H&P Operations Manual", origin: "H&P",
     applicability: "Applies to: All Land Rigs",
     lastVerified: "Reviewed by A. Lewis on Jan 14, 2026",
@@ -413,6 +422,62 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
   },
 ].map(p => ({ ...p, ...(PARAGRAPH_EXTRAS[p.id] ?? {}) })) as ParagraphData[];
 
+function MoveToAppendixPopover({ suggestedName, existingAppendices, onConfirm, onCancel }: { suggestedName: string; existingAppendices: string[]; onConfirm: (name: string) => void; onCancel: () => void; }) {
+  const [newAppendixName, setNewAppendixName] = useState(suggestedName || `Appendix ${String.fromCharCode(65 + existingAppendices.length)} — `);
+  return (
+    <div
+      className="absolute top-full left-0 mt-2 z-50 flex flex-col gap-3 p-3 rounded-[8px] shadow-lg animate-in fade-in slide-in-from-top-2 duration-200"
+      style={{ border: "1px solid #D0D8E8", minWidth: 280 }}
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="flex flex-col gap-1.5">
+        <label className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+          Appendix name
+        </label>
+        <Input
+          value={newAppendixName}
+          onChange={(e) => setNewAppendixName(e.target.value)}
+          placeholder="e.g. Appendix A — KSA Requirements"
+          className="h-8 text-[13px]"
+          autoFocus
+        />
+      </div>
+      {existingAppendices.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+            Add to existing
+          </label>
+          <Select
+            onValueChange={(val) => {
+              if (val) setNewAppendixName(val);
+            }}
+            value={existingAppendices.includes(newAppendixName) ? newAppendixName : ""}
+          >
+            <SelectTrigger size="sm" className="text-[13px]">
+              <SelectValue placeholder="Select an appendix..." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {existingAppendices.map(app => (
+                  <SelectItem key={app} value={app}>{app}</SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+      <div className="flex gap-2 justify-end mt-1">
+        <button type="button" onClick={onCancel} className="text-[12px] h-7 px-3 rounded-[6px] font-medium transition-colors hover:bg-[var(--bg-card)]" style={{ color: "var(--text-secondary)" }}>
+          Cancel
+        </button>
+        <button type="button" onClick={() => { if (newAppendixName.trim()) { onConfirm(newAppendixName.trim()); } }} disabled={!newAppendixName.trim()} className="text-[12px] h-7 px-3 rounded-[6px] font-semibold transition-colors disabled:opacity-50" style={{ backgroundColor: "var(--color-brand)", color: "var(--text-on-primary)" }}>
+          Confirm
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ReviewScreen() {
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -423,6 +488,9 @@ export function ReviewScreen() {
   const isAllReviewed = paragraphs.length > 0 && paragraphs.every(p => p.status !== 'pending');
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
   const [calloutTopPx, setCalloutTopPx] = useState(0);
+  const [badgePopoverId, setBadgePopoverId] = useState<string | null>(null);
+
+  const allAppendices = Array.from(new Set(paragraphs.filter(p => p.appendixName).map(p => p.appendixName!)));
 
   // Editing state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -558,6 +626,17 @@ export function ReviewScreen() {
     setActiveId(null);
   };
 
+  const handleMoveToAppendix = (id: string, newAppName: string) => {
+    setParagraphs(prev => prev.map(p => p.id === id ? { ...p, appendixName: newAppName, suggestedForAppendix: false } : p));
+    if (activeId === id) {
+      setTimeout(() => setActiveId(null), 200);
+    }
+  };
+
+  const dismissSuggestion = (id: string) => {
+    setParagraphs(prev => prev.map(p => p.id === id ? { ...p, suggestedForAppendix: false } : p));
+  };
+
   const startEditing = (p: ParagraphData, e: MouseEvent) => {
     e.stopPropagation();
     if (editingId && editingId !== p.id) {
@@ -630,6 +709,161 @@ export function ReviewScreen() {
   const pathLength = lineCoords
     ? Math.sqrt(Math.pow(lineCoords.x2 - lineCoords.x1, 2) + Math.pow(lineCoords.y2 - lineCoords.y1, 2)) * 1.3
     : 0;
+
+  const renderParagraph = (p: ParagraphData) => {
+    const isActive = activeId === p.id;
+    const isApproved = p.status === "approved";
+    const isRejected = p.status === "rejected";
+    const isAutoApproved = p.status === "auto-approved";
+    const isMoved = !!p.appendixName;
+
+    let leftBorderColor = "transparent";
+    if (isActive) leftBorderColor = "var(--color-brand)";
+    else if (isMoved && !isApproved && !isRejected && !isAutoApproved) leftBorderColor = "var(--color-secondary, #8B5CF6)";
+    else if (isApproved || isAutoApproved) leftBorderColor = "var(--color-positive)";
+    else if (isRejected) leftBorderColor = "var(--color-negative)";
+
+    let bgColor = "transparent";
+    if (isActive) bgColor = "var(--bg-hover)";
+    else if (isApproved) bgColor = "var(--color-positive-bg)";
+    else if (isAutoApproved) bgColor = "transparent";
+    else if (isRejected) bgColor = "var(--color-error-bg)";
+
+    return (
+      <div
+        key={p.id}
+        ref={(el) => { paragraphRefs.current[p.id] = el; }}
+        onClick={(e) => handleParagraphClick(p.id, e)}
+        className="relative group transition-all duration-200"
+        style={{
+          padding: "16px 24px 16px 20px",
+          borderLeft: `4px solid ${leftBorderColor}`,
+          backgroundColor: bgColor,
+          borderBottom: "none",
+        }}
+        onMouseEnter={(e) => {
+          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
+            e.currentTarget.style.backgroundColor = "var(--bg-hover)";
+            e.currentTarget.style.borderLeftColor = "var(--color-brand)";
+          }
+        }}
+        onMouseLeave={(e) => {
+          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
+            e.currentTarget.style.backgroundColor = "transparent";
+            e.currentTarget.style.borderLeftColor = isMoved ? "var(--color-secondary, #8B5CF6)" : "transparent";
+          }
+        }}
+      >
+        {editingId !== p.id && (
+          <button
+            onClick={(e) => startEditing(p, e)}
+            className="absolute right-4 top-4 p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            style={{ color: "var(--text-muted)", backgroundColor: "var(--bg-hover)" }}
+          >
+            <Pencil className="w-[14px] h-[14px]" />
+          </button>
+        )}
+
+        <div className="flex flex-col gap-1.5 w-full pr-10">
+          {isAutoApproved && (
+            <Badge variant="outline" className="text-[10px] h-5 font-semibold px-2 mb-1 self-start" style={{ backgroundColor: "transparent", color: "var(--color-positive)", borderColor: "rgba(17,104,68,0.25)", borderStyle: "dashed" }}>
+              Auto-approved by AI
+            </Badge>
+          )}
+
+          {p.isEdited && (
+            <span className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] self-start" style={{ backgroundColor: "var(--bg-hover)", color: "var(--text-muted)" }}>
+              {t("review.edited")}
+            </span>
+          )}
+
+          <div className="flex items-start gap-2 w-full">
+            {(isApproved || isAutoApproved) && (
+              <Check className="w-[16px] h-[16px] shrink-0 mt-0.5" style={{ color: "var(--color-positive)", animation: "fadeIn 200ms ease-out" }} />
+            )}
+
+            {editingId === p.id ? (
+              <div className="flex flex-col w-full gap-3">
+                <textarea
+                  ref={editAreaRef}
+                  value={editingText}
+                  onChange={(e) => {
+                    setEditingText(e.target.value);
+                    e.target.style.height = "auto";
+                    e.target.style.height = e.target.scrollHeight + "px";
+                  }}
+                  onKeyDown={(e) => { if (e.key === "Escape") discardEdit(); }}
+                  className="w-full text-[15px] leading-relaxed bg-transparent resize-none overflow-hidden outline-none animate-in fade-in duration-150"
+                  style={{ color: "var(--text-primary)", border: "1px solid var(--color-brand)", borderRadius: "6px", padding: "8px 12px", marginLeft: "-13px", marginTop: "-9px", boxShadow: "0 0 0 2px rgba(43,85,151,0.15)" }}
+                  autoFocus
+                />
+                <div className="flex gap-2 animate-in fade-in duration-150">
+                  <button onClick={(e) => { e.stopPropagation(); saveEdit(); }} className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-[var(--color-brand)] text-[var(--text-on-primary)]">{t("common.save", "Save")}</button>
+                  <button onClick={(e) => { e.stopPropagation(); discardEdit(); }} className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]">{t("common.discard", "Discard")}</button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2 flex-1 w-full relative">
+                <span className="text-[15px] leading-relaxed flex-1 font-medium" style={{ color: "var(--text-primary)" }}>
+                  {p.text}
+                </span>
+
+                {p.sources && p.sources.length > 0 && (
+                  <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] border transition-all cursor-default select-none" style={{ backgroundColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.08)" : p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.08)" : "rgba(247, 163, 168, 0.08)", borderColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.3)" : p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.3)" : "rgba(247, 163, 168, 0.3)", fontSize: "11px", color: p.aiConfidence === 'High' ? "var(--color-positive)" : p.aiConfidence === 'Medium' ? "var(--text-warning)" : "var(--color-negative)", fontWeight: 600 }}>
+                      {p.aiConfidence} Confidence
+                    </div>
+                    {p.sources.map((src, i) => (
+                      <div key={i} title={`${src.documentName} (${src.origin})`} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)", borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.2)" : "rgba(111, 143, 217, 0.2)", fontSize: "11px", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)", opacity: isActive ? 1 : 0.75 }}>
+                        <span className="font-bold text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(111,143,217,0.1)", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)" }}>{src.origin}</span>
+                        <span className="max-w-[220px] truncate font-normal group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
+                        <span className="text-[10px] opacity-40 font-bold tabular-nums">· {src.percentage}%</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {p.suggestedForAppendix && !p.appendixName && (
+                  <div className="relative inline-block self-start mt-1 z-20">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setBadgePopoverId(badgePopoverId === p.id ? null : p.id); }}
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border group/badge hover:bg-[rgba(139,92,246,0.15)] transition-colors cursor-pointer"
+                      style={{ backgroundColor: "rgba(139, 92, 246, 0.08)", borderColor: "rgba(139, 92, 246, 0.25)", color: "var(--color-secondary, #8B5CF6)" }}
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      <span className="text-[11px] font-bold">Suggested for Appendix</span>
+                      <ArrowRight className="w-3 h-3 group-hover/badge:translate-x-0.5 transition-transform" />
+                      <span
+                        onClick={(e) => { e.stopPropagation(); if (badgePopoverId === p.id) setBadgePopoverId(null); dismissSuggestion(p.id); }}
+                        className="ml-1 flex items-center justify-center p-0.5 rounded-full hover:bg-[rgba(139,92,246,0.2)] opacity-60 hover:opacity-100 transition-all"
+                      >
+                        <X className="w-3 h-3" />
+                      </span>
+                    </button>
+                    {badgePopoverId === p.id && (
+                      <MoveToAppendixPopover
+                        suggestedName={p.suggestedAppendixName || ""}
+                        existingAppendices={allAppendices}
+                        onConfirm={(name) => { handleMoveToAppendix(p.id, name); setBadgePopoverId(null); }}
+                        onCancel={() => setBadgePopoverId(null)}
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {isRejected && p.rejectReason && (
+          <div className="mt-3 text-[13px] font-medium p-2.5 rounded-[6px]" style={{ color: "var(--color-negative)", backgroundColor: "var(--color-error-bg)", border: "1px solid var(--color-negative)" }}>
+            <span className="font-bold">{t("review.rejectionReason", "Rejection Reason")}: </span>
+            {p.rejectReason}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -821,6 +1055,40 @@ export function ReviewScreen() {
                 </button>
               );
             })}
+
+            {/* Appendices Left Nav Item */}
+            <div className="mt-4 pt-4" style={{ borderTop: "var(--border-subtle)" }}>
+              <button
+                onClick={() => {
+                  const el = document.getElementById("appendix-zone");
+                  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  setActiveSectionId("appendices");
+                }}
+                className="text-left w-full px-3 py-2.5 rounded-[6px] transition-all duration-150 flex items-start justify-between gap-2"
+                style={{
+                  backgroundColor: activeSectionId === "appendices" ? "var(--bg-hover)" : "transparent",
+                  borderLeft: activeSectionId === "appendices" ? "3px solid var(--color-brand)" : "3px solid transparent",
+                }}
+              >
+                <span
+                  className="text-[13px] leading-tight"
+                  style={{
+                    color: activeSectionId === "appendices" ? "var(--text-primary)" : "var(--text-secondary)",
+                    fontWeight: activeSectionId === "appendices" ? 700 : 500,
+                  }}
+                >
+                  Appendices
+                </span>
+                <span className="text-[12px] font-semibold shrink-0 mt-0.5" style={{ color: "var(--text-muted)" }}>
+                  {(() => {
+                    const appChunks = paragraphs.filter(p => p.appendixName);
+                    if (appChunks.length === 0) return "0 / 0";
+                    const reviewed = appChunks.filter(p => p.status === 'approved' || p.status === 'rejected' || p.status === 'auto-approved').length;
+                    return `${reviewed} / ${appChunks.length}`;
+                  })()}
+                </span>
+              </button>
+            </div>
           </nav>
         </div>
 
@@ -849,220 +1117,44 @@ export function ReviewScreen() {
                 </div>
 
                 <div className="flex flex-col">
-                  {paragraphs.filter(p => p.sectionId === section.id).map((p) => {
-                    const isActive = activeId === p.id;
-                    const isApproved = p.status === "approved";
-                    const isRejected = p.status === "rejected";
-                    const isAutoApproved = p.status === "auto-approved";
-
-                    let leftBorderColor = "transparent";
-                    if (isActive) leftBorderColor = "var(--color-brand)";
-                    else if (isApproved || isAutoApproved) leftBorderColor = "var(--color-positive)";
-                    else if (isRejected) leftBorderColor = "var(--color-negative)";
-
-                    let bgColor = "transparent";
-                    if (isActive) bgColor = "var(--bg-hover)";
-                    else if (isApproved) bgColor = "var(--color-positive-bg)";
-                    else if (isAutoApproved) bgColor = "transparent";
-                    else if (isRejected) bgColor = "var(--color-error-bg)";
-
-                    return (
-                      <div
-                        key={p.id}
-                        ref={(el) => { paragraphRefs.current[p.id] = el; }}
-                        onClick={(e) => handleParagraphClick(p.id, e)}
-                        className="relative group"
-                        style={{
-                          padding: "16px 24px 16px 20px",
-                          borderLeft: `4px solid ${leftBorderColor}`,
-                          backgroundColor: bgColor,
-                          borderBottom: "none",
-                          transition: "background-color 150ms ease-in, border-color 200ms ease-out",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
-                            e.currentTarget.style.backgroundColor = "var(--bg-hover)";
-                            e.currentTarget.style.borderLeftColor = "var(--color-brand)";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (!isActive && !isApproved && !isRejected && !isAutoApproved) {
-                            e.currentTarget.style.backgroundColor = "transparent";
-                            e.currentTarget.style.borderLeftColor = "transparent";
-                          }
-                        }}
-                      >
-                        {/* Edit Button */}
-                        {editingId !== p.id && (
-                          <button
-                            onClick={(e) => startEditing(p, e)}
-                            className="absolute right-4 top-4 p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                            style={{ color: "var(--text-muted)", backgroundColor: "var(--bg-hover)" }}
-                          >
-                            <Pencil className="w-[14px] h-[14px]" />
-                          </button>
-                        )}
-
-                        <div className="flex flex-col gap-1.5 w-full pr-10">
-                          {isAutoApproved && (
-                            <Badge
-                              variant="outline"
-                              className="text-[10px] h-5 font-semibold px-2 mb-1 self-start"
-                              style={{
-                                backgroundColor: "transparent",
-                                color: "var(--color-positive)",
-                                borderColor: "rgba(17,104,68,0.25)",
-                                borderStyle: "dashed",
-                              }}
-                            >
-                              Auto-approved by AI
-                            </Badge>
-                          )}
-
-                          {p.isEdited && (
-                            <span 
-                              className="text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-[4px] self-start" 
-                              style={{ backgroundColor: "var(--bg-hover)", color: "var(--text-muted)" }}
-                            >
-                              {t("review.edited")}
-                            </span>
-                          )}
-
-                          <div className="flex items-start gap-2 w-full">
-                            {(isApproved || isAutoApproved) && (
-                              <Check
-                                className="w-[16px] h-[16px] shrink-0 mt-0.5"
-                                style={{
-                                  color: "var(--color-positive)",
-                                  animation: "fadeIn 200ms ease-out",
-                                }}
-                              />
-                            )}
-
-                            {editingId === p.id ? (
-                              <div className="flex flex-col w-full gap-3">
-                                <textarea
-                                  ref={editAreaRef}
-                                  value={editingText}
-                                  onChange={(e) => {
-                                    setEditingText(e.target.value);
-                                    e.target.style.height = "auto";
-                                    e.target.style.height = e.target.scrollHeight + "px";
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Escape") discardEdit();
-                                  }}
-                                  className="w-full text-[15px] leading-relaxed bg-transparent resize-none overflow-hidden outline-none animate-in fade-in duration-150"
-                                  style={{
-                                    color: "var(--text-primary)",
-                                    border: "1px solid var(--color-brand)",
-                                    borderRadius: "6px",
-                                    padding: "8px 12px",
-                                    marginLeft: "-13px",
-                                    marginTop: "-9px",
-                                    boxShadow: "0 0 0 2px rgba(43,85,151,0.15)",
-                                  }}
-                                  autoFocus
-                                />
-                                <div className="flex gap-2 animate-in fade-in duration-150">
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); saveEdit(); }}
-                                    className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-[var(--color-brand)] text-[var(--text-on-primary)]"
-                                  >
-                                    {t("common.save", "Save")}
-                                  </button>
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); discardEdit(); }}
-                                    className="px-4 h-8 rounded-[6px] text-[13px] font-semibold transition-colors bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]"
-                                  >
-                                    {t("common.discard", "Discard")}
-                                  </button>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col gap-2 flex-1 w-full">
-                                <span
-                                  className="text-[15px] leading-relaxed flex-1 font-medium"
-                                  style={{ color: "var(--text-primary)" }}
-                                >
-                                  {p.text}
-                                </span>
-
-                                {/* Inline Source Chips */}
-                                {p.sources && p.sources.length > 0 && (
-                                  <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                                    {/* AI Confidence Tag */}
-                                    <div
-                                      className="inline-flex items-center px-2 py-0.5 rounded-[4px] border transition-all cursor-default select-none"
-                                      style={{
-                                        backgroundColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.08)" : 
-                                                         p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.08)" : 
-                                                         "rgba(247, 163, 168, 0.08)",
-                                        borderColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.3)" : 
-                                                     p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.3)" : 
-                                                     "rgba(247, 163, 168, 0.3)",
-                                        fontSize: "11px",
-                                        color: p.aiConfidence === 'High' ? "var(--color-positive)" : 
-                                               p.aiConfidence === 'Medium' ? "var(--text-warning)" : 
-                                               "var(--color-negative)",
-                                        fontWeight: 600,
-                                      }}
-                                    >
-                                      {p.aiConfidence} Confidence
-                                    </div>
-
-                                    {p.sources.map((src, i) => (
-                                      <div 
-                                        key={i}
-                                        title={`${src.documentName} (${src.origin})`}
-                                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip"
-                                        style={{
-                                          backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)",
-                                          borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.2)" : "rgba(111, 143, 217, 0.2)",
-                                          fontSize: "11px",
-                                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)",
-                                          opacity: isActive ? 1 : 0.75,
-                                        }}
-                                      >
-                                        <span 
-                                          className="font-bold text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" 
-                                          style={{ 
-                                            backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(111,143,217,0.1)",
-                                            color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)",
-                                          }}
-                                        >
-                                          {src.origin}
-                                        </span>
-                                        <span className="max-w-[220px] truncate font-normal group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
-                                        <span className="text-[10px] opacity-40 font-bold tabular-nums">· {src.percentage}%</span>
-                                      </div>
-                                    ))}
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {isRejected && p.rejectReason && (
-                          <div
-                            className="mt-3 text-[13px] font-medium p-2.5 rounded-[6px]"
-                            style={{
-                              color: "var(--color-negative)",
-                              backgroundColor: "var(--color-error-bg)",
-                              border: "1px solid var(--color-negative)",
-                            }}
-                          >
-                            <span className="font-bold">{t("review.rejectionReason", "Rejection Reason")}: </span>
-                            {p.rejectReason}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {paragraphs.filter(p => p.sectionId === section.id && !p.appendixName).map(renderParagraph)}
                 </div>
               </div>
             ))}
+
+            {/* APPENDICES ZONE */}
+            <div id="appendix-zone" data-section-id="appendices" ref={(el) => { sectionRefs.current["appendices"] = el; }} className="scroll-mt-4">
+              <div className="flex items-center gap-4 mb-6 mt-4">
+                <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
+                <h3 className="text-[14px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>APPENDICES</h3>
+                <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
+              </div>
+
+              {allAppendices.length === 0 ? (
+                <div className="text-center p-8 rounded-[12px]" style={{ border: "1px dashed var(--border-default)" }}>
+                  <span className="text-[13px]" style={{ color: "var(--text-muted)" }}>
+                    No appendices yet — move region-specific content here from the document body.
+                  </span>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-8">
+                  {allAppendices.map(appName => {
+                    const appChunks = paragraphs.filter(p => p.appendixName === appName);
+                    return (
+                      <details key={appName} open className="group rounded-[12px] overflow-hidden" style={{ border: "1px solid #D0D8E8" }}>
+                        <summary className="px-6 py-4 cursor-pointer flex items-center justify-between select-none" style={{ borderBottom: "1px solid #D0D8E8" }}>
+                          <h2 className="text-[18px] font-bold" style={{ color: "var(--text-primary)" }}>{appName}</h2>
+                          <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: "var(--text-muted)" }} />
+                        </summary>
+                        <div className="flex flex-col">
+                          {appChunks.map(renderParagraph)}
+                        </div>
+                      </details>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
             <div className="h-[200px]" />
           </div>
@@ -1094,6 +1186,8 @@ export function ReviewScreen() {
                   onApprove={() => handleApprove(selectedParagraph.id)}
                   onReject={(reason) => handleReject(selectedParagraph.id, reason)}
                   onRevert={() => handleRevert(selectedParagraph.id)}
+                  onMoveToAppendix={handleMoveToAppendix}
+                  existingAppendices={allAppendices}
                   onClose={() => setActiveId(null)}
                 />
               </div>

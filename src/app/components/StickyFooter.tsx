@@ -76,16 +76,16 @@ export function FooterButton({
   
   // Disabled styles
   const disabledStyle: React.CSSProperties = {
-    backgroundColor: "var(--bg-hover)",
+    backgroundColor: isPrimary ? "var(--primary-disabled, #A9B7D0)" : "var(--bg-hover)",
     border: "none",
     borderRadius: 6,
     padding: "8px 16px",
-    color: "var(--color-text-muted)",
+    color: isPrimary ? "var(--primary-disabled-foreground, #F4F6FA)" : "var(--color-text-muted)",
     fontSize: 14,
     fontWeight: 600,
     fontFamily: "Inter, sans-serif",
     cursor: "not-allowed",
-    opacity: 0.5,
+    opacity: isPrimary ? 1 : 0.5,
   };
   
   const baseStyle = disabled ? disabledStyle : (isPrimary ? PRIMARY : SECONDARY);

@@ -40,6 +40,8 @@
   --popover-foreground: oklch(0.145 0 0);
   --primary: #6F8FD9;
   --primary-foreground: #0E141F;
+  --primary-disabled: #A9B7D0;
+  --primary-disabled-foreground: #F4F6FA;
   --secondary: oklch(0.95 0.0058 264.53);
   --secondary-foreground: #030213;
   --muted: #ececf0;
@@ -97,6 +99,8 @@
 
   --border-default: 1px solid #D0D8E8;
   --border-active: 1px solid #2B5597;
+  --primary-disabled: #A9B7D0;
+  --primary-disabled-foreground: #F4F6FA;
 
   --shadow-dropdown: 0 4px 12px rgba(0,0,0,0.12);
 }

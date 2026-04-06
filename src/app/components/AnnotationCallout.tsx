@@ -4,6 +4,15 @@ import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
+import { Input } from "./ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { useTranslation } from "react-i18next";
 
 export interface SourceContribution {
@@ -35,6 +44,9 @@ export interface ParagraphData {
   sourceDocumentUrl?: string;
   excludedExcerpts?: string[];
   sources?: SourceContribution[];
+  appendixName?: string;
+  suggestedForAppendix?: boolean;
+  suggestedAppendixName?: string;
 }
 
 /* ──────────────────────────────────────────────
@@ -169,10 +181,12 @@ interface AnnotationCalloutProps {
   onApprove: () => void;
   onReject: (reason: string) => void;
   onRevert?: () => void;
+  onMoveToAppendix?: (id: string, newAppName: string) => void;
+  existingAppendices?: string[];
   onClose: () => void;
 }
 
-export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose }: AnnotationCalloutProps) {
+export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveToAppendix, existingAppendices = [], onClose }: AnnotationCalloutProps) {
   const { t } = useTranslation();
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState(data.rejectReason || "");
@@ -182,6 +196,8 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
   const [excludedOpen, setExcludedOpen] = useState(false);
   const [excludedHeight, setExcludedHeight] = useState(0);
   const excludedRef = useRef<HTMLDivElement>(null);
+  const [movePopoverOpen, setMovePopoverOpen] = useState(false);
+  const [newAppendixName, setNewAppendixName] = useState("");
 
   const hasConflict = !!data.conflict;
 
@@ -190,6 +206,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
     setRejectReasonText(data.rejectReason || "");
     setEntered(false);
     setExcludedOpen(false);
+    setMovePopoverOpen(false);
     const raf = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(raf);
   }, [data.id]);
@@ -341,12 +358,33 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                   {data.excludedExcerpts.map((excerpt, idx) => (
                     <div
                       key={idx}
-                      className="pl-3 py-1"
+                      className="pl-3 py-1 flex flex-col gap-2"
                       style={{ borderLeft: "2px solid var(--border-default)" }}
                     >
                       <span className="text-[12px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
                         {excerpt}
                       </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          className="h-6 px-2 text-[11px] font-semibold"
+                          style={{ color: "var(--color-brand)" }}
+                          onClick={() => {}}
+                        >
+                          Re-include
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          className="h-6 px-2 text-[11px] font-semibold"
+                          style={{ color: "var(--color-secondary, #8B5CF6)" }}
+                          onClick={() => {
+                            setNewAppendixName(data.suggestedAppendixName || `Appendix ${String.fromCharCode(65 + existingAppendices.length)} — `);
+                            setMovePopoverOpen(true);
+                          }}
+                        >
+                          Add to Appendix
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -366,20 +404,24 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                       variant="outline"
                       className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
                       style={{
-                        borderColor: "var(--color-brand)",
-                        color: "var(--color-brand)",
+                        borderColor: "var(--color-positive)",
+                        color: "var(--color-positive)",
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(17,104,68,0.08)"}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                       onClick={onApprove}
                     >
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
                       {t("review.approveButton")}
                     </Button>
                     <Button
-                      className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
+                      className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200 cursor-pointer"
                       style={{
                         backgroundColor: "var(--color-negative)",
                         color: "var(--text-on-primary)",
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
                       onClick={() => setRejectMode(true)}
                     >
                       <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
@@ -389,11 +431,14 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                 ) : (
                   <>
                     <Button
-                      className="flex-1 h-9 font-semibold text-[13px] shadow-sm transition-all duration-200"
+                      variant="outline"
+                      className="flex-1 h-9 font-semibold text-[13px] shadow-sm transition-all duration-200 cursor-pointer"
                       style={{
-                        backgroundColor: "var(--color-brand)",
-                        color: "var(--text-on-primary)",
+                        borderColor: "var(--color-positive)",
+                        color: "var(--color-positive)",
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "rgba(17,104,68,0.08)"}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                       onClick={onApprove}
                     >
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
@@ -406,6 +451,8 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                         borderColor: "var(--color-negative)",
                         color: "var(--color-negative)",
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--color-error-bg)"}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
                       onClick={() => setRejectMode(true)}
                     >
                       <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
@@ -413,6 +460,93 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                     </Button>
                   </>
                 )}
+              </div>
+            )}
+
+            {/* Move to Appendix button */}
+            {!rejectMode && !movePopoverOpen && (
+              <Button
+                variant="outline"
+                className="w-full h-9 font-semibold text-[13px] relative group"
+                style={{
+                  borderColor: "var(--color-brand)",
+                  color: "var(--color-brand)",
+                }}
+                onClick={() => {
+                  setNewAppendixName(data.suggestedAppendixName || `Appendix ${String.fromCharCode(65 + existingAppendices.length)} — `);
+                  setMovePopoverOpen(true);
+                }}
+              >
+                <ChevronDown className="w-[14px] h-[14px] mr-1.5 -rotate-90 group-hover:translate-x-1 transition-transform" />
+                {t("review.moveToAppendix", "Move to Appendix")}
+              </Button>
+            )}
+
+            {/* Move to Appendix popover content */}
+            {movePopoverOpen && (
+              <div 
+                className="flex flex-col gap-3 p-3 rounded-[8px] animate-in fade-in slide-in-from-top-2 duration-200"
+                style={{ border: "1px solid #D0D8E8" }}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                    Appendix name
+                  </label>
+                  <Input
+                    value={newAppendixName}
+                    onChange={(e) => setNewAppendixName(e.target.value)}
+                    placeholder="e.g. Appendix A — KSA Requirements"
+                    className="h-8 text-[13px]"
+                    autoFocus
+                  />
+                </div>
+                {existingAppendices.length > 0 && (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-[12px] font-bold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
+                      Add to existing
+                    </label>
+                    <Select
+                      onValueChange={(val) => {
+                        if (val) setNewAppendixName(val);
+                      }}
+                      value={existingAppendices.includes(newAppendixName) ? newAppendixName : ""}
+                    >
+                      <SelectTrigger size="sm" className="text-[13px]">
+                        <SelectValue placeholder="Select an appendix..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {existingAppendices.map(app => (
+                            <SelectItem key={app} value={app}>{app}</SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div className="flex gap-2 justify-end mt-1">
+                  <Button
+                    variant="ghost"
+                    onClick={() => setMovePopoverOpen(false)}
+                    className="text-[12px] h-7 px-3"
+                    style={{ color: "var(--text-secondary)" }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      if (onMoveToAppendix && newAppendixName.trim()) {
+                        onMoveToAppendix(data.id, newAppendixName.trim());
+                        setMovePopoverOpen(false);
+                      }
+                    }}
+                    className="text-[12px] h-7 px-3 font-semibold"
+                    style={{ backgroundColor: "var(--color-brand)", color: "var(--text-on-primary)" }}
+                    disabled={!newAppendixName.trim()}
+                  >
+                    Confirm
+                  </Button>
+                </div>
               </div>
             )}
 
@@ -449,11 +583,13 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
                   </Button>
                   <Button
                     onClick={handleRejectSubmit}
-                    className="text-[13px] h-8"
+                    className="text-[13px] h-8 cursor-pointer"
                     style={{
                       backgroundColor: "var(--color-negative)",
                       color: "var(--text-on-primary)",
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
                     disabled={!rejectReasonText.trim()}
                   >
                     {t("review.submitRejection")}
@@ -483,7 +619,7 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onClose
         {/* Close button — top right */}
         <button
           onClick={onClose}
-          className="absolute right-3 top-3 p-1.5 rounded-md transition-colors duration-150"
+          className="absolute right-3 top-3 p-1.5 rounded-md transition-colors duration-150 cursor-pointer"
           style={{ color: "var(--text-tertiary)" }}
           onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--bg-hover)"; }}
           onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
