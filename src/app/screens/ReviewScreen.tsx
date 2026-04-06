@@ -496,6 +496,7 @@ export function ReviewScreen() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingText, setEditingText] = useState("");
   const editAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [flashId, setFlashId] = useState<string | null>(null);
 
   // Connector line coordinates
   const [lineCoords, setLineCoords] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null);
@@ -683,11 +684,38 @@ export function ReviewScreen() {
         return {
           ...p,
           text: p.originalText || p.text,
-          isEdited: false
+          isEdited: false,
+          excludedExcerpts: p.originalExcludedExcerpts !== undefined ? p.originalExcludedExcerpts : p.excludedExcerpts,
+          status: p.status === 'approved' ? 'pending' : p.status
         };
       }
       return p;
     }));
+  };
+
+  const handleReinclude = (id: string, excerptIndex: number, excerptText: string) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== id) return p;
+
+      const origText = p.originalText !== undefined ? p.originalText : p.text;
+      const origExcluded = p.originalExcludedExcerpts !== undefined ? p.originalExcludedExcerpts : p.excludedExcerpts;
+
+      const newExcerpts = [...(p.excludedExcerpts || [])];
+      newExcerpts.splice(excerptIndex, 1);
+
+      return {
+        ...p,
+        originalText: origText,
+        originalExcludedExcerpts: origExcluded,
+        text: p.text + "\n" + excerptText,
+        isEdited: true,
+        excludedExcerpts: newExcerpts,
+        status: p.status === 'approved' ? 'pending' : p.status,
+      };
+    }));
+
+    setFlashId(id);
+    setTimeout(() => setFlashId(null), 800);
   };
 
   const selectedParagraph = paragraphs.find(p => p.id === activeId);
@@ -724,7 +752,8 @@ export function ReviewScreen() {
     else if (isRejected) leftBorderColor = "var(--color-negative)";
 
     let bgColor = "transparent";
-    if (isActive) bgColor = "var(--bg-hover)";
+    if (flashId === p.id) bgColor = "var(--color-positive-bg)";
+    else if (isActive) bgColor = "var(--bg-hover)";
     else if (isApproved) bgColor = "var(--color-positive-bg)";
     else if (isAutoApproved) bgColor = "transparent";
     else if (isRejected) bgColor = "var(--color-error-bg)";
@@ -734,7 +763,7 @@ export function ReviewScreen() {
         key={p.id}
         ref={(el) => { paragraphRefs.current[p.id] = el; }}
         onClick={(e) => handleParagraphClick(p.id, e)}
-        className="relative group transition-all duration-200"
+        className={`relative group transition-colors ${flashId === p.id ? "duration-200" : "duration-200"}`}
         style={{
           padding: "16px 24px 16px 20px",
           borderLeft: `4px solid ${leftBorderColor}`,
@@ -757,8 +786,13 @@ export function ReviewScreen() {
         {editingId !== p.id && (
           <button
             onClick={(e) => startEditing(p, e)}
-            className="absolute right-4 top-4 p-2 rounded-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-            style={{ color: "var(--text-muted)", backgroundColor: "var(--bg-hover)" }}
+            className="absolute right-4 top-4 rounded-md transition-opacity cursor-pointer flex items-center justify-center"
+            style={{ 
+              color: "var(--text-muted)", 
+              backgroundColor: "var(--bg-hover)",
+              width: "28px",
+              height: "28px"
+            }}
           >
             <Pencil className="w-[14px] h-[14px]" />
           </button>
@@ -1185,8 +1219,9 @@ export function ReviewScreen() {
                   data={selectedParagraph}
                   onApprove={() => handleApprove(selectedParagraph.id)}
                   onReject={(reason) => handleReject(selectedParagraph.id, reason)}
-                  onRevert={() => handleRevert(selectedParagraph.id)}
+                  onRevert={selectedParagraph.isEdited ? () => handleRevert(selectedParagraph.id) : undefined}
                   onMoveToAppendix={handleMoveToAppendix}
+                  onReinclude={handleReinclude}
                   existingAppendices={allAppendices}
                   onClose={() => setActiveId(null)}
                 />
