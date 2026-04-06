@@ -15,6 +15,7 @@ import {
 } from "./ui/select";
 import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger, UnderlineTabsContent } from "./ui/underline-tabs";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
 import { useTranslation } from "react-i18next";
 
 export interface SourceContribution {
@@ -150,7 +151,7 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
           className="text-[10px] font-bold px-2 py-0.5"
           style={{ 
             color: confidenceColor, 
-            borderColor: confidenceColor,
+            borderColor: confidenceValue === 'Medium' ? '#B6974D' : `${confidenceColor}70`,
             backgroundColor: `${confidenceColor}10` 
           }}
         >
@@ -177,12 +178,6 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
           </>
         )}
       </div>
-
-      {/* AI reason note */}
-      <p className="text-[12px] flex items-start gap-2 leading-relaxed mt-1" style={{ color: "var(--text-secondary)" }}>
-        <Info className="w-[14px] h-[14px] shrink-0 mt-0.5" style={{ color: "var(--text-tertiary)" }} />
-        {data.aiReason}
-      </p>
     </div>
   );
 }
@@ -333,17 +328,6 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                 <div className="flex flex-col gap-4">
                   {(data.sources || []).sort((a,b) => b.percentage - a.percentage).map((src, i) => (
                     <div key={i} className="flex flex-col gap-1.5 pl-[22px]">
-                      <Badge
-                        variant="outline"
-                        className="text-[10px] h-5 font-semibold w-fit"
-                        style={{
-                          backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(17,104,68,0.1)",
-                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
-                          borderColor: src.origin === 'H&P' ? "rgba(43,85,151,0.25)" : "rgba(17,104,68,0.25)",
-                        }}
-                      >
-                        {src.origin} {t("review.origin", "Origin")}
-                      </Badge>
                       <a
                         href={src.documentUrl ?? "#"}
                         target="_blank"
@@ -527,19 +511,28 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
                       {t("review.approveButton")}
                     </Button>
-                    <Button
-                      className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200 cursor-pointer"
-                      style={{
-                        backgroundColor: "var(--color-negative)",
-                        color: "var(--text-on-primary)",
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
-                      onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
-                      onClick={() => setRejectMode(true)}
-                    >
-                      <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                      {t("review.rejectButton")}
-                    </Button>
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200 cursor-pointer"
+                            style={{
+                              backgroundColor: "var(--color-negative)",
+                              color: "var(--text-on-primary)",
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
+                            onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+                            onClick={() => setRejectMode(true)}
+                          >
+                            <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
+                            {t("review.rejectButton")}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
+                          {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </>
                 ) : (
                   <>
@@ -557,20 +550,29 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                       <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
                       {t("review.approveButton")}
                     </Button>
-                    <Button
-                      variant="outline"
-                      className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
-                      style={{
-                        borderColor: "var(--color-negative)",
-                        color: "var(--color-negative)",
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--color-error-bg)"}
-                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                      onClick={() => setRejectMode(true)}
-                    >
-                      <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                      {t("review.rejectButton")}
-                    </Button>
+                    <TooltipProvider delayDuration={300}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
+                            style={{
+                              borderColor: "var(--color-negative)",
+                              color: "var(--color-negative)",
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--color-error-bg)"}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                            onClick={() => setRejectMode(true)}
+                          >
+                            <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
+                            {t("review.rejectButton")}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
+                          {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </>
                 )}
               </div>

@@ -282,7 +282,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     applicability: "Applies to: All Locations",
     lastVerified: "Reviewed by M. Davis on Sep 01, 2025",
     regulatoryReferences: ["OSHA 1910.119", "EPA 40 CFR 112"],
-    aiConfidence: "High", aiReason: "Safely integrated multiple regulatory requirements from KCAD legacy standard.",
+    aiConfidence: "Medium", aiReason: "Safely integrated multiple regulatory requirements from KCAD legacy standard.",
     status: "pending", hpPercent: 25, kcadPercent: 75,
     aiConfidenceScore: 75,
     sources: [
@@ -311,7 +311,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     applicability: "Applies to: All Locations",
     lastVerified: "Reviewed by M. Davis on Sep 01, 2025",
     regulatoryReferences: ["OSHA 1910.119"],
-    aiConfidence: "High", aiReason: "Standard compliance requirement inherited from KCAD.",
+    aiConfidence: "Medium", aiReason: "Standard compliance requirement inherited from KCAD.",
     status: "pending", hpPercent: 20, kcadPercent: 80,
     aiConfidenceScore: 80,
     sources: [
@@ -388,7 +388,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     applicability: "Applies to: Sour Gas Zones",
     lastVerified: "Reviewed by T. Nguyen on Feb 05, 2026",
     regulatoryReferences: ["OSHA 1910.1000", "API RP 49"],
-    aiConfidence: "High", aiReason: "Standard H\u2082S monitoring requirement from KCAD.",
+    aiConfidence: "Medium", aiReason: "Standard H\u2082S monitoring requirement from KCAD.",
     status: "pending", hpPercent: 15, kcadPercent: 85,
     aiConfidenceScore: 85,
     sources: [
@@ -449,7 +449,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     applicability: "Applies to: Offshore & Critical Land Rigs",
     lastVerified: "Reviewed by T. Nguyen on Feb 05, 2026",
     regulatoryReferences: ["API RP 53"],
-    aiConfidence: "High", aiReason: "Standard equipment specification inherited from KCAD.",
+    aiConfidence: "Medium", aiReason: "Standard equipment specification inherited from KCAD.",
     status: "pending", hpPercent: 12, kcadPercent: 88,
     aiConfidenceScore: 88,
     sources: [
@@ -509,7 +509,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     applicability: "Applies to: Offshore & Critical Land Rigs",
     lastVerified: "Reviewed by T. Nguyen on Feb 05, 2026",
     regulatoryReferences: ["OSHA 1910.157", "API RP 14G"],
-    aiConfidence: "High", aiReason: "Standard emergency equipment inspection requirement.",
+    aiConfidence: "Medium", aiReason: "Standard emergency equipment inspection requirement.",
     status: "pending", hpPercent: 18, kcadPercent: 82,
     aiConfidenceScore: 82,
     sources: [
@@ -1001,14 +1001,12 @@ export function ReviewScreen() {
 
                 {p.sources && p.sources.length > 0 && (
                   <div className="flex flex-wrap gap-2 animate-in fade-in slide-in-from-top-1 duration-300">
-                    <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] border transition-all cursor-default select-none" style={{ backgroundColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.08)" : p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.08)" : "rgba(247, 163, 168, 0.08)", borderColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.3)" : p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.3)" : "rgba(247, 163, 168, 0.3)", fontSize: "11px", color: p.aiConfidence === 'High' ? "var(--color-positive)" : p.aiConfidence === 'Medium' ? "var(--text-warning)" : "var(--color-negative)", fontWeight: 600 }}>
+                    <div className="inline-flex items-center px-2 py-0.5 rounded-[4px] border transition-all cursor-default select-none" style={{ backgroundColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.08)" : p.aiConfidence === 'Medium' ? "rgba(255, 218, 138, 0.08)" : "rgba(247, 163, 168, 0.08)", borderColor: p.aiConfidence === 'High' ? "rgba(78, 209, 153, 0.45)" : p.aiConfidence === 'Medium' ? "#B6974D" : "rgba(247, 163, 168, 0.45)", fontSize: "11px", color: p.aiConfidence === 'High' ? "var(--color-positive)" : p.aiConfidence === 'Medium' ? "var(--text-warning)" : "var(--color-negative)", fontWeight: 600 }}>
                       {p.aiConfidence} Confidence
                     </div>
                     {p.sources.map((src, i) => (
-                      <div key={i} title={`${src.documentName} (${src.origin})`} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)", borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.2)" : "rgba(111, 143, 217, 0.2)", fontSize: "11px", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)", opacity: isActive ? 1 : 0.75 }}>
-                        <span className="font-bold text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(111,143,217,0.1)", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)" }}>{src.origin}</span>
+                      <div key={i} title={`${src.documentName} (${src.origin})`} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)", borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.35)" : "rgba(111, 143, 217, 0.35)", fontSize: "11px", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)", opacity: isActive ? 1 : 0.75 }}>
                         <span className="max-w-[220px] truncate font-normal group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
-
                       </div>
                     ))}
                   </div>
@@ -1245,21 +1243,6 @@ export function ReviewScreen() {
                       </span>
                     </div>
                   </div>
-                  
-                  {unresolvedCommentsCount > 0 && (
-                    <div className="flex items-center justify-center shrink-0 w-6">
-                       <div className="relative">
-                        <MessageSquare className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />
-                        <span 
-                          className="absolute -top-1 -right-1 text-[8px] font-bold h-2.5 w-2.5 flex items-center justify-center rounded-full"
-                          style={{ backgroundColor: "var(--color-brand)", color: "white", padding: "0" }}
-                        >
-                          {unresolvedCommentsCount}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                  
                   {isDone && unresolvedCommentsCount === 0 && (
                     <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--color-positive)" }} />
                   )}
