@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw, ExternalLink, ChevronDown } from "lucide-react";
+import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw, ExternalLink, ChevronDown, MessageSquare, CornerDownRight, Send } from "lucide-react";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -13,13 +13,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
+import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger, UnderlineTabsContent } from "./ui/underline-tabs";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
 import { useTranslation } from "react-i18next";
 
 export interface SourceContribution {
   documentName: string;
   origin: 'H&P' | 'KCAD';
   percentage: number;
-  url?: string;
+  documentUrl?: string;
+}
+
+export interface CommentData {
+  id: string;
+  author: string;
+  role: string;
+  timestamp: string;
+  body: string;
+  mentions?: string[];
+  resolved?: boolean;
+  replies?: CommentData[];
 }
 
 export interface ParagraphData {
@@ -41,13 +54,13 @@ export interface ParagraphData {
   kcadPercent: number;
   isEdited?: boolean;
   originalText?: string;
-  sourceDocumentUrl?: string;
   excludedExcerpts?: string[];
   originalExcludedExcerpts?: string[];
   sources?: SourceContribution[];
   appendixName?: string;
   suggestedForAppendix?: boolean;
   suggestedAppendixName?: string;
+  comments?: CommentData[];
 }
 
 /* ──────────────────────────────────────────────
@@ -184,11 +197,13 @@ interface AnnotationCalloutProps {
   onRevert?: () => void;
   onMoveToAppendix?: (id: string, newAppName: string) => void;
   onReinclude?: (id: string, excerptIndex: number, excerptText: string) => void;
+  onAddComment?: (paragraphId: string, text: string, mentions?: string[]) => void;
+  onResolveComment?: (paragraphId: string, commentId: string) => void;
   existingAppendices?: string[];
   onClose: () => void;
 }
 
-export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveToAppendix, onReinclude, existingAppendices = [], onClose }: AnnotationCalloutProps) {
+export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveToAppendix, onReinclude, onAddComment, onResolveComment, existingAppendices = [], onClose }: AnnotationCalloutProps) {
   const { t } = useTranslation();
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState(data.rejectReason || "");
@@ -238,6 +253,39 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
     setRejectMode(false);
   };
 
+  const [activeTab, setActiveTab] = useState<"details" | "comments">("details");
+  const [showResolved, setShowResolved] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [showMentions, setShowMentions] = useState(false);
+  
+  // List of possible mentions
+  const mentionUsers = ["John Doe", "Marcos", "Sarah Smith", "Raleigh"];
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setCommentText(val);
+    if (val.endsWith("@")) setShowMentions(true);
+    else if (!val.includes("@")) setShowMentions(false);
+  };
+
+  const handleCommentSubmit = () => {
+    if (!commentText.trim() || !onAddComment) return;
+    const mentions = mentionUsers.filter(u => commentText.includes(`@${u}`));
+    onAddComment(data.id, commentText, mentions);
+    setCommentText("");
+    setShowMentions(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Escape") {
+      setCommentText("");
+      setShowMentions(false);
+    }
+  };
+
+  const unresolvedCount = data.comments?.filter(c => !c.resolved).length || 0;
+  const displayComments = data.comments?.filter(c => showResolved ? true : !c.resolved) || [];
+
   return (
     <div
       style={{
@@ -255,39 +303,63 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
           boxShadow: "var(--shadow-modal)",
         }}
       >
-        {/* ── Source & Origin ── */}
-        <div className="flex flex-col gap-4 px-4 pt-4 pb-4">
-          <div className="flex flex-col gap-1.5">
-            <div className="flex items-center gap-2">
-              <FileText className="w-[14px] h-[14px]" style={{ color: "var(--color-brand)" }} />
-              <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                {t("review.source")}
-              </span>
-              <Badge
-                variant="outline"
-                className="ml-1 text-[10px] h-5 font-semibold"
-                style={{
-                  backgroundColor: data.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(17,104,68,0.1)",
-                  color: data.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
-                  borderColor: data.origin === 'H&P' ? "rgba(43,85,151,0.25)" : "rgba(17,104,68,0.25)",
-                }}
-              >
-                {data.origin} {t("review.origin")}
-              </Badge>
-            </div>
-            <a
-              href={data.sourceDocumentUrl ?? "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-[13px] font-semibold"
-              style={{ color: "var(--color-brand)", textDecoration: "none" }}
-              onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
-            >
-              {data.sourceDocument}
-              <ExternalLink className="w-[12px] h-[12px] shrink-0" />
-            </a>
+        <UnderlineTabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)} className="flex flex-col h-full w-full">
+          <div className="flex w-full" style={{ borderBottom: 'var(--border-default)' }}>
+            <UnderlineTabsList className="w-full">
+              <UnderlineTabsTrigger value="details" fullWidth hideSeparator>
+                Details
+              </UnderlineTabsTrigger>
+              <UnderlineTabsTrigger value="comments" fullWidth hideSeparator>
+                Comments 
+                {unresolvedCount > 0 && (
+                  <Badge variant="secondary" className="px-1.5 py-0 h-4 text-[10px] rounded-full ml-1.5" style={{ backgroundColor: 'var(--bg-hover)', color: 'var(--text-primary)' }}>
+                    {unresolvedCount}
+                  </Badge>
+                )}
+              </UnderlineTabsTrigger>
+            </UnderlineTabsList>
           </div>
+
+          <UnderlineTabsContent value="details" className="m-0 border-0 outline-none flex flex-col w-full data-[state=inactive]:hidden">
+            <div className="flex flex-col gap-4 px-4 pt-4 pb-4">
+              {/* ── Sources ── */}
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-[14px] h-[14px]" style={{ color: "var(--color-brand)" }} />
+                  <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+                    {data.sources && data.sources.length > 1 ? t("review.sources", "SOURCES") : t("review.source", "SOURCE")}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {(data.sources || []).sort((a,b) => b.percentage - a.percentage).map((src, i) => (
+                    <div key={i} className="flex flex-col gap-1.5 pl-[22px]">
+                      <Badge
+                        variant="outline"
+                        className="text-[10px] h-5 font-semibold w-fit"
+                        style={{
+                          backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(17,104,68,0.1)",
+                          color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-positive)",
+                          borderColor: src.origin === 'H&P' ? "rgba(43,85,151,0.25)" : "rgba(17,104,68,0.25)",
+                        }}
+                      >
+                        {src.origin} {t("review.origin", "Origin")}
+                      </Badge>
+                      <a
+                        href={src.documentUrl ?? "#"}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-[13px] font-semibold"
+                        style={{ color: "var(--color-brand)", textDecoration: "none" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+                      >
+                        {src.documentName}
+                        <ExternalLink className="w-[12px] h-[12px] shrink-0" />
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
           {/* ── Applicability ── */}
           <div className="flex flex-col gap-1">
@@ -654,19 +726,147 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                 </Button>
               </>
             )}
+            </div>
           </div>
-        </div>
+          </UnderlineTabsContent>
 
-        {/* Close button — top right */}
-        <button
-          onClick={onClose}
-          className="absolute right-3 top-3 p-1.5 rounded-md transition-colors duration-150 cursor-pointer"
-          style={{ color: "var(--text-tertiary)" }}
-          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "var(--bg-hover)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
-        >
-          <X size={16} />
-        </button>
+          <UnderlineTabsContent value="comments" className="m-0 border-0 outline-none flex flex-col w-full h-[400px] max-h-[50vh] data-[state=inactive]:hidden pointer-events-auto relative">
+            <div className="flex items-center justify-between px-4 py-2" style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+              <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+                Discussion
+              </span>
+              <button
+                onClick={() => setShowResolved(!showResolved)}
+                className="text-[11px] font-medium hover:underline"
+                style={{ color: "var(--color-brand)" }}
+              >
+                {showResolved ? "Hide resolved" : "Show resolved"}
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4">
+              {displayComments.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-center py-6">
+                  <MessageSquare className="w-8 h-8 mb-2" style={{ color: "var(--border-strong)" }} />
+                  <span className="text-[13px] font-medium" style={{ color: "var(--text-secondary)" }}>No comments yet</span>
+                  <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>Start the conversation below</span>
+                </div>
+              ) : (
+                displayComments.map(c => (
+                  <div key={c.id} className="flex flex-col gap-2">
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-start gap-2.5">
+                        <Avatar className="w-6 h-6 mt-0.5">
+                          <AvatarFallback className="text-[10px] font-semibold bg-[var(--bg-hover)] text-[var(--text-primary)]">
+                            {c.author.split(' ').map(n => n[0]).join('')}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col flex-1">
+                          <div className="flex justify-between items-baseline w-full">
+                            <span className="text-[12px] font-semibold" style={{ color: "var(--text-primary)" }}>{c.author}</span>
+                            <span className="text-[10px] whitespace-nowrap" style={{ color: "var(--text-muted)" }}>{c.timestamp}</span>
+                          </div>
+                          <span className="text-[11px]" style={{ color: "var(--text-tertiary)" }}>{c.role}</span>
+                          
+                          <div className="mt-1 flex flex-col gap-1.5">
+                            <span className="text-[13px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                              {c.body}
+                            </span>
+                            
+                            <div className="flex items-center justify-between mt-0.5">
+                              <button className="text-[11px] font-medium hover:underline flex items-center gap-1" style={{ color: "var(--text-tertiary)" }}>
+                                Reply
+                              </button>
+                              
+                              {!c.resolved && onResolveComment && (
+                                <button
+                                  onClick={() => onResolveComment(data.id, c.id)}
+                                  className="text-[11px] font-medium hover:underline"
+                                  style={{ color: "var(--color-positive)" }}
+                                >
+                                  Mark as resolved
+                                </button>
+                              )}
+                              {c.resolved && (
+                                <span className="text-[11px] font-medium italic" style={{ color: "var(--text-muted)" }}>Resolved</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Replies */}
+                    {c.replies?.map(r => (
+                      <div key={r.id} className="flex flex-col gap-2 ml-5 border-l-2 pl-3 mt-1" style={{ borderColor: "var(--border-subtle)" }}>
+                        <div className="flex items-start gap-2.5">
+                          <Avatar className="w-5 h-5 mt-0.5">
+                            <AvatarFallback className="text-[9px] font-semibold bg-[var(--bg-hover)] text-[var(--text-primary)]">
+                              {r.author.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col flex-1">
+                            <div className="flex justify-between items-baseline w-full">
+                              <span className="text-[11px] font-semibold" style={{ color: "var(--text-primary)" }}>{r.author}</span>
+                              <span className="text-[9px] whitespace-nowrap" style={{ color: "var(--text-muted)" }}>{r.timestamp}</span>
+                            </div>
+                            <div className="mt-0.5">
+                              <span className="text-[12px] leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+                                {r.body}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="p-3" style={{ borderTop: "1px solid var(--border-subtle)", backgroundColor: "var(--bg-hover)" }}>
+              <div className="relative">
+                <Textarea 
+                  value={commentText}
+                  onChange={handleCommentChange}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Add a comment... (Type @ to mention)"
+                  className="min-h-[60px] text-[13px] resize-none pr-10"
+                  style={{ backgroundColor: "var(--bg-card)" }}
+                />
+                
+                {showMentions && (
+                  <div className="absolute bottom-full left-0 mb-1 w-[200px] rounded-md shadow-lg overflow-hidden py-1 z-10" style={{ backgroundColor: "var(--bg-card)", border: "1px solid var(--border-default)" }}>
+                    {mentionUsers.map(u => (
+                      <button
+                        key={u}
+                        className="w-full text-left px-3 py-1.5 text-[12px] font-medium hover:bg-[var(--bg-hover)]"
+                        style={{ color: "var(--text-primary)" }}
+                        onClick={() => {
+                          setCommentText(prev => prev.replace(/@\w*$/, `@${u} `));
+                          setShowMentions(false);
+                        }}
+                      >
+                        {u}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                
+                <Button 
+                  size="icon" 
+                  variant="ghost" 
+                  className="absolute right-1 bottom-1 h-7 w-7 rounded-sm"
+                  style={{ color: commentText.trim() ? "var(--color-brand)" : "var(--text-muted)" }}
+                  onClick={handleCommentSubmit}
+                  disabled={!commentText.trim()}
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+          </UnderlineTabsContent>
+        </UnderlineTabs>
       </Card>
     </div>
   );

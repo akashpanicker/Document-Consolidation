@@ -5,6 +5,7 @@ import { Header } from "../components/Header";
 import { StatCard } from "../components/dashboard/StatCard";
 import { TaskRow } from "../components/dashboard/TaskRow";
 import { ActivityItem } from "../components/dashboard/ActivityItem";
+import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger } from "../components/ui/underline-tabs";
 import { DashboardStats, ConsolidationTask, ActivityItem as ActivityItemType } from "../types/dashboard.types";
 
 /* ── Mock Data ─────────────────────────────────────────────── */
@@ -315,68 +316,41 @@ function ReviewQueue({
       }}
     >
       {/* Tabbed Header */}
-      <div
-        className="flex items-center justify-between px-1 shrink-0"
-        style={{ borderBottom: "var(--border-default)" }}
-      >
-        <div className="flex">
-          {[
-            { id: "pending", label: "My Review Queue" },
-            { id: "in-progress", label: "In Progress" },
-            { id: "completed", label: "Completed" },
-          ].map((tab, idx) => {
-            const isTabActive = activeTab === tab.id;
-            return (
-              <div key={tab.id} className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => onTabChange(tab.id as any)}
-                  className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider relative transition-colors duration-200"
-                  style={{
-                    color: isTabActive ? "var(--color-brand)" : "var(--text-muted)",
-                    fontFamily: "Inter, sans-serif",
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  {tab.label}
-                  {isTabActive && (
-                    <div
-                      className="absolute bottom-0 left-0 right-0 h-[2px]"
-                      style={{ backgroundColor: "var(--color-brand)" }}
-                    />
-                  )}
-                </button>
-                {/* Vertical separator between tabs */}
-                {idx < 2 && (
-                  <div 
-                    className="h-4 w-[1px]" 
-                    style={{ backgroundColor: "var(--border-default)" }} 
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-        
-        <button
-          type="button"
-          className="mr-4"
-          style={{
-            fontSize: 12,
-            fontWeight: 500,
-            color: "var(--color-brand)",
-            fontFamily: "Inter, sans-serif",
-            background: "none",
-            border: "none",
-            cursor: "pointer",
-            padding: 0,
-          }}
+      <UnderlineTabs value={activeTab} onValueChange={(v) => onTabChange(v as any)}>
+        <div
+          className="flex items-center justify-between px-1 shrink-0"
+          style={{ borderBottom: "var(--border-default)" }}
         >
-          View All
-        </button>
-      </div>
+          <UnderlineTabsList>
+            <UnderlineTabsTrigger value="pending">
+              My Review Queue
+            </UnderlineTabsTrigger>
+            <UnderlineTabsTrigger value="in-progress">
+              In Progress
+            </UnderlineTabsTrigger>
+            <UnderlineTabsTrigger value="completed" hideSeparator>
+              Completed
+            </UnderlineTabsTrigger>
+          </UnderlineTabsList>
+          
+          <button
+            type="button"
+            className="mr-4 hover:underline"
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "var(--color-brand)",
+              fontFamily: "Inter, sans-serif",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: 0,
+            }}
+          >
+            View All
+          </button>
+        </div>
+      </UnderlineTabs>
 
       {/* Rows or empty state */}
       <div className="flex flex-col flex-1 overflow-y-auto">

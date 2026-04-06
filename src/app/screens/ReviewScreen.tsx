@@ -3,8 +3,8 @@ import { Header } from "../components/Header";
 import { StickyFooter, FooterButton } from "../components/StickyFooter";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown } from "lucide-react";
-import { AnnotationCallout, AIConfidenceCard, ParagraphData } from "../components/AnnotationCallout";
+import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown, MessageSquare, CheckCircle } from "lucide-react";
+import { AnnotationCallout, AIConfidenceCard, ParagraphData, CommentData, SourceContribution } from "../components/AnnotationCallout";
 import { Badge } from "../components/ui/badge";
 import { Input } from "../components/ui/input";
 import {
@@ -39,121 +39,218 @@ const SECTIONS = [
   { id: "s3", title: "3. Emergency Response" },
 ];
 
-const PARAGRAPH_EXTRAS: Record<string, { sourceDocumentUrl?: string; excludedExcerpts?: string[]; suggestedForAppendix?: boolean; suggestedAppendixName?: string; }> = {
+const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; excludedExcerpts?: string[]; suggestedForAppendix?: boolean; suggestedAppendixName?: string; comments?: CommentData[]; }> = {
   p1: {
-    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
+    ],
     excludedExcerpts: [
       "As an alternative to the procedures described herein, an Operator may use equivalent equipment or methods, provided such equivalency is demonstrated through documented risk assessment and approved by the Drilling Engineer of Record prior to deployment.",
       "This document is subject to periodic review by the H&P Well Control Review Board and will be updated to reflect changes to API Recommended Practice 53, IADC Well Control Guidelines, and applicable governmental regulations.",
     ],
+    comments: [
+      {
+        id: "c1",
+        author: "Sarah Smith",
+        role: "HSE Director",
+        timestamp: "10 mins ago",
+        body: "Are we sure this strictly aligns with the new minimum requirements in API RP 53?",
+        resolved: false,
+        replies: [
+          {
+            id: "c1a",
+            author: "Marcos",
+            role: "Well Control Specialist",
+            timestamp: "5 mins ago",
+            body: "Yes, I double checked against the 2024 addendum. We are covered.",
+          },
+          {
+            id: "c1b",
+            author: "Sarah Smith",
+            role: "HSE Director",
+            timestamp: "1 min ago",
+            body: "Great, thanks Marcos.",
+          }
+        ]
+      }
+    ]
   },
   p2: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
+    ],
     excludedExcerpts: [
       "Legacy KCAD procedures from the K-CW 002 Health and Safety series shall remain in force for Kazakhstan operations until the transition period concludes on 31 December 2025, after which this consolidated document supersedes all predecessor documents.",
       "Compliance verification shall be conducted by an independent third-party auditor not less than once every 24 months, and following any significant operational incident classified as Tier 1 or above under the KCAD Incident Classification Matrix.",
     ],
+    comments: [
+      {
+        id: "c2",
+        author: "John Doe",
+        role: "Operations Manager",
+        timestamp: "1 hour ago",
+        body: "This threshold differs from the KSA regulatory requirement — flagging for @Raleigh to confirm.",
+        mentions: ["Raleigh"],
+        resolved: false
+      }
+    ]
   },
   p3: {
-    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
+    ],
     excludedExcerpts: [
       "Operations conducted under temporary variance authorizations, including deviation from standard well control procedures during well testing or production testing phases, shall be governed by a separately approved site-specific well control plan.",
       "Contractor personnel engaged in well control operations must hold current IADC WellCAP certification at the Supervisory level or equivalent as approved by the H&P Drilling Manager. Certification records shall be maintained in the crew competency register.",
     ],
+    comments: [
+      {
+        id: "c3",
+        author: "Marcos",
+        role: "Well Control Specialist",
+        timestamp: "Yesterday",
+        body: "I think we can go ahead and Auto-approve this section, the text is practically identical to our current global standard.",
+        resolved: true
+      }
+    ]
   },
   p4: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
+    ],
     excludedExcerpts: [
       "Personnel classified as visitors or short-term site guests on-site for fewer than 4 hours are exempt from the full induction requirement but must receive a site-specific safety briefing not exceeding 15 minutes upon arrival.",
       "Deviation from any mandatory compliance requirement contained herein requires formal Management of Change approval at the Regional HSE Director level and must be communicated to the relevant regulatory authority within 72 hours.",
     ],
   },
   p5: {
-    sourceDocumentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf",
+    sources: [
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
+    ],
     excludedExcerpts: [
       "For operations conducted under active production sharing agreements, any variance from this standard identified as potentially conflicting with the host government's mandatory well control regulations must be escalated to the Drilling Manager and Legal department for review prior to operations.",
       "Where third-party clients impose supplementary well control requirements through their own Technical Standards, these shall be reviewed against the provisions of this document by a qualified Well Control Specialist and a bridging document prepared where necessary.",
     ],
   },
   p6: {
-    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" }
+    ],
     excludedExcerpts: [
       "In wells with elevated formation pressure gradients or where a SICP greater than 300 psi has been recorded within the preceding 48 hours, the trip sheet verification frequency shall be increased to every 3 stands rather than the standard 5-stand interval.",
       "The Mud Engineer shall ensure that all trip tank volumes are recorded in real-time drilling data systems and that any manual override of automated fill-up calculations is documented with written justification in the drilling report.",
     ],
   },
   p7: {
-    sourceDocumentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf",
+    sources: [
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
+    ],
     excludedExcerpts: [
       "The volumetric well control method may be applied where wellbore geometry or drill string configuration prevents circulation. Application of this method requires express authorization from the Drilling Engineer and shall be documented in the post-well kick report.",
       "Surface shut-in pressure readings shall be taken no later than 30 minutes after initial well shut-in to establish stable SIDP and SICP values for kick analysis. Readings taken before pressure stabilization must be annotated as preliminary in the well control report.",
     ],
   },
   p8: {
-    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
+    ],
     excludedExcerpts: [
       "BOP function tests shall include both manual and remote operation of all available closing units. Where remote actuation equipment is found to be inoperative, drilling operations shall be suspended until full remote capability is restored and verified.",
       "Accumulator pre-charge pressures shall be verified against the manufacturer's specifications at the start of each hitch. Any deviation from the specified pre-charge range shall result in immediate investigation by the Rig Mechanic before operations continue.",
     ],
   },
   p9: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
+    ],
     excludedExcerpts: [
-      "Fixed-point H₂S monitoring sensors shall be calibrated in accordance with the manufacturer's schedule or a minimum of once per calendar quarter, whichever is more frequent. Calibration records must be maintained and available for regulatory inspection.",
-      "In the event of a continuous H₂S reading exceeding 10 ppm at any monitoring station, all non-essential personnel shall evacuate the affected zone immediately. Operations may only resume after H₂S readings return to below 1 ppm for a sustained period of 15 minutes.",
+      "Fixed-point H\u2082S monitoring sensors shall be calibrated in accordance with the manufacturer's schedule or a minimum of once per calendar quarter, whichever is more frequent. Calibration records must be maintained and available for regulatory inspection.",
+      "In the event of a continuous H\u2082S reading exceeding 10 ppm at any monitoring station, all non-essential personnel shall evacuate the affected zone immediately. Operations may only resume after H\u2082S readings return to below 1 ppm for a sustained period of 15 minutes.",
     ],
   },
   p10: {
-    sourceDocumentUrl: "/documents/hp/HP-Operations-Manual.pdf",
+    sources: [
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
+    ],
     excludedExcerpts: [
       "Mud weight adjustments of more than 0.5 ppg shall only be authorized by the Drilling Engineer and shall be preceded by a formal review of the current pore pressure prediction and wellbore stability analysis.",
       "The Mud Engineer shall prepare a daily mud report summarizing actual versus planned mud weight, rheology data, and any chemical treatments applied. This report must be signed by the Company Man before being transmitted to the operations office.",
     ],
   },
   p11: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
+    ],
     excludedExcerpts: [
       "Permits to work for tasks within the rotating equipment exclusion zone must specifically identify the equipment involved, the nature of the task, and the isolation measures in place. Generic PTW templates that do not reference specific equipment are not acceptable.",
       "Following any incident or near miss involving rotating equipment, the affected equipment shall be subject to a formal Post-Incident Inspection before being returned to service. A copy of the inspection report shall be forwarded to the KCAD Equipment Integrity team within 5 business days.",
     ],
   },
   p12: {
-    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
+    ],
     excludedExcerpts: [
       "Personnel with mobility restrictions or physical impairments requiring evacuation assistance shall be identified on the Emergency Accommodation List maintained by the Rig Manager. Designated personnel shall be assigned to assist these individuals during emergency mustering.",
       "The Emergency Response Coordinator shall maintain a headcount until all personnel are accounted for at their designated muster station. No personnel may return to their work area until the Rig Manager issues an all-clear via the site PA system.",
     ],
   },
   p13: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf",
+    sources: [
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
+    ],
     excludedExcerpts: [
       "Accumulator capacity calculations shall be performed using the actual BOP closing ratios verified during the most recent full BOP pressure test. Calculations based on nominal or design values without field verification are not acceptable.",
       "A secondary hydraulic accumulator system with independent pressure supply must be installed and maintained at full operational status on all HPHT well operations where bottomhole pressures exceed 10,000 psi, regardless of rig vintage or existing equipment certification status.",
     ],
   },
   p14: {
-    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
+    ],
     excludedExcerpts: [
-      "Tabletop emergency response exercises shall be conducted at the start of each hitch in addition to physical drills, covering well control, fire, and H₂S release scenarios on a rotating basis.",
+      "Tabletop emergency response exercises shall be conducted at the start of each hitch in addition to physical drills, covering well control, fire, and H\u2082S release scenarios on a rotating basis.",
       "Records of emergency drills, including attendance sheets, observer notes, and corrective actions arising from drill debriefs, shall be retained in the site HSE file for a minimum of 24 months and be available for review during regulatory inspections.",
     ],
   },
   p15: {
-    sourceDocumentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf",
+    sources: [
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" }
+    ],
     excludedExcerpts: [
       "In facilities where a deluge or fixed suppression system is installed, activation of the ESD shall automatically trigger suppression system flow to the affected zone. Manual override of automatic suppression activation is only permitted by the Rig Manager in consultation with the HSE Representative.",
       "Post-incident fire investigation reports shall be completed within 5 working days using the H&P Incident Investigation template (Form HSE-INV-001). Root cause analysis must identify contributing organizational factors in addition to immediate physical causes.",
     ],
   },
   p16: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf",
+    sources: [
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 60, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 10, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
+    ],
     excludedExcerpts: [
       "Medevac authorization protocols shall include pre-designated decision trees specifying which injuries or medical conditions mandate immediate helicopter evacuation versus land transport. These protocols shall be reviewed by a qualified medical professional prior to each major drilling campaign.",
       "Where satellite communication equipment is the primary means of emergency communication, a secondary method such as HF radio must be tested at least once per week and the test documented in the communication log.",
     ],
   },
   p17: {
-    sourceDocumentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf",
+    sources: [
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
+    ],
     excludedExcerpts: [
       "Breathing apparatus inspection records shall include the unique serial number of each unit, the inspector's name and qualification, the test pressure achieved, and the estimated remaining service life of each component, countersigned by the HSE Representative.",
       "Life raft and life ring inspections shall be conducted by a third-party marine safety specialist holding a current qualification recognized by the applicable flag state authority. Self-certification of life-saving appliances is not permitted on offshore operations.",
@@ -174,8 +271,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 98, kcadPercent: 2,
     aiConfidenceScore: 98,
     sources: [
-      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98 },
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2 }
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ]
   },
   {
@@ -189,8 +286,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 25, kcadPercent: 75,
     aiConfidenceScore: 75,
     sources: [
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25 }
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ]
   },
   {
@@ -204,7 +301,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 100, kcadPercent: 0,
     aiConfidenceScore: 100,
     sources: [
-      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100 }
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
     ]
   },
   {
@@ -218,8 +315,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 20, kcadPercent: 80,
     aiConfidenceScore: 80,
     sources: [
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80 },
-      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20 }
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
     ]
   },
   {
@@ -233,8 +330,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 85, kcadPercent: 15,
     aiConfidenceScore: 85,
     sources: [
-      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85 },
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15 }
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ]
   },
   // ── Section 2: Hazard Identification & Controls ──
@@ -249,8 +346,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 72, kcadPercent: 28,
     aiConfidenceScore: 72,
     sources: [
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72 },
-      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28 }
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" }
     ]
   },
   {
@@ -265,8 +362,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 45, kcadPercent: 55,
     aiConfidenceScore: 55,
     sources: [
-      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45 }
+      { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ]
   },
   {
@@ -280,8 +377,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 95, kcadPercent: 5,
     aiConfidenceScore: 95,
     sources: [
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95 },
-      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5 }
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
     ]
   },
   {
@@ -295,8 +392,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 15, kcadPercent: 85,
     aiConfidenceScore: 85,
     sources: [
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15 }
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ]
   },
   {
@@ -310,8 +407,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 97, kcadPercent: 3,
     aiConfidenceScore: 97,
     sources: [
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97 },
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3 }
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ]
   },
   {
@@ -325,8 +422,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 10, kcadPercent: 90,
     aiConfidenceScore: 90,
     sources: [
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10 }
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ]
   },
   // ── Section 3: Emergency Response ──
@@ -341,8 +438,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 96, kcadPercent: 4,
     aiConfidenceScore: 96,
     sources: [
-      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96 },
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4 }
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ]
   },
   {
@@ -356,8 +453,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 12, kcadPercent: 88,
     aiConfidenceScore: 88,
     sources: [
-      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88 },
-      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12 }
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
+      { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
     ]
   },
   {
@@ -371,8 +468,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 92, kcadPercent: 8,
     aiConfidenceScore: 92,
     sources: [
-      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92 },
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8 }
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ]
   },
   {
@@ -386,7 +483,7 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "auto-approved", hpPercent: 100, kcadPercent: 0,
     aiConfidenceScore: 100,
     sources: [
-      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100 }
+      { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" }
     ]
   },
   {
@@ -400,9 +497,9 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 30, kcadPercent: 70,
     aiConfidenceScore: 70,
     sources: [
-      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 60 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30 },
-      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 10 }
+      { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 60, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 10, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
     ]
   },
   {
@@ -416,8 +513,8 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
     status: "pending", hpPercent: 18, kcadPercent: 82,
     aiConfidenceScore: 82,
     sources: [
-      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82 },
-      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18 }
+      { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
+      { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ]
   },
 ].map(p => ({ ...p, ...(PARAGRAPH_EXTRAS[p.id] ?? {}) })) as ParagraphData[];
@@ -718,6 +815,35 @@ export function ReviewScreen() {
     setTimeout(() => setFlashId(null), 800);
   };
 
+  const handleCommentAdd = (paragraphId: string, text: string, mentions?: string[]) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== paragraphId) return p;
+      const newComment = {
+        id: `c_${Date.now()}`,
+        author: "Current User",
+        role: "Reviewer",
+        timestamp: "Just now",
+        body: text,
+        mentions,
+        resolved: false
+      };
+      return {
+        ...p,
+        comments: [...(p.comments || []), newComment]
+      };
+    }));
+  };
+
+  const handleCommentResolve = (paragraphId: string, commentId: string) => {
+    setParagraphs(prev => prev.map(p => {
+      if (p.id !== paragraphId || !p.comments) return p;
+      return {
+        ...p,
+        comments: p.comments.map(c => c.id === commentId ? { ...c, resolved: true } : c)
+      };
+    }));
+  };
+
   const selectedParagraph = paragraphs.find(p => p.id === activeId);
 
   // ── Per-section review progress ──
@@ -784,18 +910,49 @@ export function ReviewScreen() {
         }}
       >
         {editingId !== p.id && (
-          <button
-            onClick={(e) => startEditing(p, e)}
-            className="absolute right-4 top-4 rounded-md transition-opacity cursor-pointer flex items-center justify-center"
-            style={{ 
-              color: "var(--text-muted)", 
-              backgroundColor: "var(--bg-hover)",
-              width: "28px",
-              height: "28px"
-            }}
-          >
-            <Pencil className="w-[14px] h-[14px]" />
-          </button>
+          <>
+            <button
+              onClick={(e) => startEditing(p, e)}
+              className="absolute right-4 top-4 rounded-md transition-opacity cursor-pointer flex items-center justify-center"
+              style={{ 
+                color: "var(--text-muted)", 
+                backgroundColor: "var(--bg-hover)",
+                width: "28px",
+                height: "28px"
+              }}
+            >
+              <Pencil className="w-[14px] h-[14px]" />
+            </button>
+
+            {p.comments && p.comments.filter(c => !c.resolved).length > 0 && (
+              <button
+                className="absolute right-4 top-[56px] rounded-md transition-opacity cursor-pointer flex items-center justify-center group"
+                title={`${p.comments.filter(c => !c.resolved).length} unresolved comments`}
+                style={{ 
+                  color: "var(--text-muted)", 
+                  backgroundColor: "var(--bg-hover)",
+                  width: "28px",
+                  height: "28px"
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveId(p.id);
+                  setTimeout(() => {
+                    const commentsTab = document.querySelector('[value="comments"]') as HTMLElement;
+                    if (commentsTab) commentsTab.click();
+                  }, 50);
+                }}
+              >
+                <MessageSquare className="w-[14px] h-[14px] group-hover:opacity-80 transition-opacity" />
+                <span 
+                  className="absolute -top-1.5 -right-1.5 text-[9px] font-bold h-3.5 w-3.5 flex items-center justify-center rounded-full"
+                  style={{ backgroundColor: "var(--color-brand)", color: "white" }}
+                >
+                  {p.comments.filter(c => !c.resolved).length}
+                </span>
+              </button>
+            )}
+          </>
         )}
 
         <div className="flex flex-col gap-1.5 w-full pr-10">
@@ -851,7 +1008,7 @@ export function ReviewScreen() {
                       <div key={i} title={`${src.documentName} (${src.origin})`} className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[4px] border transition-all animate-in fade-in zoom-in-95 duration-200 cursor-default select-none group/chip" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.04)" : "rgba(111, 143, 217, 0.04)", borderColor: src.origin === 'H&P' ? "rgba(43, 85, 151, 0.2)" : "rgba(111, 143, 217, 0.2)", fontSize: "11px", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)", opacity: isActive ? 1 : 0.75 }}>
                         <span className="font-bold text-[8px] uppercase tracking-tighter px-1 rounded-[2px]" style={{ backgroundColor: src.origin === 'H&P' ? "rgba(43,85,151,0.1)" : "rgba(111,143,217,0.1)", color: src.origin === 'H&P' ? "var(--color-brand)" : "var(--color-info)" }}>{src.origin}</span>
                         <span className="max-w-[220px] truncate font-normal group-hover/chip:underline underline-offset-2 decoration-1">{src.documentName}</span>
-                        <span className="text-[10px] opacity-40 font-bold tabular-nums">· {src.percentage}%</span>
+
                       </div>
                     ))}
                   </div>
@@ -1052,44 +1209,63 @@ export function ReviewScreen() {
           </span>
 
           <nav className="flex flex-col gap-1">
-            {SECTIONS.map(section => {
-              const isActive = activeSectionId === section.id;
-              const progress = sectionProgress(section.id);
-              const label = section.title.replace(/^\d+\.\s*/, "");
-
+            {SECTIONS.map(s => {
+              const isActive = activeSectionId === s.id;
+              const prog = sectionProgress(s.id);
+              const isDone = prog.reviewed === prog.total && prog.total > 0;
+              const unresolvedCommentsCount = paragraphs
+                .filter(p => p.sectionId === s.id)
+                .reduce((acc, p) => acc + (p.comments?.filter(c => !c.resolved).length || 0), 0);
+              
               return (
-                <button
-                  key={section.id}
-                  onClick={() => scrollToSection(section.id)}
-                  className="text-left px-3 py-2.5 rounded-[6px] transition-all duration-150 flex items-start justify-between gap-2"
+                <div
+                  key={s.id}
+                  onClick={() => scrollToSection(s.id)}
+                  className="group cursor-pointer rounded-lg p-2 transition-colors relative flex items-center justify-between"
                   style={{
                     backgroundColor: isActive ? "var(--bg-hover)" : "transparent",
-                    borderLeft: isActive ? "3px solid var(--color-brand)" : "3px solid transparent",
                   }}
                 >
-                  <span
-                    className="text-[13px] leading-tight"
-                    style={{
-                      color: isActive ? "var(--text-primary)" : "var(--text-secondary)",
-                      fontWeight: isActive ? 700 : 500,
-                    }}
-                  >
-                    {label}
-                  </span>
-                  <span
-                    className="text-[12px] font-semibold shrink-0 mt-0.5"
-                    style={{
-                      color: progress.reviewed === progress.total && progress.total > 0
-                        ? "var(--color-positive)"
-                        : "var(--text-muted)",
-                    }}
-                  >
-                    {progress.reviewed} / {progress.total}
-                  </span>
-                </button>
+                  <div className="flex flex-col gap-1 opacity-70 group-hover:opacity-100 transition-opacity flex-1 pr-2" style={{ opacity: isActive ? 1 : undefined }}>
+                    <span className="text-[13px] font-semibold leading-tight line-clamp-2" style={{ color: isActive ? "var(--color-brand)" : "var(--text-secondary)" }}>
+                      {s.title}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 bg-[var(--border-strong)] h-1 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: prog.total > 0 ? `${(prog.reviewed / prog.total) * 100}%` : "0%",
+                            backgroundColor: isDone ? "var(--color-positive)" : "var(--color-brand)"
+                          }}
+                        />
+                      </div>
+                      <span className="text-[10px] font-bold" style={{ color: "var(--text-muted)" }}>
+                        {prog.reviewed}/{prog.total}
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {unresolvedCommentsCount > 0 && (
+                    <div className="flex items-center justify-center shrink-0 w-6">
+                       <div className="relative">
+                        <MessageSquare className="w-3.5 h-3.5" style={{ color: "var(--text-muted)" }} />
+                        <span 
+                          className="absolute -top-1 -right-1 text-[8px] font-bold h-2.5 w-2.5 flex items-center justify-center rounded-full"
+                          style={{ backgroundColor: "var(--color-brand)", color: "white", padding: "0" }}
+                        >
+                          {unresolvedCommentsCount}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {isDone && unresolvedCommentsCount === 0 && (
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0" style={{ color: "var(--color-positive)" }} />
+                  )}
+                </div>
               );
             })}
-
             {/* Appendices Left Nav Item */}
             <div className="mt-4 pt-4" style={{ borderTop: "var(--border-subtle)" }}>
               <button
@@ -1222,6 +1398,8 @@ export function ReviewScreen() {
                   onRevert={selectedParagraph.isEdited ? () => handleRevert(selectedParagraph.id) : undefined}
                   onMoveToAppendix={handleMoveToAppendix}
                   onReinclude={handleReinclude}
+                  onAddComment={handleCommentAdd}
+                  onResolveComment={handleCommentResolve}
                   existingAppendices={allAppendices}
                   onClose={() => setActiveId(null)}
                 />
