@@ -249,18 +249,24 @@ export function DashboardPage() {
             value={STATS.awaitingMyReview}
             supportingText="Documents in your review queue"
             valueColor="var(--color-warning)"
+            onClick={() => setActiveTab("pending")}
+            isActive={activeTab === "pending"}
           />
           <StatCard
             label="In Progress"
             value={STATS.inProgress}
             supportingText="Consolidations under review"
             valueColor="var(--color-brand)"
+            onClick={() => setActiveTab("in-progress")}
+            isActive={activeTab === "in-progress"}
           />
           <StatCard
             label="Completed"
             value={STATS.completedThisMonth}
             supportingText="Approved and published"
             valueColor="var(--color-success)"
+            onClick={() => setActiveTab("completed")}
+            isActive={activeTab === "completed"}
           />
         </div>
 
