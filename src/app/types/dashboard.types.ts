@@ -15,6 +15,7 @@ export interface ConsolidationTask {
   status?: "pending" | "in-progress" | "completed";
   completedAt?: string;
   completedBy?: string;
+  nextReviewer?: { name: string; role: string } | null;
 }
 
 export interface ActivityItem {

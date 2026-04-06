@@ -99,9 +99,30 @@ export function TaskRow({ task, onReview }: TaskRowProps) {
               color: "var(--text-muted)",
               fontFamily: "Inter, sans-serif",
               flexShrink: 0,
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
             }}
           >
-            Reviewer {task.reviewerPosition} of {task.totalReviewers}
+            <span>Reviewer {task.reviewerPosition} of {task.totalReviewers}</span>
+            {(task.nextReviewer !== undefined || task.reviewerPosition === task.totalReviewers) && (
+              <span style={{ color: "var(--border-strong)" }}>·</span>
+            )}
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 500,
+                color: task.nextReviewer === null ? "var(--color-brand)" : "var(--text-muted)",
+              }}
+            >
+              {task.nextReviewer === null ? (
+                "Next: You"
+              ) : task.nextReviewer ? (
+                `Next: ${task.nextReviewer.name} (${task.nextReviewer.role})`
+              ) : task.reviewerPosition === task.totalReviewers ? (
+                "Final review"
+              ) : null}
+            </span>
           </span>
           <div className="flex-1 h-[5px] rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-hover)" }}>
             <div

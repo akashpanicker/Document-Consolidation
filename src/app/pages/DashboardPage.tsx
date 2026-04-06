@@ -27,6 +27,7 @@ const TASK_LIST: ConsolidationTask[] = [
     totalReviewers: 3,
     progressPercent: 33,
     status: "pending",
+    nextReviewer: null // You
   },
   {
     id: "task-2",
@@ -36,6 +37,7 @@ const TASK_LIST: ConsolidationTask[] = [
     totalReviewers: 3,
     progressPercent: 67,
     status: "pending",
+    nextReviewer: null // You
   },
   {
     id: "task-3",
@@ -45,6 +47,7 @@ const TASK_LIST: ConsolidationTask[] = [
     totalReviewers: 2,
     progressPercent: 50,
     status: "pending",
+    nextReviewer: null // You
   },
   {
     id: "task-4",
@@ -54,6 +57,7 @@ const TASK_LIST: ConsolidationTask[] = [
     totalReviewers: 4,
     progressPercent: 75,
     status: "pending",
+    nextReviewer: null // You
   },
   {
     id: "task-5",
@@ -63,6 +67,7 @@ const TASK_LIST: ConsolidationTask[] = [
     totalReviewers: 2,
     progressPercent: 90,
     status: "pending",
+    nextReviewer: null // You
   },
 
   // In Progress (Completed by 1st or 2nd, but not last) - 12 items
@@ -76,6 +81,7 @@ const TASK_LIST: ConsolidationTask[] = [
     status: "in-progress",
     completedAt: "2026-04-01 10:30 AM",
     completedBy: "Sarah Chen",
+    nextReviewer: null // You
   },
   {
     id: "task-7",
@@ -87,29 +93,29 @@ const TASK_LIST: ConsolidationTask[] = [
     status: "in-progress",
     completedAt: "2026-04-01 02:15 PM",
     completedBy: "James Okonkwo",
+    nextReviewer: { name: "John Doe", role: "Mgr" }
   },
-  { id: "task-ip-3", documentName: "Blowout Preventer Inspection", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-29 11:20 AM", completedBy: "Wei Zhang" },
-  { id: "task-ip-4", documentName: "Mooring System Standards", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 09:45 AM", completedBy: "Lisa Park" },
-  { id: "task-ip-5", documentName: "Waste Management Protocol", documentType: "Policy", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 01:10 PM", completedBy: "Ahmed Al-Rashid" },
-  { id: "task-ip-6", documentName: "Confined Space Entry", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-27 10:00 AM", completedBy: "Carlos Rivera" },
-  { id: "task-ip-7", documentName: "Lifting Operations Guide", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-26 03:30 PM", completedBy: "Sarah Chen" },
-  { id: "task-ip-8", documentName: "Radiographic Testing Manual", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-26 11:15 AM", completedBy: "James Okonkwo" },
-  { id: "task-ip-9", documentName: "Contractor Safety Plan", documentType: "Policy", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-25 02:20 PM", completedBy: "Marcos Diaz" },
-  { id: "task-ip-10", documentName: "Equipment Maintenance Schedule", documentType: "Standard", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-25 09:10 AM", completedBy: "Wei Zhang" },
-  { id: "task-ip-11", documentName: "Fire Protection Standard", documentType: "Standard", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-24 04:50 PM", completedBy: "Lisa Park" },
-  { id: "task-ip-12", documentName: "Hazardous Materials Handling", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-24 10:30 AM", completedBy: "Ahmed Al-Rashid" },
+  { id: "task-ip-3", documentName: "Blowout Preventer Inspection", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-29 11:20 AM", completedBy: "Wei Zhang", nextReviewer: { name: "Marcos", role: "Sr. QHSC Mgr" } },
+  { id: "task-ip-4", documentName: "Mooring System Standards", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 09:45 AM", completedBy: "Lisa Park", nextReviewer: null },
+  { id: "task-ip-5", documentName: "Waste Management Protocol", documentType: "Policy", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-28 01:10 PM", completedBy: "Ahmed Al-Rashid", nextReviewer: { name: "Sarah Smith", role: "HSE" } },
+  { id: "task-ip-6", documentName: "Confined Space Entry", documentType: "Procedure", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-27 10:00 AM", completedBy: "Carlos Rivera", nextReviewer: { name: "Marcos", role: "Sr. QHSC Mgr" } },
+  { id: "task-ip-7", documentName: "Lifting Operations Guide", documentType: "Standard", reviewerPosition: 1, totalReviewers: 2, progressPercent: 50, status: "in-progress", completedAt: "2026-03-26 03:30 PM", completedBy: "Sarah Chen", nextReviewer: { name: "John Doe", role: "Mgr" } },
+  { id: "task-ip-8", documentName: "Radiographic Testing Manual", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-26 11:15 AM", completedBy: "James Okonkwo", nextReviewer: null },
+  { id: "task-ip-9", documentName: "Contractor Safety Plan", documentType: "Policy", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-25 02:20 PM", completedBy: "Marcos Diaz", nextReviewer: { name: "Sarah Smith", role: "HSE" } },
+  { id: "task-ip-10", documentName: "Equipment Maintenance Schedule", documentType: "Standard", reviewerPosition: 2, totalReviewers: 4, progressPercent: 50, status: "in-progress", completedAt: "2026-03-25 09:10 AM", completedBy: "Wei Zhang", nextReviewer: { name: "John Doe", role: "Mgr" } },
+  { id: "task-ip-11", documentName: "Fire Protection Standard", documentType: "Standard", reviewerPosition: 1, totalReviewers: 3, progressPercent: 33, status: "in-progress", completedAt: "2026-03-24 04:50 PM", completedBy: "Lisa Park", nextReviewer: { name: "Marcos", role: "Sr. QHSC Mgr" } },
+  { id: "task-ip-12", documentName: "Hazardous Materials Handling", documentType: "Procedure", reviewerPosition: 2, totalReviewers: 3, progressPercent: 66, status: "in-progress", completedAt: "2026-03-24 10:30 AM", completedBy: "Ahmed Al-Rashid", nextReviewer: null },
 
-  // Completed (Completed by the last reviewer) - 7 items
   {
     id: "task-8",
-    documentName: "Safety Management System",
-    documentType: "Standard",
+    documentName: "HSE 005 — Hot Work Procedure",
+    documentType: "Procedure",
     reviewerPosition: 3,
     totalReviewers: 3,
     progressPercent: 100,
     status: "completed",
-    completedAt: "2026-03-30 09:00 AM",
-    completedBy: "Marcos Diaz",
+    completedAt: "06 Apr 2026",
+    completedBy: "Sarah Smith",
   },
   {
     id: "task-9",
@@ -187,7 +193,14 @@ export function DashboardPage() {
   const [activeTab, setActiveTab] = useState<"pending" | "in-progress" | "completed">("pending");
 
   const handleCreateNew = () => navigate("/scope");
-  const handleReview = (_id: string) => navigate("/review");
+  const handleReview = (id: string) => {
+    const task = TASK_LIST.find(t => t.id === id);
+    if (task?.status === "completed") {
+      navigate(`/document/${id}/view`);
+    } else {
+      navigate("/review");
+    }
+  };
 
   const filteredTasks = useMemo(() => {
     return TASK_LIST.filter(task => task.status === activeTab);
@@ -198,7 +211,7 @@ export function DashboardPage() {
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      <Header breadcrumb={[{ label: "Dashboard" }]} showOnlineStatus={true} showUser={true} />
+      <Header breadcrumb={[{ label: "Dashboard" }]} showUser={true} />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-6 mt-2 overflow-y-auto">
         {/* Page title row */}

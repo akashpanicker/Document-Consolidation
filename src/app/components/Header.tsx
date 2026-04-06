@@ -16,7 +16,6 @@ interface HeaderProps {
   userName?: string;
   userRole?: string;
   userInitials?: string;
-  showOnlineStatus?: boolean;
   showUser?: boolean;
   layoutSwitcher?: {
     activeLayout: 1 | 2;
@@ -29,7 +28,6 @@ export function Header({
   userName = "Josh",
   userRole = "Sr. QHSE Manager",
   userInitials = "DM",
-  showOnlineStatus = true,
   showUser = true,
   layoutSwitcher,
 }: HeaderProps) {
@@ -162,28 +160,6 @@ export function Header({
 
       {/* Right content */}
       <div className="flex flex-[1_0_0] gap-[24px] h-full items-center justify-end min-h-px min-w-px">
-        {/* Online Status Indicator */}
-        {showOnlineStatus && (
-          <div className="flex items-start relative shrink-0">
-            <div
-              className="flex gap-[8px] h-[24px] items-center pl-[12px] pr-[8px] relative rounded-[30px] shrink-0"
-              style={{ backgroundColor: "var(--bg-online-badge)" }}
-            >
-              <div className="relative shrink-0 size-[8px]">
-                <svg className="absolute block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 8 8">
-                  <circle cx="4" cy="4" fill="var(--color-success)" r="4" />
-                </svg>
-              </div>
-              <div
-                className="flex flex-col font-['Inter',sans-serif] font-semibold justify-center leading-[0] not-italic relative shrink-0 text-[14px] text-center tracking-[0.15px] whitespace-nowrap"
-                style={{ color: "var(--text-online)" }}
-              >
-                <p className="leading-none">{t("header.online")}</p>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Video & Language Icons Group */}
         <div className="flex gap-[8px] items-center shrink-0">
           {/* Watch Safety Video Button - Only on Briefing Dashboard */}

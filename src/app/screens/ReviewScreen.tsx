@@ -1067,7 +1067,6 @@ export function ReviewScreen() {
           { label: "Scope", path: "/scope" },
           { label: "Review" }
         ]}
-        showOnlineStatus={true}
         showUser={true}
       />
 
