@@ -23,6 +23,7 @@ export interface Activity {
 export interface ScopeLayoutProps {
   selectedRegions: string[];
   selectedRigTypes: string[];
+  selectedDocumentTypes: string[];
   selectedActivities: string[];
   selectedDocuments: { hp: string[]; kcad: string[] };
   documents: { hp: SourceDocument[]; kcad: SourceDocument[] };
@@ -30,6 +31,7 @@ export interface ScopeLayoutProps {
   
   onRegionChange: (regions: string[]) => void;
   onRigTypeChange: (rigTypes: string[]) => void;
+  onDocumentTypeChange: (types: string[]) => void;
   onActivityChange: (activityId: string) => void;
   onActivitiesChange: (activities: string[]) => void;
   onDocumentSelect: (id: string) => void;

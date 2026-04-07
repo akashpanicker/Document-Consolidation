@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Header } from "../components/Header";
-import { ArrowLeft, FileText, Download, CheckCircle, Check } from "lucide-react";
+import { ArrowLeft, FileText, Download, CheckCircle, Check, ExternalLink } from "lucide-react";
 import { Badge } from "../components/ui/badge";
 import { Button } from "../components/ui/button";
 import { Toaster } from "../components/ui/sonner";
@@ -26,15 +26,15 @@ const DOC_DATA = {
           id: "p1",
           text: "This procedure establishes the minimum safety requirements to be followed for all hot work activities conducted at rig locations. Its primary objective is to prevent fire-related incidents through standardized ignition source control.",
           sources: [
-            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const },
-            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const },
+            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const, url: "/documents/hp/HSE-005-Hot-Work-Standard-v2.0.pdf" },
+            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const, url: "/documents/kcad/KCAD-Global-Safety-Guidelines.pdf" },
           ],
         },
         {
           id: "p2",
           text: "The scope includes all welding, burning, cutting, and other sparks or flame-producing activities. It applies to all H&P and contractor personnel without exception.",
           sources: [
-            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const },
+            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const, url: "/documents/hp/HSE-005-Hot-Work-Standard-v2.0.pdf" },
           ],
         },
       ],
@@ -47,14 +47,14 @@ const DOC_DATA = {
           id: "p3",
           text: "Prior to any hot work, a thorough hazard assessment must be conducted. All flammable materials must be removed or properly shielded within a 10-meter (35-foot) radius of the work site.",
           sources: [
-            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const },
+            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const, url: "/documents/hp/HSE-005-Hot-Work-Standard-v2.0.pdf" },
           ],
         },
         {
           id: "p4",
           text: "A dedicated fire watch must be stationed at the site. This individual must remain on site for at least 30 minutes after hot work has been completed to monitor for smoldering materials.",
           sources: [
-            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const },
+            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const, url: "/documents/kcad/KCAD-Global-Safety-Guidelines.pdf" },
           ],
         },
       ],
@@ -67,8 +67,8 @@ const DOC_DATA = {
           id: "p5",
           text: "All personnel involved in hot work must wear task-specific PPE, including flame-resistant clothing, leather gloves, and appropriate face shields or goggles. All equipment must be inspected for damage prior to each shift.",
           sources: [
-            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const },
-            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const },
+            { documentName: "H&P Hot Work Standard v2.0", origin: "H&P" as const, url: "/documents/hp/HSE-005-Hot-Work-Standard-v2.0.pdf" },
+            { documentName: "KCAD Global Safety Guidelines", origin: "KCAD" as const, url: "/documents/kcad/KCAD-Global-Safety-Guidelines.pdf" },
           ],
         },
       ],
@@ -83,14 +83,14 @@ const DOC_DATA = {
           id: "ap1",
           text: "On Flex 3 rigs operating in Australia, additional ventilation systems must be active during all hot work in confined spaces. Local regulatory permits must be obtained prior to work initiation.",
           sources: [
-            { documentName: "Australia Rig Ops v1.1", origin: "H&P" as const },
+            { documentName: "Australia Rig Ops v1.1", origin: "H&P" as const, url: "/documents/hp/Australia-Rig-Ops-v1.1.pdf" },
           ],
         },
         {
           id: "ap2",
           text: "A dual-gas monitor is mandatory for continuous tracking of explosive gas levels and oxygen concentrations during the process.",
           sources: [
-            { documentName: "Australia Rig Ops v1.1", origin: "H&P" as const },
+            { documentName: "Australia Rig Ops v1.1", origin: "H&P" as const, url: "/documents/hp/Australia-Rig-Ops-v1.1.pdf" },
           ],
         },
       ],
@@ -122,6 +122,25 @@ const DOC_DATA = {
 };
 
 const SECTION_IDS = DOC_DATA.sections.map(s => s.id);
+
+type SourceEntry = { documentName: string; origin: "H&P" | "KCAD"; url: string };
+
+/* Deduplicated list of all source documents used across sections + appendices */
+const SOURCE_DOCUMENTS_USED = (() => {
+  const seen = new Set<string>();
+  const result: SourceEntry[] = [];
+  const allSources: SourceEntry[] = [
+    ...DOC_DATA.sections.flatMap(s => s.paragraphs.flatMap(p => p.sources)),
+    ...DOC_DATA.appendices.flatMap(a => a.paragraphs.flatMap(p => p.sources)),
+  ];
+  for (const src of allSources) {
+    if (!seen.has(src.documentName)) {
+      seen.add(src.documentName);
+      result.push(src);
+    }
+  }
+  return result;
+})();
 
 export function CompletedDocumentView() {
   const navigate = useNavigate();
@@ -633,6 +652,48 @@ export function CompletedDocumentView() {
                   <span className="text-[12px]" style={{ color: "var(--text-muted)" }}>
                     Fully approved on {DOC_DATA.consolidationDate}
                   </span>
+                </div>
+              </div>
+
+              {/* Source Documents Used */}
+              <div className="mt-6 pt-5" style={{ borderTop: "var(--border-default)" }}>
+                <span
+                  className="text-[13px] font-bold uppercase tracking-[0.08em] mb-3 block"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Source Documents Used
+                </span>
+                <div className="flex flex-col gap-2">
+                  {SOURCE_DOCUMENTS_USED.map((src, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <div
+                        className="shrink-0 px-1.5 py-0.5 rounded-[3px] text-[9px] font-bold text-center"
+                        style={{
+                          width: "36px",
+                          backgroundColor: src.origin === "H&P"
+                            ? "rgba(43, 85, 151, 0.1)"
+                            : "rgba(111, 143, 217, 0.1)",
+                          color: src.origin === "H&P"
+                            ? "var(--color-brand)"
+                            : "var(--color-info)",
+                        }}
+                      >
+                        {src.origin}
+                      </div>
+                      <a
+                        href={src.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-[12px] leading-snug"
+                        style={{ color: "var(--color-brand)", textDecoration: "none" }}
+                        onMouseEnter={(e) => { e.currentTarget.style.textDecoration = "underline"; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.textDecoration = "none"; }}
+                      >
+                        {src.documentName}
+                        <ExternalLink className="w-[11px] h-[11px] shrink-0" />
+                      </a>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

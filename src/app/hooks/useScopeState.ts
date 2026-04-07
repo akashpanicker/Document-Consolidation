@@ -299,6 +299,7 @@ export function useScopeState() {
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
   const [rigTypes, setRigTypes] = useState<string[]>([]);
+  const [documentTypes, setDocumentTypes] = useState<string[]>([]);
   const [selectedDocs, setSelectedDocs] = useState<string[]>([]);
 
   // AI Modal States
@@ -317,6 +318,7 @@ export function useScopeState() {
     let rawFiltered = SOURCE_DOCUMENTS.filter((doc) => {
       if (regions.length > 0 && !regions.includes(doc.region)) return false;
       if (rigTypes.length > 0 && !rigTypes.includes(doc.rig)) return false;
+      if (documentTypes.length > 0 && !documentTypes.includes(doc.category)) return false;
       if (selectedActivities.length > 0 && !doc.activities.some((a) => selectedActivities.includes(a))) return false;
       return true;
     });
@@ -342,7 +344,7 @@ export function useScopeState() {
     const kc = rawFiltered.filter((d) => d.origin === "KCAD");
 
     return { hpDocs: hp, kcadDocs: kc };
-  }, [regions, rigTypes, selectedActivities]);
+  }, [regions, rigTypes, documentTypes, selectedActivities]);
 
   const toggleDoc = (id: string) => {
     setSelectedDocs((prev) =>
@@ -420,6 +422,7 @@ export function useScopeState() {
   return {
     selectedRegions: regions,
     selectedRigTypes: rigTypes,
+    selectedDocumentTypes: documentTypes,
     selectedActivities,
     selectedDocuments,
     documents: { hp: hpDocs, kcad: kcadDocs },
@@ -427,6 +430,7 @@ export function useScopeState() {
 
     onRegionChange: setRegions,
     onRigTypeChange: setRigTypes,
+    onDocumentTypeChange: setDocumentTypes,
     onActivityChange: toggleActivity,
     onActivitiesChange: setSelectedActivities,
     onDocumentSelect: toggleDoc,

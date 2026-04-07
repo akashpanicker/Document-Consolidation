@@ -16,11 +16,13 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
   const {
     selectedRegions,
     selectedRigTypes,
+    selectedDocumentTypes,
     selectedActivities,
     selectedDocuments,
     documents,
     onRegionChange,
     onRigTypeChange,
+    onDocumentTypeChange,
     onActivitiesChange,
     onDocumentSelect,
     onToggleAllDocuments,
@@ -69,7 +71,7 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
 
           {/* Dropdowns Section */}
           <div className="p-6">
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-4 gap-6">
               <MultiSelectDropdown
                 label={t("scope.region")}
                 values={selectedRegions}
@@ -109,6 +111,19 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
                   { value: "snubbing-unit", label: "Snubbing Unit" },
                 ]}
                 placeholder={t("scope.selectRigTypes")}
+              />
+
+              <MultiSelectDropdown
+                label="Document Type"
+                values={selectedDocumentTypes}
+                onChange={onDocumentTypeChange}
+                options={[
+                  { value: "Standard", label: "Standard" },
+                  { value: "Procedure", label: "Procedure" },
+                  { value: "Checklist", label: "Checklist" },
+                  { value: "Policy", label: "Policy" },
+                ]}
+                placeholder="Select types..."
               />
 
               <MultiSelectDropdown
