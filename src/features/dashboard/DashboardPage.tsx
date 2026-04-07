@@ -1,12 +1,12 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import { FolderSearch } from "lucide-react";
-import { Header } from "../components/Header";
-import { StatCard } from "../components/dashboard/StatCard";
-import { TaskRow } from "../components/dashboard/TaskRow";
-import { ActivityItem } from "../components/dashboard/ActivityItem";
-import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger } from "../components/ui/underline-tabs";
-import { DashboardStats, ConsolidationTask, ActivityItem as ActivityItemType } from "../types/dashboard.types";
+import { Header } from "../../components/shared/AppHeader";
+import { StatCard } from "./components/StatCard";
+import { TaskRow } from "./components/TaskRow";
+import { ActivityItem } from "./components/ActivityItem";
+import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger } from "../../components/ui/underline-tabs";
+import { DashboardStats, ConsolidationTask, ActivityItem as ActivityItemType } from "./dashboard.types";
 
 /* ── Mock Data ─────────────────────────────────────────────── */
 
@@ -217,8 +217,8 @@ export function DashboardPage() {
         {/* Page title row */}
         <div className="flex items-center justify-between mt-6 mb-3">
           <h1
-            className="text-[20px] font-bold uppercase tracking-wide"
-            style={{ color: "var(--text-primary)" }}
+            className="text-[18px] font-bold uppercase tracking-wide"
+            style={{ color: "var(--text-secondary)" }}
           >
             Dashboard
           </h1>
@@ -345,7 +345,7 @@ function ReviewQueue({
               Completed
             </UnderlineTabsTrigger>
           </UnderlineTabsList>
-          
+
           <button
             type="button"
             className="mr-4 hover:underline"

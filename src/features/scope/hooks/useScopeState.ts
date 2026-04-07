@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { SourceDocument, Activity } from "../types/ScopeLayoutProps";
+import { SourceDocument, Activity } from "../ScopeLayoutProps";
 
 export const ACTIVITIES: Activity[] = [
   { id: "life-critical", name: "Life-Critical Controls", image: "/assets/site-conditions/inspection.png" },

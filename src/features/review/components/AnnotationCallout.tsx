@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { X, CheckCircle, AlertTriangle, ShieldAlert, FileText, Info, Sparkles, RotateCcw, ExternalLink, ChevronDown, MessageSquare, CornerDownRight, Send } from "lucide-react";
-import { Card } from "./ui/card";
-import { Badge } from "./ui/badge";
-import { Button } from "./ui/button";
-import { Textarea } from "./ui/textarea";
-import { Input } from "./ui/input";
+import { Card } from "../../../components/ui/card";
+import { Badge } from "../../../components/ui/badge";
+import { Button } from "../../../components/ui/button";
+import { Textarea } from "../../../components/ui/textarea";
+import { Input } from "../../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -12,10 +12,10 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger, UnderlineTabsContent } from "./ui/underline-tabs";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
-import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "./ui/tooltip";
+} from "../../../components/ui/select";
+import { UnderlineTabs, UnderlineTabsList, UnderlineTabsTrigger, UnderlineTabsContent } from "../../../components/ui/underline-tabs";
+import { Avatar, AvatarImage, AvatarFallback } from "../../../components/ui/avatar";
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "../../../components/ui/tooltip";
 import { useTranslation } from "react-i18next";
 
 export interface SourceContribution {
@@ -96,7 +96,7 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
       >
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
-          <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-muted)" }}>
+          <span className="text-[14px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
             {t("review.aiConfidence")}
           </span>
         </div>
@@ -142,7 +142,7 @@ export function AIConfidenceCard({ data }: AIConfidenceCardProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 shrink-0" style={{ color: "var(--color-brand)" }} />
-          <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+          <span className="text-[14px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
             {t("review.aiConfidence")}
           </span>
         </div>

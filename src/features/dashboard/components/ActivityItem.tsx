@@ -1,4 +1,4 @@
-import { ActivityItem as ActivityItemType } from "../../types/dashboard.types";
+import { ActivityItem as ActivityItemType } from "../dashboard.types";
 
 const ACTION_BORDER_COLOR: Record<ActivityItemType["actionType"], string> = {
   approved: "var(--color-success)",

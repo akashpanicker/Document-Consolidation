@@ -1,12 +1,12 @@
 import { useState, useRef, useEffect, useCallback, MouseEvent } from "react";
-import { Header } from "../components/Header";
-import { StickyFooter, FooterButton } from "../components/StickyFooter";
+import { Header } from "../../components/shared/AppHeader";
+import { StickyFooter, FooterButton } from "../../components/shared/StickyFooter";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown, MessageSquare, CheckCircle } from "lucide-react";
-import { AnnotationCallout, AIConfidenceCard, ParagraphData, CommentData, SourceContribution } from "../components/AnnotationCallout";
-import { Badge } from "../components/ui/badge";
-import { Input } from "../components/ui/input";
+import { AnnotationCallout, AIConfidenceCard, ParagraphData, CommentData, SourceContribution } from "./components/AnnotationCallout";
+import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -14,7 +14,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../components/ui/select";
+} from "../../components/ui/select";
 
 /* ── Custom keyframe styles injected via a <style> tag ── */
 const REVIEW_STYLES = `
@@ -575,7 +575,7 @@ function MoveToAppendixPopover({ suggestedName, existingAppendices, onConfirm, o
   );
 }
 
-export function ReviewScreen() {
+export function ReviewPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -1080,8 +1080,8 @@ export function ReviewScreen() {
       >
         <div className="flex items-center justify-between">
           <span
-            className="text-[12px] font-bold uppercase tracking-wider"
-            style={{ color: "var(--text-tertiary)" }}
+            className="text-[14px] font-bold uppercase tracking-wide"
+            style={{ color: "var(--text-secondary)" }}
           >
             {t("review.reviewPipeline")}
           </span>
@@ -1199,8 +1199,8 @@ export function ReviewScreen() {
           }}
         >
           <span
-            className="text-[12px] font-bold uppercase tracking-[0.1em] mb-5"
-            style={{ color: "var(--text-muted)", letterSpacing: "0.1em" }}
+            className="text-[14px] font-bold uppercase tracking-wide mb-5"
+            style={{ color: "var(--text-secondary)" }}
           >
             {t("review.inThisDocument")}
           </span>

@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import Form from "../../imports/Form";
-import { Header } from "../components/Header";
+import { Header } from "../../components/shared/AppHeader";
 import { useTranslation } from "react-i18next";
 
-export function LoginScreen() {
+export function LoginPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [currentTime, setCurrentTime] = useState(new Date());

@@ -1,18 +1,17 @@
-import { Header } from "../components/Header";
-import { StickyFooter, FooterButton } from "../components/StickyFooter";
-import { SearchableSelect } from "../components/SearchableSelect";
+import { Header } from "../../../components/shared/AppHeader";
+import { StickyFooter, FooterButton } from "../../../components/shared/StickyFooter";
 import { MultiSelectDropdown } from "../components/MultiSelectDropdown";
-import { Checkbox } from "../components/ui/checkbox";
-import { Tooltip, TooltipTrigger, TooltipContent } from "../components/ui/tooltip";
-import { Popover, PopoverTrigger, PopoverContent } from "../components/ui/popover";
+import { Checkbox } from "../../../components/ui/checkbox";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../../../components/ui/tooltip";
+import { Popover, PopoverTrigger, PopoverContent } from "../../../components/ui/popover";
 import { useState } from "react";
 import { ArrowLeft, Sparkles, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ScopeLayoutProps, SourceDocument } from "../types/ScopeLayoutProps";
+import { ScopeLayoutProps, SourceDocument } from "../ScopeLayoutProps";
 
 const STATUS_MESSAGES_COUNT = 7;
 
-export function ScopeLayout2(props: ScopeLayoutProps) {
+export function ScopeLayout1(props: ScopeLayoutProps) {
   const { t } = useTranslation();
   const {
     selectedRegions,
@@ -21,11 +20,10 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
     selectedActivities,
     selectedDocuments,
     documents,
-    activities,
     onRegionChange,
     onRigTypeChange,
     onDocumentTypeChange,
-    onActivityChange,
+    onActivitiesChange,
     onDocumentSelect,
     onToggleAllDocuments,
     onClearSelection,
@@ -50,11 +48,6 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      {/* Header should probably be managed by Page or we can render it here. The prompt says "Add a layout switcher icon button to the Scope screen header". So Header is rendered here. 
-          Actually wait, if Header is in layout, then state for switcher needs to be passed down. But orchestrator ScopePage can pass header? Let's just render inner main content?
-          Wait, existing UI has Header inside ScopeScreen.tsx. I'll keep it here, or we can move Header to ScopePage. 
-          Prompt says: "Add a layout switcher... placed immediately left of the dark/light mode toggle". I will modify Header directly.
-      */}
       <Header
         breadcrumb={[
           { label: "Dashboard", path: "/dashboard" },
@@ -65,20 +58,20 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
         layoutSwitcher={layoutSwitcher}
       />
 
-      <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 overflow-y-auto">
+      <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 min-h-0">
         {/* Title row */}
         <div className="flex items-center justify-between mt-8 mb-[6px]">
-          <h1 className="text-[14px] font-bold text-[var(--text-primary)] uppercase tracking-wide">
+          <h1 className="text-[14px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
             {t("scope.title")}
           </h1>
         </div>
 
         {/* ── Single Scope Container ── */}
-        <div className="bg-[var(--bg-card)] rounded-[8px] shadow-sm" style={{ border: "var(--border-default)" }}>
+        <div className="bg-[var(--bg-card)] rounded-[8px] shadow-sm shrink-0" style={{ border: "var(--border-default)" }}>
 
           {/* Dropdowns Section */}
           <div className="p-6">
-            <div className="grid grid-cols-3 gap-6">
+            <div className="grid grid-cols-4 gap-6">
               <MultiSelectDropdown
                 label={t("scope.region")}
                 values={selectedRegions}
@@ -132,74 +125,38 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
                 ]}
                 placeholder="Select types..."
               />
-            </div>
-          </div>
 
-          {/* Separator */}
-          <div className="mx-6" style={{ height: 1, backgroundColor: "var(--color-surface-3, var(--bg-hover))" }} />
-
-          {/* Filter by Activity Section */}
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-[14px] font-bold text-[var(--text-secondary)] uppercase tracking-wide">{t("scope.filterByActivity")}</h2>
-              <span className="text-[12px] font-normal" style={{ color: "var(--text-muted)", fontFamily: "Inter, sans-serif" }}>Optional</span>
-            </div>
-            <div className="grid grid-cols-8 gap-3">
-              {activities.map(activity => {
-                const isSelected = selectedActivities.includes(activity.id);
-                return (
-                  <div
-                    key={activity.id}
-                    onClick={() => onActivityChange(activity.id)}
-                    className="flex flex-col cursor-pointer rounded-[8px] overflow-hidden"
-                    style={{
-                      border: isSelected ? "2px solid var(--color-brand)" : "1px solid var(--color-surface-5, rgba(255,255,255,0.08))",
-                      backgroundColor: isSelected ? "rgba(43,85,151,0.05)" : "var(--bg-card)",
-                      transition: "all 150ms ease-in-out",
-                    }}
-                  >
-                    {/* Image */}
-                    <div
-                      className="relative overflow-hidden"
-                      style={{ height: 90 }}
-                    >
-                      <img
-                        src={activity.image}
-                        alt={activity.name}
-                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-150"
-                      />
-                      {isSelected && (
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background: "linear-gradient(180deg, rgba(43,85,151,0.1) 0%, rgba(43,85,151,0.25) 100%)",
-                          }}
-                        />
-                      )}
-                    </div>
-                    {/* Text below image */}
-                    <div className="px-2.5 py-2" style={{ borderTop: "1px solid var(--color-surface-5, rgba(255,255,255,0.08))" }}>
-                      <span
-                        className="text-[12px] font-semibold leading-tight"
-                        style={{
-                          color: isSelected ? "var(--color-brand)" : "var(--text-secondary)",
-                          transition: "color 150ms ease-in-out",
-                        }}
-                      >
-                        {t(`scope.activities.${activity.id}`, activity.name)}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+              <MultiSelectDropdown
+                label={t("scope.filterByActivity")}
+                values={selectedActivities}
+                onChange={onActivitiesChange}
+                options={[
+                  { value: "life-critical", label: "Life-Critical Controls" },
+                  { value: "hse-governance", label: "HSE Governance" },
+                  { value: "drilling-ops", label: "Drilling Operations" },
+                  { value: "well-control", label: "Well Control" },
+                  { value: "pipe-tubular", label: "Pipe & Tubular Handling" },
+                  { value: "mud-solids", label: "Mud System & Solids Control" },
+                  { value: "pressure-drilling-line", label: "Pressure Systems & Drilling Line" },
+                  { value: "rig-move", label: "Rig Move & Structural" },
+                  { value: "lifting-hoisting", label: "Lifting & Hoisting" },
+                  { value: "tools-equipment", label: "Tools & Equipment" },
+                  { value: "maintenance-electrical", label: "Maintenance & Electrical" },
+                  { value: "non-drilling", label: "Non-Drilling Operations" },
+                  { value: "emergency-response", label: "Emergency Response" },
+                  { value: "environmental-logistics", label: "Environmental & Logistics" },
+                  { value: "loto", label: "LOTO" },
+                ]}
+                placeholder={t("scope.selectActivities", "Select activities...")}
+              />
             </div>
           </div>
 
         </div>
 
         {/* ══════ Source Documents Section ══════ */}
-        <div className="flex flex-col gap-1 mt-8 mb-4">
-          <h2 className="text-[14px] font-bold uppercase tracking-[0.08em]" style={{ color: "var(--text-secondary)" }}>
+        <div className="flex flex-col gap-1 mt-8 mb-4 shrink-0">
+          <h2 className="text-[14px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
             {t("scope.sourceDocuments")}
           </h2>
           <p className="text-[13px]" style={{ color: "var(--text-muted)" }}>
@@ -208,7 +165,7 @@ export function ScopeLayout2(props: ScopeLayoutProps) {
         </div>
 
         {/* Two Column Document Library */}
-        <div className="grid grid-cols-2 gap-5">
+        <div className="grid grid-cols-2 gap-5 flex-1 min-h-0 overflow-hidden" style={{ gridTemplateRows: "1fr" }}>
           {/* ── H&P Column ── */}
           <DocumentColumn
             origin="H&P"
@@ -371,6 +328,7 @@ function DocumentColumn({
   const allSelected = docs.length > 0 && columnSelectedCount === docs.length;
   const isIndeterminate = columnSelectedCount > 0 && columnSelectedCount < docs.length;
 
+  // col widths
   const W = { cb: 40, type: 100, action: 40 };
   const hdrCell: React.CSSProperties = {
     fontSize: 12, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase",
@@ -379,14 +337,14 @@ function DocumentColumn({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 h-full min-h-0">
       {/* Title */}
-      <h3 className="text-[13px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+      <h3 className="text-[13px] font-bold uppercase tracking-wide shrink-0" style={{ color: "var(--text-secondary)" }}>
         {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
       </h3>
 
       {/* Search */}
-      <div style={{ position: "relative" }}>
+      <div className="shrink-0" style={{ position: "relative" }}>
         <Search className="absolute top-1/2 -translate-y-1/2 pointer-events-none"
           style={{ left: 10, width: 13, height: 13, color: "var(--text-muted)" }} />
         <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
@@ -400,7 +358,7 @@ function DocumentColumn({
       </div>
 
       {/* Card */}
-      <div className="rounded-[10px] flex flex-col overflow-hidden"
+      <div className="rounded-[10px] flex flex-col overflow-hidden flex-1 min-h-0"
         style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}>
 
         {/* Header row */}
@@ -414,9 +372,11 @@ function DocumentColumn({
               className="data-[state=checked]:bg-[var(--color-brand)] data-[state=checked]:border-[var(--color-brand)] data-[state=indeterminate]:bg-[var(--color-brand)] data-[state=indeterminate]:border-[var(--color-brand)]"
             />
           </div>
-          <div style={{ width: 300, flexShrink: 0, display: "flex", alignItems: "center", gap: 6 }}>
+          <div style={{ width: 300, flexShrink: 0, display: "flex", alignItems: "center", gap: 6, paddingLeft: 6 }}>
             <span style={hdrCell}>Document Name</span>
-            <span style={{ ...hdrCell, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>({filtered.length})</span>
+            <span style={{ ...hdrCell, fontWeight: 400, textTransform: "none", letterSpacing: 0 }}>
+              ({filtered.length})
+            </span>
           </div>
           <div style={{ width: W.type, flexShrink: 0, paddingLeft: 8 }}><span style={hdrCell}>Type</span></div>
           <div style={{ flex: 1, minWidth: 0, paddingLeft: 8 }}><span style={hdrCell}>Activities</span></div>
@@ -424,7 +384,7 @@ function DocumentColumn({
         </div>
 
         {/* Rows */}
-        <div className="flex flex-col overflow-y-auto" style={{ maxHeight: 6 * 52 }}>
+        <div className="flex flex-col overflow-y-auto flex-1 min-h-0">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 gap-2 px-6">
               <FolderSearch className="w-[28px] h-[28px]" style={{ color: "var(--text-muted)", opacity: 0.4 }} />
@@ -456,7 +416,7 @@ function DocumentColumn({
                 </div>
 
                 {/* Col 2 — Doc info */}
-                <div style={{ width: 300, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+                <div style={{ width: 300, flexShrink: 0, display: "flex", flexDirection: "column", gap: 2, paddingLeft: 6 }}>
                   <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)", fontFamily: "Inter, sans-serif",
                     overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "flex", alignItems: "center" }}>
                     {doc.name}
@@ -490,12 +450,12 @@ function DocumentColumn({
                 <div style={{ flex: 1, minWidth: 0, paddingLeft: 8, display: "flex", alignItems: "center", gap: 4, overflow: "hidden" }}>
                   {visibleActs.map(actId => (
                     <span key={actId} style={{
-                      display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
-                      fontSize: 11, fontWeight: 600, fontFamily: "Inter, sans-serif",
-                      padding: "2px 6px", borderRadius: 4,
-                      backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
-                      border: "1px solid var(--border-default)",
-                    }}>
+                        display: "inline-flex", alignItems: "center", whiteSpace: "nowrap",
+                        fontSize: 11, fontWeight: 600, fontFamily: "Inter, sans-serif",
+                        padding: "2px 6px", borderRadius: 4,
+                        backgroundColor: "var(--bg-hover)", color: "var(--text-secondary)",
+                        border: "1px solid var(--border-default)",
+                      }}>
                       {t(`scope.activities.${actId}`, actId)}
                     </span>
                   ))}
@@ -505,9 +465,9 @@ function DocumentColumn({
                         <span style={{
                           display: "inline-flex", alignItems: "center", cursor: "pointer", whiteSpace: "nowrap",
                           fontSize: 10, fontWeight: 600, fontFamily: "Inter, sans-serif",
-                          padding: "2px 6px", borderRadius: 4, flexShrink: 0,
+                          padding: "2px 6px", borderRadius: 4,
                           backgroundColor: "var(--bg-hover)", color: "var(--text-muted)",
-                          border: "1px solid var(--border-default)",
+                          border: "1px solid var(--border-default)", flexShrink: 0,
                         }}>
                           +{overflowActs.length}
                         </span>

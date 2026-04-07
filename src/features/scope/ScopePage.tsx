@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useScopeState } from "../hooks/useScopeState";
-import { ScopeLayout1 } from "../layouts/ScopeLayout1";
-import { ScopeLayout2 } from "../layouts/ScopeLayout2";
+import { useScopeState } from "./hooks/useScopeState";
+import { ScopeLayout1 } from "./layouts/ScopeLayout1";
+import { ScopeLayout2 } from "./layouts/ScopeLayout2";
 
 const LAYOUT_STORAGE_KEY = "hp_doc_scope_layout";
 

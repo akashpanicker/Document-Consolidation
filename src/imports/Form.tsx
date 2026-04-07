@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useTheme } from "../app/components/ThemeContext";
+import { useTheme } from "../components/shared/ThemeContext";
 import svgPaths from "./svg-9ccboph6c2";
 import { useTranslation } from "react-i18next";
 

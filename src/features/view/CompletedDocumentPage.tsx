@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { Header } from "../components/Header";
+import { Header } from "../../components/shared/AppHeader";
 import { ArrowLeft, FileText, Download, CheckCircle, Check, ExternalLink } from "lucide-react";
-import { Badge } from "../components/ui/badge";
-import { Button } from "../components/ui/button";
-import { Toaster } from "../components/ui/sonner";
+import { Badge } from "../../components/ui/badge";
+import { Button } from "../../components/ui/button";
+import { Toaster } from "../../components/ui/sonner";
 
 /* ── Mock Data ── */
 
@@ -142,7 +142,7 @@ const SOURCE_DOCUMENTS_USED = (() => {
   return result;
 })();
 
-export function CompletedDocumentView() {
+export function CompletedDocumentPage() {
   const navigate = useNavigate();
   const [activeSectionId, setActiveSectionId] = useState<string>("s1");
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -548,7 +548,7 @@ export function CompletedDocumentView() {
             style={{ borderBottom: "var(--border-default)" }}
           >
             <span
-              className="text-[13px] font-bold uppercase tracking-wide"
+              className="text-[14px] font-bold uppercase tracking-wide"
               style={{ color: "var(--text-secondary)" }}
             >
               APPROVAL CHAIN
@@ -658,8 +658,8 @@ export function CompletedDocumentView() {
               {/* Source Documents Used */}
               <div className="mt-6 pt-5" style={{ borderTop: "var(--border-default)" }}>
                 <span
-                  className="text-[13px] font-bold uppercase tracking-[0.08em] mb-3 block"
-                  style={{ color: "var(--text-muted)" }}
+                  className="text-[14px] font-bold uppercase tracking-wide mb-3 block"
+                  style={{ color: "var(--text-secondary)" }}
                 >
                   Source Documents Used
                 </span>

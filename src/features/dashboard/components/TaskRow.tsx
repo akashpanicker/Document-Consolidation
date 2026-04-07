@@ -1,4 +1,4 @@
-import { ConsolidationTask } from "../../types/dashboard.types";
+import { ConsolidationTask } from "../dashboard.types";
 
 const DOC_TYPE_STYLES: Record<ConsolidationTask["documentType"], { bg: string; color: string }> = {
   Procedure: { bg: "rgba(16,185,129,0.12)", color: "#10b981" },
