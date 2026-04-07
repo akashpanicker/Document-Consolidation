@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { SourceDocument, Activity } from "../ScopeLayoutProps";
+import { SourceDocument, Activity } from "../NewConsolidationLayoutProps";
 
 export const ACTIVITIES: Activity[] = [
   { id: "life-critical", name: "Life-Critical Controls", image: "/assets/site-conditions/inspection.png" },
@@ -293,7 +293,7 @@ export const SOURCE_DOCUMENTS: SourceDocument[] = [
 
 export const STATUS_MESSAGES_COUNT = 7;
 
-export function useScopeState() {
+export function useNewConsolidationState() {
   const navigate = useNavigate();
 
   const [selectedActivities, setSelectedActivities] = useState<string[]>([]);

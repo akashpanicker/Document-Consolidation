@@ -7,11 +7,11 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../../components/ui/
 import { useState } from "react";
 import { ArrowLeft, Sparkles, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { ScopeLayoutProps, SourceDocument } from "../ScopeLayoutProps";
+import { NewConsolidationLayoutProps, SourceDocument } from "../NewConsolidationLayoutProps";
 
 const STATUS_MESSAGES_COUNT = 7;
 
-export function ScopeLayout1(props: ScopeLayoutProps) {
+export function NewConsolidationLayout1(props: NewConsolidationLayoutProps) {
   const { t } = useTranslation();
   const {
     selectedRegions,
@@ -51,7 +51,7 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
       <Header
         breadcrumb={[
           { label: "Dashboard", path: "/dashboard" },
-          { label: "Scope" }
+          { label: "New Consolidation" }
         ]}
         showOnlineStatus={true}
         showUser={true}
@@ -60,8 +60,8 @@ export function ScopeLayout1(props: ScopeLayoutProps) {
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 min-h-0">
         {/* Title row */}
-        <div className="flex items-center justify-between mt-8 mb-[6px]">
-          <h1 className="text-[14px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
+        <div className="flex items-center justify-between mt-8 mb-[12px]">
+          <h1 className="text-[18px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
             {t("scope.title")}
           </h1>
         </div>

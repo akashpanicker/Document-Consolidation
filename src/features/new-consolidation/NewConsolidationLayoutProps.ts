@@ -20,7 +20,7 @@ export interface Activity {
   image: string;
 }
 
-export interface ScopeLayoutProps {
+export interface NewConsolidationLayoutProps {
   selectedRegions: string[];
   selectedRigTypes: string[];
   selectedDocumentTypes: string[];

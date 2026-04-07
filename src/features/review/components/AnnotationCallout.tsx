@@ -55,8 +55,6 @@ export interface ParagraphData {
   kcadPercent: number;
   isEdited?: boolean;
   originalText?: string;
-  excludedExcerpts?: string[];
-  originalExcludedExcerpts?: string[];
   sources?: SourceContribution[];
   appendixName?: string;
   suggestedForAppendix?: boolean;
@@ -191,26 +189,22 @@ interface AnnotationCalloutProps {
   onReject: (reason: string) => void;
   onRevert?: () => void;
   onMoveToAppendix?: (id: string, newAppName: string) => void;
-  onReinclude?: (id: string, excerptIndex: number, excerptText: string) => void;
   onAddComment?: (paragraphId: string, text: string, mentions?: string[]) => void;
   onResolveComment?: (paragraphId: string, commentId: string) => void;
   existingAppendices?: string[];
+  initialTab?: "details" | "comments";
   onClose: () => void;
 }
 
-export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveToAppendix, onReinclude, onAddComment, onResolveComment, existingAppendices = [], onClose }: AnnotationCalloutProps) {
+export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveToAppendix, onAddComment, onResolveComment, existingAppendices = [], initialTab = "details", onClose }: AnnotationCalloutProps) {
   const { t } = useTranslation();
   const [rejectMode, setRejectMode] = useState(false);
   const [rejectReasonText, setRejectReasonText] = useState(data.rejectReason || "");
   const [entered, setEntered] = useState(false);
   const [rejectAreaHeight, setRejectAreaHeight] = useState(0);
   const rejectRef = useRef<HTMLDivElement>(null);
-  const [excludedOpen, setExcludedOpen] = useState(false);
-  const [excludedHeight, setExcludedHeight] = useState(0);
-  const excludedRef = useRef<HTMLDivElement>(null);
   const [movePopoverOpen, setMovePopoverOpen] = useState(false);
   const [newAppendixName, setNewAppendixName] = useState("");
-  const [removingExcerpts, setRemovingExcerpts] = useState<number[]>([]);
 
   const hasConflict = !!data.conflict;
 
@@ -218,18 +212,11 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
     setRejectMode(false);
     setRejectReasonText(data.rejectReason || "");
     setEntered(false);
-    setExcludedOpen(false);
     setMovePopoverOpen(false);
-    setRemovingExcerpts([]);
+    setActiveTab(initialTab);
     const raf = requestAnimationFrame(() => setEntered(true));
     return () => cancelAnimationFrame(raf);
-  }, [data.id]);
-
-  useEffect(() => {
-    if (data.excludedExcerpts?.length === 0 && excludedOpen) {
-      setExcludedOpen(false);
-    }
-  }, [data.excludedExcerpts?.length, excludedOpen]);
+  }, [data.id, initialTab]);
 
   useEffect(() => {
     if (rejectMode && rejectRef.current) {
@@ -237,18 +224,12 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
     }
   }, [rejectMode]);
 
-  useEffect(() => {
-    if (excludedOpen && excludedRef.current) {
-      setExcludedHeight(excludedRef.current.scrollHeight);
-    }
-  }, [excludedOpen]);
-
   const handleRejectSubmit = () => {
     onReject(rejectReasonText);
     setRejectMode(false);
   };
 
-  const [activeTab, setActiveTab] = useState<"details" | "comments">("details");
+  const [activeTab, setActiveTab] = useState<"details" | "comments">(initialTab);
   const [showResolved, setShowResolved] = useState(false);
   const [commentText, setCommentText] = useState("");
   const [showMentions, setShowMentions] = useState(false);
@@ -385,109 +366,6 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                 </span>
                 <span className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>{data.lastVerified}</span>
               </div>
-
-              {/* ── What Was Excluded ── */}
-              {((data.excludedExcerpts && data.excludedExcerpts.length > 0) || (data.originalExcludedExcerpts && data.originalExcludedExcerpts.length > 0)) && (
-                <div className="flex flex-col gap-1">
-                  {(!data.excludedExcerpts || data.excludedExcerpts.length === 0) ? (
-                    <div className="flex flex-col gap-1 mt-1">
-                      <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                        What Was Excluded
-                      </span>
-                      <span className="text-[11px] italic" style={{ color: "var(--text-muted)" }}>
-                        All excluded content has been re-included
-                      </span>
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={() => setExcludedOpen(!excludedOpen)}
-                        className="flex items-center justify-between w-full"
-                        style={{ background: "none", border: "none", padding: 0, cursor: "pointer" }}
-                      >
-                        <span className="text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
-                          What Was Excluded
-                        </span>
-                        <ChevronDown
-                          className="w-[14px] h-[14px] shrink-0"
-                          style={{
-                            color: "var(--text-muted)",
-                            transform: excludedOpen ? "rotate(180deg)" : "rotate(0deg)",
-                            transition: "transform 200ms ease-out",
-                          }}
-                        />
-                      </button>
-                      {!excludedOpen && (
-                        <span className="text-[11px]" style={{ color: "var(--text-muted)" }}>
-                          Content from source documents not carried into this chunk
-                        </span>
-                      )}
-                      <div
-                        ref={excludedRef}
-                        style={{
-                          maxHeight: excludedOpen ? excludedHeight + 16 : 0,
-                          overflow: "hidden",
-                          transition: "max-height 200ms ease-out",
-                        }}
-                      >
-                        <div className="flex flex-col gap-2 pt-1">
-                          {data.excludedExcerpts.map((excerpt, idx) => {
-                            const isRemoving = removingExcerpts.includes(idx);
-                            return (
-                              <div
-                                key={`${data.id}-exc-${idx}`}
-                                className="pl-3 py-1 flex flex-col gap-2"
-                                style={{
-                                  borderLeft: "2px solid var(--border-default)",
-                                  opacity: isRemoving ? 0 : 1,
-                                  maxHeight: isRemoving ? 0 : 500,
-                                  margin: isRemoving ? 0 : undefined,
-                                  paddingTop: isRemoving ? 0 : undefined,
-                                  paddingBottom: isRemoving ? 0 : undefined,
-                                  overflow: "hidden",
-                                  transition: "all 150ms ease-out"
-                                }}
-                              >
-                                <span className="text-[12px] leading-relaxed" style={{ color: "var(--text-muted)" }}>
-                                  {excerpt}
-                                </span>
-                                <div className="flex gap-2">
-                                  <Button
-                                    variant="ghost"
-                                    className="h-6 px-2 text-[11px] font-semibold"
-                                    style={{ color: "var(--color-brand)" }}
-                                    disabled={isRemoving}
-                                    onClick={() => {
-                                      setRemovingExcerpts(prev => [...prev, idx]);
-                                      setTimeout(() => {
-                                        if (onReinclude) onReinclude(data.id, idx, excerpt);
-                                      }, 150);
-                                    }}
-                                  >
-                                    Re-include
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    className="h-6 px-2 text-[11px] font-semibold"
-                                    style={{ color: "var(--color-secondary, #8B5CF6)" }}
-                                    onClick={() => {
-                                      setNewAppendixName(data.suggestedAppendixName || `Appendix ${String.fromCharCode(65 + existingAppendices.length)} — `);
-                                      setMovePopoverOpen(true);
-                                    }}
-                                  >
-                                    Add to Appendix
-                                  </Button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
 
               <div className="h-px w-full my-1" style={{ backgroundColor: "var(--bg-hover)" }} />
 

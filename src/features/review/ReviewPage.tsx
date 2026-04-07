@@ -39,15 +39,11 @@ const SECTIONS = [
   { id: "s3", title: "3. Emergency Response" },
 ];
 
-const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; excludedExcerpts?: string[]; suggestedForAppendix?: boolean; suggestedAppendixName?: string; comments?: CommentData[]; }> = {
+const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; suggestedForAppendix?: boolean; suggestedAppendixName?: string; comments?: CommentData[]; }> = {
   p1: {
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 98, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 2, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
-    ],
-    excludedExcerpts: [
-      "As an alternative to the procedures described herein, an Operator may use equivalent equipment or methods, provided such equivalency is demonstrated through documented risk assessment and approved by the Drilling Engineer of Record prior to deployment.",
-      "This document is subject to periodic review by the H&P Well Control Review Board and will be updated to reflect changes to API Recommended Practice 53, IADC Well Control Guidelines, and applicable governmental regulations.",
     ],
     comments: [
       {
@@ -81,10 +77,6 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 75, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 25, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
     ],
-    excludedExcerpts: [
-      "Legacy KCAD procedures from the K-CW 002 Health and Safety series shall remain in force for Kazakhstan operations until the transition period concludes on 31 December 2025, after which this consolidated document supersedes all predecessor documents.",
-      "Compliance verification shall be conducted by an independent third-party auditor not less than once every 24 months, and following any significant operational incident classified as Tier 1 or above under the KCAD Incident Classification Matrix.",
-    ],
     comments: [
       {
         id: "c2",
@@ -100,10 +92,6 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
   p3: {
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
-    ],
-    excludedExcerpts: [
-      "Operations conducted under temporary variance authorizations, including deviation from standard well control procedures during well testing or production testing phases, shall be governed by a separately approved site-specific well control plan.",
-      "Contractor personnel engaged in well control operations must hold current IADC WellCAP certification at the Supervisory level or equivalent as approved by the H&P Drilling Manager. Certification records shall be maintained in the crew competency register.",
     ],
     comments: [
       {
@@ -121,19 +109,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 80, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 20, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
     ],
-    excludedExcerpts: [
-      "Personnel classified as visitors or short-term site guests on-site for fewer than 4 hours are exempt from the full induction requirement but must receive a site-specific safety briefing not exceeding 15 minutes upon arrival.",
-      "Deviation from any mandatory compliance requirement contained herein requires formal Management of Change approval at the Regional HSE Director level and must be communicated to the relevant regulatory authority within 72 hours.",
-    ],
   },
   p5: {
     sources: [
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 85, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 15, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
-    ],
-    excludedExcerpts: [
-      "For operations conducted under active production sharing agreements, any variance from this standard identified as potentially conflicting with the host government's mandatory well control regulations must be escalated to the Drilling Manager and Legal department for review prior to operations.",
-      "Where third-party clients impose supplementary well control requirements through their own Technical Standards, these shall be reviewed against the provisions of this document by a qualified Well Control Specialist and a bridging document prepared where necessary.",
     ],
   },
   p6: {
@@ -141,19 +121,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 72, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
       { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 28, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" }
     ],
-    excludedExcerpts: [
-      "In wells with elevated formation pressure gradients or where a SICP greater than 300 psi has been recorded within the preceding 48 hours, the trip sheet verification frequency shall be increased to every 3 stands rather than the standard 5-stand interval.",
-      "The Mud Engineer shall ensure that all trip tank volumes are recorded in real-time drilling data systems and that any manual override of automated fill-up calculations is documented with written justification in the drilling report.",
-    ],
   },
   p7: {
     sources: [
       { documentName: "Merged Safety Guidelines", origin: "KCAD", percentage: 55, documentUrl: "/documents/kcad/Merged-Safety-Guidelines.pdf" },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 45, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
-    ],
-    excludedExcerpts: [
-      "The volumetric well control method may be applied where wellbore geometry or drill string configuration prevents circulation. Application of this method requires express authorization from the Drilling Engineer and shall be documented in the post-well kick report.",
-      "Surface shut-in pressure readings shall be taken no later than 30 minutes after initial well shut-in to establish stable SIDP and SICP values for kick analysis. Readings taken before pressure stabilization must be annotated as preliminary in the well control report.",
     ],
   },
   p8: {
@@ -161,19 +133,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 95, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 5, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
     ],
-    excludedExcerpts: [
-      "BOP function tests shall include both manual and remote operation of all available closing units. Where remote actuation equipment is found to be inoperative, drilling operations shall be suspended until full remote capability is restored and verified.",
-      "Accumulator pre-charge pressures shall be verified against the manufacturer's specifications at the start of each hitch. Any deviation from the specified pre-charge range shall result in immediate investigation by the Rig Mechanic before operations continue.",
-    ],
   },
   p9: {
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 85, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 15, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
-    ],
-    excludedExcerpts: [
-      "Fixed-point H\u2082S monitoring sensors shall be calibrated in accordance with the manufacturer's schedule or a minimum of once per calendar quarter, whichever is more frequent. Calibration records must be maintained and available for regulatory inspection.",
-      "In the event of a continuous H\u2082S reading exceeding 10 ppm at any monitoring station, all non-essential personnel shall evacuate the affected zone immediately. Operations may only resume after H\u2082S readings return to below 1 ppm for a sustained period of 15 minutes.",
     ],
   },
   p10: {
@@ -181,19 +145,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 97, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 3, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ],
-    excludedExcerpts: [
-      "Mud weight adjustments of more than 0.5 ppg shall only be authorized by the Drilling Engineer and shall be preceded by a formal review of the current pore pressure prediction and wellbore stability analysis.",
-      "The Mud Engineer shall prepare a daily mud report summarizing actual versus planned mud weight, rheology data, and any chemical treatments applied. This report must be signed by the Company Man before being transmitted to the operations office.",
-    ],
   },
   p11: {
     sources: [
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 90, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 10, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
-    ],
-    excludedExcerpts: [
-      "Permits to work for tasks within the rotating equipment exclusion zone must specifically identify the equipment involved, the nature of the task, and the isolation measures in place. Generic PTW templates that do not reference specific equipment are not acceptable.",
-      "Following any incident or near miss involving rotating equipment, the affected equipment shall be subject to a formal Post-Incident Inspection before being returned to service. A copy of the inspection report shall be forwarded to the KCAD Equipment Integrity team within 5 business days.",
     ],
   },
   p12: {
@@ -201,19 +157,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 96, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 4, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ],
-    excludedExcerpts: [
-      "Personnel with mobility restrictions or physical impairments requiring evacuation assistance shall be identified on the Emergency Accommodation List maintained by the Rig Manager. Designated personnel shall be assigned to assist these individuals during emergency mustering.",
-      "The Emergency Response Coordinator shall maintain a headcount until all personnel are accounted for at their designated muster station. No personnel may return to their work area until the Rig Manager issues an all-clear via the site PA system.",
-    ],
   },
   p13: {
     sources: [
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 88, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
       { documentName: "H&P Well Control Manual v4.2", origin: "H&P", percentage: 12, documentUrl: "/documents/hp/HP-Well-Control-Manual-v4.2.pdf" }
-    ],
-    excludedExcerpts: [
-      "Accumulator capacity calculations shall be performed using the actual BOP closing ratios verified during the most recent full BOP pressure test. Calculations based on nominal or design values without field verification are not acceptable.",
-      "A secondary hydraulic accumulator system with independent pressure supply must be installed and maintained at full operational status on all HPHT well operations where bottomhole pressures exceed 10,000 psi, regardless of rig vintage or existing equipment certification status.",
     ],
   },
   p14: {
@@ -221,18 +169,10 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 92, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" },
       { documentName: "KCAD Global HSE Standard", origin: "KCAD", percentage: 8, documentUrl: "/documents/kcad/KCAD-Global-HSE-Standard.pdf" }
     ],
-    excludedExcerpts: [
-      "Tabletop emergency response exercises shall be conducted at the start of each hitch in addition to physical drills, covering well control, fire, and H\u2082S release scenarios on a rotating basis.",
-      "Records of emergency drills, including attendance sheets, observer notes, and corrective actions arising from drill debriefs, shall be retained in the site HSE file for a minimum of 24 months and be available for review during regulatory inspections.",
-    ],
   },
   p15: {
     sources: [
       { documentName: "H&P Emergency Action Plan", origin: "H&P", percentage: 100, documentUrl: "/documents/hp/HP-Emergency-Action-Plan.pdf" }
-    ],
-    excludedExcerpts: [
-      "In facilities where a deluge or fixed suppression system is installed, activation of the ESD shall automatically trigger suppression system flow to the affected zone. Manual override of automatic suppression activation is only permitted by the Rig Manager in consultation with the HSE Representative.",
-      "Post-incident fire investigation reports shall be completed within 5 working days using the H&P Incident Investigation template (Form HSE-INV-001). Root cause analysis must identify contributing organizational factors in addition to immediate physical causes.",
     ],
   },
   p16: {
@@ -241,19 +181,11 @@ const PARAGRAPH_EXTRAS: Record<string, { sources?: SourceContribution[]; exclude
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 30, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" },
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 10, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" }
     ],
-    excludedExcerpts: [
-      "Medevac authorization protocols shall include pre-designated decision trees specifying which injuries or medical conditions mandate immediate helicopter evacuation versus land transport. These protocols shall be reviewed by a qualified medical professional prior to each major drilling campaign.",
-      "Where satellite communication equipment is the primary means of emergency communication, a secondary method such as HF radio must be tested at least once per week and the test documented in the communication log.",
-    ],
   },
   p17: {
     sources: [
       { documentName: "KCAD Equipment Requirements", origin: "KCAD", percentage: 82, documentUrl: "/documents/kcad/KCAD-Equipment-Requirements.pdf" },
       { documentName: "H&P Operations Manual", origin: "H&P", percentage: 18, documentUrl: "/documents/hp/HP-Operations-Manual.pdf" }
-    ],
-    excludedExcerpts: [
-      "Breathing apparatus inspection records shall include the unique serial number of each unit, the inspector's name and qualification, the test pressure achieved, and the estimated remaining service life of each component, countersigned by the HSE Representative.",
-      "Life raft and life ring inspections shall be conducted by a third-party marine safety specialist holding a current qualification recognized by the applicable flag state authority. Self-certification of life-saving appliances is not permitted on offshore operations.",
     ],
   },
 };
@@ -582,6 +514,7 @@ export function ReviewPage() {
   const [paragraphs, setParagraphs] = useState<ParagraphData[]>(INITIAL_PARAGRAPHS);
 
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [calloutTab, setCalloutTab] = useState<"details" | "comments">("details");
   const isAllReviewed = paragraphs.length > 0 && paragraphs.every(p => p.status !== 'pending');
   const [activeSectionId, setActiveSectionId] = useState<string>(SECTIONS[0].id);
   const [calloutTopPx, setCalloutTopPx] = useState(0);
@@ -711,6 +644,7 @@ export function ReviewPage() {
       }
       setCalloutTopPx(desiredTop);
     }
+    setCalloutTab("details");
     setActiveId(id);
   };
 
@@ -782,37 +716,11 @@ export function ReviewPage() {
           ...p,
           text: p.originalText || p.text,
           isEdited: false,
-          excludedExcerpts: p.originalExcludedExcerpts !== undefined ? p.originalExcludedExcerpts : p.excludedExcerpts,
           status: p.status === 'approved' ? 'pending' : p.status
         };
       }
       return p;
     }));
-  };
-
-  const handleReinclude = (id: string, excerptIndex: number, excerptText: string) => {
-    setParagraphs(prev => prev.map(p => {
-      if (p.id !== id) return p;
-
-      const origText = p.originalText !== undefined ? p.originalText : p.text;
-      const origExcluded = p.originalExcludedExcerpts !== undefined ? p.originalExcludedExcerpts : p.excludedExcerpts;
-
-      const newExcerpts = [...(p.excludedExcerpts || [])];
-      newExcerpts.splice(excerptIndex, 1);
-
-      return {
-        ...p,
-        originalText: origText,
-        originalExcludedExcerpts: origExcluded,
-        text: p.text + "\n" + excerptText,
-        isEdited: true,
-        excludedExcerpts: newExcerpts,
-        status: p.status === 'approved' ? 'pending' : p.status,
-      };
-    }));
-
-    setFlashId(id);
-    setTimeout(() => setFlashId(null), 800);
   };
 
   const handleCommentAdd = (paragraphId: string, text: string, mentions?: string[]) => {
@@ -936,11 +844,8 @@ export function ReviewPage() {
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
+                  setCalloutTab("comments");
                   setActiveId(p.id);
-                  setTimeout(() => {
-                    const commentsTab = document.querySelector('[value="comments"]') as HTMLElement;
-                    if (commentsTab) commentsTab.click();
-                  }, 50);
                 }}
               >
                 <MessageSquare className="w-[14px] h-[14px] group-hover:opacity-80 transition-opacity" />
@@ -1064,7 +969,7 @@ export function ReviewPage() {
       <Header
         breadcrumb={[
           { label: "Dashboard", path: "/dashboard" },
-          { label: "Scope", path: "/scope" },
+          { label: "New Consolidation", path: "/new-consolidation" },
           { label: "Review" }
         ]}
         showUser={true}
@@ -1379,10 +1284,10 @@ export function ReviewPage() {
                   onReject={(reason) => handleReject(selectedParagraph.id, reason)}
                   onRevert={selectedParagraph.isEdited ? () => handleRevert(selectedParagraph.id) : undefined}
                   onMoveToAppendix={handleMoveToAppendix}
-                  onReinclude={handleReinclude}
                   onAddComment={handleCommentAdd}
                   onResolveComment={handleCommentResolve}
                   existingAppendices={allAppendices}
+                  initialTab={calloutTab}
                   onClose={() => setActiveId(null)}
                 />
               </div>
@@ -1410,7 +1315,7 @@ export function ReviewPage() {
           label={t("common.back")}
           icon={<ArrowLeft className="w-[14px] h-[14px]" />}
           variant="secondary"
-          onClick={() => navigate("/scope")}
+          onClick={() => navigate("/new-consolidation")}
         />
         <FooterButton
           label="Complete Review"

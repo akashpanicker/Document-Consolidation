@@ -192,7 +192,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"pending" | "in-progress" | "completed">("pending");
 
-  const handleCreateNew = () => navigate("/scope");
+  const handleCreateNew = () => navigate("/new-consolidation");
   const handleReview = (id: string) => {
     const task = TASK_LIST.find(t => t.id === id);
     if (task?.status === "completed") {
