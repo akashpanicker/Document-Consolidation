@@ -8,7 +8,7 @@ interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: "dark",
+  theme: "light",
   toggleTheme: () => {},
 });
 
@@ -24,7 +24,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(() => {
     // Read from localStorage on mount
     const stored = localStorage.getItem("rigsafe-theme");
-    return (stored === "light" || stored === "dark") ? stored : "dark";
+    return (stored === "light" || stored === "dark") ? stored : "light";
   });
 
   useEffect(() => {
