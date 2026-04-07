@@ -34,7 +34,7 @@ export function ActivityItem({ item }: ActivityItemProps) {
         </span>
         <span
           style={{
-            fontSize: 11,
+            fontSize: 12,
             color: "var(--text-muted)",
             fontFamily: "Inter, sans-serif",
           }}

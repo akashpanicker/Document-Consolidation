@@ -389,28 +389,26 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                           <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
                           {t("review.approveButton")}
                         </Button>
-                        <TooltipProvider delayDuration={300}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200 cursor-pointer"
-                                style={{
-                                  backgroundColor: "var(--color-negative)",
-                                  color: "var(--text-on-primary)",
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
-                                onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
-                                onClick={() => setRejectMode(true)}
-                              >
-                                <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                                {t("review.rejectButton")}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
-                              {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Tooltip delayDuration={300} open={true}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200 cursor-pointer"
+                              style={{
+                                backgroundColor: "var(--color-negative)",
+                                color: "var(--text-on-primary)",
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.opacity = "0.85"}
+                              onMouseLeave={(e) => e.currentTarget.style.opacity = "1"}
+                              onClick={() => setRejectMode(true)}
+                            >
+                              <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
+                              {t("review.rejectButton")}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
+                            {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
+                          </TooltipContent>
+                        </Tooltip>
                       </>
                     ) : (
                       <>
@@ -428,29 +426,27 @@ export function AnnotationCallout({ data, onApprove, onReject, onRevert, onMoveT
                           <CheckCircle className="w-[14px] h-[14px] mr-1.5" />
                           {t("review.approveButton")}
                         </Button>
-                        <TooltipProvider delayDuration={300}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                variant="outline"
-                                className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
-                                style={{
-                                  borderColor: "var(--color-negative)",
-                                  color: "var(--color-negative)",
-                                }}
-                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--color-error-bg)"}
-                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
-                                onClick={() => setRejectMode(true)}
-                              >
-                                <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
-                                {t("review.rejectButton")}
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
-                              {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
+                        <Tooltip delayDuration={300}>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="flex-1 h-9 font-semibold text-[13px] transition-all duration-200"
+                              style={{
+                                borderColor: "var(--color-negative)",
+                                color: "var(--color-negative)",
+                              }}
+                              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "var(--color-error-bg)"}
+                              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                              onClick={() => setRejectMode(true)}
+                            >
+                              <ShieldAlert className="w-[14px] h-[14px] mr-1.5" />
+                              {t("review.rejectButton")}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" align="end" className="max-w-[200px] text-center">
+                            {t("review.rejectTooltip", "This chunk will be excluded from the final document")}
+                          </TooltipContent>
+                        </Tooltip>
                       </>
                     )}
                   </div>

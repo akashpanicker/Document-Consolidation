@@ -26,7 +26,7 @@ const UnderlineTabsTrigger = React.forwardRef<
     <TabsPrimitive.Trigger
       ref={ref}
       className={cn(
-        "px-4 py-3 text-[11px] font-bold uppercase tracking-wider relative transition-colors duration-200 outline-none w-full",
+        "px-4 py-3 text-[12px] font-bold uppercase tracking-wider relative transition-colors duration-200 outline-none w-full",
         "text-[var(--text-muted)] data-[state=active]:text-[var(--color-brand)] disabled:pointer-events-none disabled:opacity-50",
         className
       )}

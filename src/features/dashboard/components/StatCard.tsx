@@ -45,7 +45,7 @@ export function StatCard({
 
       <span
         style={{
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 600,
           letterSpacing: "0.08em",
           textTransform: "uppercase" as const,
