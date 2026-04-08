@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect, useCallback, MouseEvent } from "react";
+import { useState, useRef, useEffect, useCallback, MouseEvent, ReactNode } from "react";
 import { Header } from "../../components/shared/AppHeader";
 import { StickyFooter, FooterButton } from "../../components/shared/StickyFooter";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown, MessageSquare, CheckCircle } from "lucide-react";
+import { ArrowLeft, Check, FileSearch, Pencil, Sparkles, ArrowRight, X, ChevronDown, MessageSquare, CheckCircle, GripVertical } from "lucide-react";
 import { AnnotationCallout, AIConfidenceCard, ParagraphData, CommentData, SourceContribution } from "./components/AnnotationCallout";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
@@ -15,6 +15,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../../components/ui/select";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  closestCenter,
+  DragStartEvent,
+  DragOverEvent,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { toast } from "sonner";
+import { Toaster } from "../../components/ui/sonner";
 
 /* ── Custom keyframe styles injected via a <style> tag ── */
 const REVIEW_STYLES = `
@@ -451,6 +471,98 @@ const INITIAL_PARAGRAPHS: ParagraphData[] = [
   },
 ].map(p => ({ ...p, ...(PARAGRAPH_EXTRAS[p.id] ?? {}) })) as ParagraphData[];
 
+/* ── Sortable paragraph wrapper ── */
+interface SortableWrapperProps {
+  id: string;
+  isDragEnabled: boolean;
+  isDraggingMe: boolean;
+  children: ReactNode;
+}
+
+function SortableWrapper({ id, isDragEnabled, isDraggingMe, children }: SortableWrapperProps) {
+  const canDrag = isDragEnabled;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
+    id,
+    disabled: !canDrag,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition: isDragging ? undefined : (transition ?? "transform 150ms ease"),
+        position: "relative",
+        opacity: isDragging ? 0 : 1,
+      }}
+      className="group/drag relative"
+    >
+      {/* Blue insertion line above target */}
+      {isOver && !isDragging && (
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 2,
+            backgroundColor: "var(--color-brand)",
+            zIndex: 20,
+            pointerEvents: "none",
+          }}
+        />
+      )}
+
+      {/* Drag handle */}
+      <div
+        {...(canDrag ? { ...attributes, ...listeners } : {})}
+        className="absolute z-10 flex items-center justify-center opacity-0 group-hover/drag:opacity-100 transition-opacity duration-150"
+        style={{
+          left: 6,
+          top: "50%",
+          transform: "translateY(-50%)",
+          cursor: isDraggingMe ? "grabbing" : "grab",
+          color: "var(--text-secondary)",
+          width: 16,
+          height: 28,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <GripVertical className="w-3.5 h-3.5" />
+      </div>
+
+      {children}
+    </div>
+  );
+}
+
+/* ── Drag overlay clone (shown while dragging) ── */
+function ParagraphClone({ paragraph }: { paragraph: ParagraphData }) {
+  return (
+    <div
+      style={{
+        padding: "16px 24px 16px 20px",
+        backgroundColor: "var(--bg-card)",
+        borderLeft: "4px solid var(--color-brand)",
+        borderRadius: 4,
+        boxShadow: "var(--shadow-dropdown)",
+        opacity: 0.95,
+        cursor: "grabbing",
+      }}
+    >
+      <span
+        className="text-[15px] leading-relaxed font-medium"
+        style={{ color: "var(--text-primary)" }}
+      >
+        {paragraph.text}
+      </span>
+    </div>
+  );
+}
+
 function MoveToAppendixPopover({ suggestedName, existingAppendices, onConfirm, onCancel }: { suggestedName: string; existingAppendices: string[]; onConfirm: (name: string) => void; onCancel: () => void; }) {
   const [newAppendixName, setNewAppendixName] = useState(suggestedName || `Appendix ${String.fromCharCode(65 + existingAppendices.length)} — `);
   return (
@@ -752,6 +864,73 @@ export function ReviewPage() {
     }));
   };
 
+  // ── Drag and drop state ──
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const undoSnapshotRef = useRef<ParagraphData[] | null>(null);
+  const undoToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Determine if drag is enabled for the current reviewer turn
+  // Active reviewer is index 1 (status: "active") — drag is enabled for them
+  const isDragEnabled = REVIEWERS[1].status === "active";
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setDraggingId(event.active.id as string);
+    undoSnapshotRef.current = paragraphs;
+  };
+
+  const handleDragOver = (_event: DragOverEvent) => {
+    // Visual feedback handled by SortableWrapper's isOver state
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setDraggingId(null);
+
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = paragraphs.findIndex(p => p.id === active.id);
+    const newIndex = paragraphs.findIndex(p => p.id === over.id);
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    const dragged = paragraphs[oldIndex];
+    const target = paragraphs[newIndex];
+
+    // Reorder and update sectionId to match drop target's section
+    const reordered = arrayMove(paragraphs, oldIndex, newIndex).map((p, idx) => {
+      if (idx === newIndex) return { ...p, sectionId: target.sectionId };
+      return p;
+    });
+
+    const snapshot = undoSnapshotRef.current!;
+    setParagraphs(reordered);
+
+    // Clear any pending undo toast
+    if (undoToastTimerRef.current) clearTimeout(undoToastTimerRef.current);
+
+    toast("Paragraph moved", {
+      action: {
+        label: "Undo",
+        onClick: () => {
+          if (undoToastTimerRef.current) clearTimeout(undoToastTimerRef.current);
+          setParagraphs(snapshot);
+        },
+        actionButtonStyle: {
+          backgroundColor: "var(--color-brand)",
+          color: "var(--text-on-primary)",
+        },
+      },
+      duration: 2000,
+    });
+  };
+
+  const draggingParagraph = draggingId ? paragraphs.find(p => p.id === draggingId) ?? null : null;
+
   const selectedParagraph = paragraphs.find(p => p.id === activeId);
 
   // ── Per-section review progress ──
@@ -778,6 +957,7 @@ export function ReviewPage() {
     const isRejected = p.status === "rejected";
     const isAutoApproved = p.status === "auto-approved";
     const isMoved = !!p.appendixName;
+    const isDraggingMe = draggingId === p.id;
 
     let leftBorderColor = "transparent";
     if (isActive) leftBorderColor = "var(--color-brand)";
@@ -793,13 +973,18 @@ export function ReviewPage() {
     else if (isRejected) bgColor = "var(--color-error-bg)";
 
     return (
-      <div
+      <SortableWrapper
         key={p.id}
+        id={p.id}
+        isDragEnabled={isDragEnabled}
+        isDraggingMe={isDraggingMe}
+      >
+      <div
         ref={(el) => { paragraphRefs.current[p.id] = el; }}
         onClick={(e) => handleParagraphClick(p.id, e)}
         className={`relative group transition-colors ${flashId === p.id ? "duration-200" : "duration-200"}`}
         style={{
-          padding: "16px 24px 16px 20px",
+          padding: "16px 24px 16px 36px",
           borderLeft: `4px solid ${leftBorderColor}`,
           backgroundColor: bgColor,
           borderBottom: "none",
@@ -956,6 +1141,7 @@ export function ReviewPage() {
           </div>
         )}
       </div>
+      </SortableWrapper>
     );
   };
 
@@ -1195,66 +1381,93 @@ export function ReviewPage() {
           ref={centerRef}
           onClick={() => setActiveId(null)}
         >
-          <div className="max-w-[800px] mx-auto flex flex-col gap-8">
-            {SECTIONS.map(section => (
-              <div
-                key={section.id}
-                ref={(el) => { sectionRefs.current[section.id] = el; }}
-                data-section-id={section.id}
-                className="flex flex-col gap-1 rounded-[12px] overflow-hidden scroll-mt-4"
-                style={{
-                  backgroundColor: "var(--bg-card)",
-                  border: "var(--border-default)",
-                }}
-              >
-                <div className="px-6 py-4" style={{ borderBottom: "var(--border-subtle)" }}>
-                  <h2 className="text-[18px] font-bold" style={{ color: "var(--text-primary)" }}>
-                    {section.title}
-                  </h2>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragOver={handleDragOver}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={paragraphs.map(p => p.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="max-w-[800px] mx-auto flex flex-col gap-8">
+                {SECTIONS.map(section => {
+                  const sectionParas = paragraphs.filter(p => p.sectionId === section.id && !p.appendixName);
+                  const isDragOver = draggingId !== null && !sectionParas.find(p => p.id === draggingId);
+                  return (
+                    <div
+                      key={section.id}
+                      ref={(el) => { sectionRefs.current[section.id] = el; }}
+                      data-section-id={section.id}
+                      className="flex flex-col gap-1 rounded-[12px] overflow-hidden scroll-mt-4"
+                      style={{
+                        backgroundColor: "var(--bg-card)",
+                        border: "var(--border-default)",
+                      }}
+                    >
+                      <div
+                        className="px-6 py-4 transition-colors duration-150"
+                        style={{
+                          borderBottom: "var(--border-subtle)",
+                          backgroundColor: isDragOver ? "var(--bg-hover)" : undefined,
+                        }}
+                      >
+                        <h2 className="text-[18px] font-bold" style={{ color: "var(--text-primary)" }}>
+                          {section.title}
+                        </h2>
+                      </div>
+
+                      <div className="flex flex-col">
+                        {sectionParas.map(renderParagraph)}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* APPENDICES ZONE */}
+                <div id="appendix-zone" data-section-id="appendices" ref={(el) => { sectionRefs.current["appendices"] = el; }} className="scroll-mt-4">
+                  <div className="flex items-center gap-4 mb-6 mt-4">
+                    <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
+                    <h3 className="text-[14px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>APPENDICES</h3>
+                    <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
+                  </div>
+
+                  {allAppendices.length === 0 ? (
+                    <div className="text-center p-8 rounded-[12px]" style={{ border: "1px dashed var(--border-default)" }}>
+                      <span className="text-[13px]" style={{ color: "var(--text-muted)" }}>
+                        No appendices yet — move region-specific content here from the document body.
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-8">
+                      {allAppendices.map(appName => {
+                        const appChunks = paragraphs.filter(p => p.appendixName === appName);
+                        return (
+                          <details key={appName} open className="group rounded-[12px] overflow-hidden" style={{ border: "1px solid #D0D8E8" }}>
+                            <summary className="px-6 py-4 cursor-pointer flex items-center justify-between select-none" style={{ borderBottom: "1px solid #D0D8E8" }}>
+                              <h2 className="text-[18px] font-bold" style={{ color: "var(--text-primary)" }}>{appName}</h2>
+                              <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: "var(--text-muted)" }} />
+                            </summary>
+                            <div className="flex flex-col">
+                              {appChunks.map(renderParagraph)}
+                            </div>
+                          </details>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col">
-                  {paragraphs.filter(p => p.sectionId === section.id && !p.appendixName).map(renderParagraph)}
-                </div>
+                <div className="h-[200px]" />
               </div>
-            ))}
+            </SortableContext>
 
-            {/* APPENDICES ZONE */}
-            <div id="appendix-zone" data-section-id="appendices" ref={(el) => { sectionRefs.current["appendices"] = el; }} className="scroll-mt-4">
-              <div className="flex items-center gap-4 mb-6 mt-4">
-                <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
-                <h3 className="text-[14px] font-bold uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>APPENDICES</h3>
-                <div className="h-px flex-1" style={{ backgroundColor: "var(--border-default)" }} />
-              </div>
-
-              {allAppendices.length === 0 ? (
-                <div className="text-center p-8 rounded-[12px]" style={{ border: "1px dashed var(--border-default)" }}>
-                  <span className="text-[13px]" style={{ color: "var(--text-muted)" }}>
-                    No appendices yet — move region-specific content here from the document body.
-                  </span>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-8">
-                  {allAppendices.map(appName => {
-                    const appChunks = paragraphs.filter(p => p.appendixName === appName);
-                    return (
-                      <details key={appName} open className="group rounded-[12px] overflow-hidden" style={{ border: "1px solid #D0D8E8" }}>
-                        <summary className="px-6 py-4 cursor-pointer flex items-center justify-between select-none" style={{ borderBottom: "1px solid #D0D8E8" }}>
-                          <h2 className="text-[18px] font-bold" style={{ color: "var(--text-primary)" }}>{appName}</h2>
-                          <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" style={{ color: "var(--text-muted)" }} />
-                        </summary>
-                        <div className="flex flex-col">
-                          {appChunks.map(renderParagraph)}
-                        </div>
-                      </details>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <div className="h-[200px]" />
-          </div>
+            <DragOverlay dropAnimation={{ duration: 200, easing: "ease-out" }}>
+              {draggingParagraph ? <ParagraphClone paragraph={draggingParagraph} /> : null}
+            </DragOverlay>
+          </DndContext>
         </div>
 
         {/* ── Column 3: Annotation Panel (Right, Fixed 320px) ── */}
@@ -1325,6 +1538,8 @@ export function ReviewPage() {
           onClick={() => navigate("/dashboard")}
         />
       </StickyFooter>
+
+      <Toaster position="bottom-center" />
     </div>
   );
 }

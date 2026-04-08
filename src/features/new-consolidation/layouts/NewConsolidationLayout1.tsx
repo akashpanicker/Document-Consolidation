@@ -73,6 +73,30 @@ export function NewConsolidationLayout1(props: NewConsolidationLayoutProps) {
           <div className="p-6">
             <div className="grid grid-cols-4 gap-6">
               <MultiSelectDropdown
+                label={t("scope.filterByActivity")}
+                values={selectedActivities}
+                onChange={onActivitiesChange}
+                options={[
+                  { value: "life-critical", label: "Life-Critical Controls" },
+                  { value: "hse-governance", label: "HSE Governance" },
+                  { value: "drilling-ops", label: "Drilling Operations" },
+                  { value: "well-control", label: "Well Control" },
+                  { value: "pipe-tubular", label: "Pipe & Tubular Handling" },
+                  { value: "mud-solids", label: "Mud System & Solids Control" },
+                  { value: "pressure-drilling-line", label: "Pressure Systems & Drilling Line" },
+                  { value: "rig-move", label: "Rig Move & Structural" },
+                  { value: "lifting-hoisting", label: "Lifting & Hoisting" },
+                  { value: "tools-equipment", label: "Tools & Equipment" },
+                  { value: "maintenance-electrical", label: "Maintenance & Electrical" },
+                  { value: "non-drilling", label: "Non-Drilling Operations" },
+                  { value: "emergency-response", label: "Emergency Response" },
+                  { value: "environmental-logistics", label: "Environmental & Logistics" },
+                  { value: "loto", label: "LOTO" },
+                ]}
+                placeholder={t("scope.selectActivities", "Select activities...")}
+              />
+
+              <MultiSelectDropdown
                 label={t("scope.region")}
                 values={selectedRegions}
                 onChange={onRegionChange}
@@ -124,30 +148,6 @@ export function NewConsolidationLayout1(props: NewConsolidationLayoutProps) {
                   { value: "Policy", label: "Policy" },
                 ]}
                 placeholder="Select types..."
-              />
-
-              <MultiSelectDropdown
-                label={t("scope.filterByActivity")}
-                values={selectedActivities}
-                onChange={onActivitiesChange}
-                options={[
-                  { value: "life-critical", label: "Life-Critical Controls" },
-                  { value: "hse-governance", label: "HSE Governance" },
-                  { value: "drilling-ops", label: "Drilling Operations" },
-                  { value: "well-control", label: "Well Control" },
-                  { value: "pipe-tubular", label: "Pipe & Tubular Handling" },
-                  { value: "mud-solids", label: "Mud System & Solids Control" },
-                  { value: "pressure-drilling-line", label: "Pressure Systems & Drilling Line" },
-                  { value: "rig-move", label: "Rig Move & Structural" },
-                  { value: "lifting-hoisting", label: "Lifting & Hoisting" },
-                  { value: "tools-equipment", label: "Tools & Equipment" },
-                  { value: "maintenance-electrical", label: "Maintenance & Electrical" },
-                  { value: "non-drilling", label: "Non-Drilling Operations" },
-                  { value: "emergency-response", label: "Emergency Response" },
-                  { value: "environmental-logistics", label: "Environmental & Logistics" },
-                  { value: "loto", label: "LOTO" },
-                ]}
-                placeholder={t("scope.selectActivities", "Select activities...")}
               />
             </div>
           </div>
