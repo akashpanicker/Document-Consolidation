@@ -23,28 +23,28 @@ import { CopyFromRegionDropdown } from "./components/CopyFromRegionDropdown";
 /* ── Available reviewers ──────────────────────────────────────── */
 
 const USERS: GovernanceUser[] = [
-  { id: "john-doe",          name: "John Doe",           role: "Rig Manager" },
-  { id: "marcos-de-almeida", name: "Marcos de Almeida",  role: "Sr. QHSE Manager" },
-  { id: "sarah-smith",       name: "Sarah Smith",        role: "HSE Director" },
-  { id: "lloyd-baxter",      name: "Lloyd Baxter",       role: "Operations Manager" },
-  { id: "adrian-franco",     name: "Adrian Franco",      role: "Drilling Supervisor" },
+  { id: "john-doe", name: "John Doe", role: "Rig Manager" },
+  { id: "marcos-de-almeida", name: "Marcos de Almeida", role: "Sr. QHSE Manager" },
+  { id: "sarah-smith", name: "Sarah Smith", role: "HSE Director" },
+  { id: "lloyd-baxter", name: "Lloyd Baxter", role: "Operations Manager" },
+  { id: "adrian-franco", name: "Adrian Franco", role: "Drilling Supervisor" },
 ];
 
 /* ── Pre-populated mock governance data ──────────────────────── */
 
 const DEFAULT_GOVERNANCE: Record<string, GovernanceStage[]> = {
   "united-states": [
-    { id: "us-1", stageNumber: 1, userId: "john-doe",          userName: "John Doe",          userRole: "Rig Manager" },
-    { id: "us-2", stageNumber: 2, userId: "sarah-smith",       userName: "Sarah Smith",       userRole: "HSE Director" },
-    { id: "us-3", stageNumber: 3, userId: "lloyd-baxter",      userName: "Lloyd Baxter",      userRole: "Operations Manager" },
+    { id: "us-1", stageNumber: 1, userId: "john-doe", userName: "John Doe", userRole: "Rig Manager" },
+    { id: "us-2", stageNumber: 2, userId: "sarah-smith", userName: "Sarah Smith", userRole: "HSE Director" },
+    { id: "us-3", stageNumber: 3, userId: "lloyd-baxter", userName: "Lloyd Baxter", userRole: "Operations Manager" },
   ],
   "saudi-arabia": [
     { id: "sa-1", stageNumber: 1, userId: "marcos-de-almeida", userName: "Marcos de Almeida", userRole: "Sr. QHSE Manager" },
-    { id: "sa-2", stageNumber: 2, userId: "adrian-franco",     userName: "Adrian Franco",     userRole: "Drilling Supervisor" },
+    { id: "sa-2", stageNumber: 2, userId: "adrian-franco", userName: "Adrian Franco", userRole: "Drilling Supervisor" },
   ],
   "united-kingdom": [
-    { id: "uk-1", stageNumber: 1, userId: "sarah-smith",       userName: "Sarah Smith",       userRole: "HSE Director" },
-    { id: "uk-2", stageNumber: 2, userId: "john-doe",          userName: "John Doe",          userRole: "Rig Manager" },
+    { id: "uk-1", stageNumber: 1, userId: "sarah-smith", userName: "Sarah Smith", userRole: "HSE Director" },
+    { id: "uk-2", stageNumber: 2, userId: "john-doe", userName: "John Doe", userRole: "Rig Manager" },
     { id: "uk-3", stageNumber: 3, userId: "marcos-de-almeida", userName: "Marcos de Almeida", userRole: "Sr. QHSE Manager" },
   ],
 };
@@ -282,7 +282,7 @@ export function ReviewGovernancePage() {
 
           {/* ── Reviewer chain card — full width ── */}
           <div
-            className="rounded-[8px]"
+            className="w-full rounded-[8px]"
             style={{
               backgroundColor: "var(--bg-card)",
               border: "var(--border-default)",
@@ -442,7 +442,7 @@ export function ReviewGovernancePage() {
         open={pendingRegionId !== null}
         onOpenChange={(open) => { if (!open) handleCancelSwitch(); }}
       >
-        <DialogContent className="max-w-md">
+        <DialogContent className="sm:max-w-[640px]">
           <DialogHeader>
             <DialogTitle>Unsaved Changes</DialogTitle>
             <DialogDescription>
@@ -475,7 +475,7 @@ export function ReviewGovernancePage() {
             <button
               type="button"
               onClick={handleDiscardAndSwitch}
-              className="text-[13px] font-semibold px-4 h-9 rounded-[6px] transition-colors"
+              className="text-[13px] font-semibold px-4 h-9 rounded-[6px] transition-colors whitespace-nowrap shrink-0"
               style={{
                 background: "none",
                 border: "var(--border-default)",
@@ -493,7 +493,7 @@ export function ReviewGovernancePage() {
             <button
               type="button"
               onClick={handleSaveAndSwitch}
-              className="text-[13px] font-semibold px-4 h-9 rounded-[6px] transition-colors"
+              className="text-[13px] font-semibold px-4 h-9 rounded-[6px] transition-colors whitespace-nowrap shrink-0"
               style={{
                 backgroundColor: "var(--color-brand)",
                 border: "none",
