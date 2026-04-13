@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Check, X } from "lucide-react";
+import { Checkbox } from "../../../components/ui/checkbox";
 
 interface MultiSelectDropdownProps {
   label: string;
@@ -199,20 +200,8 @@ export function MultiSelectDropdown({
                   e.currentTarget.style.backgroundColor = "transparent";
                 }}
               >
-                <div
-                  style={{
-                    width: 16,
-                    height: 16,
-                    borderRadius: 3,
-                    border: isSelected ? "none" : `1px solid var(--color-surface-5)`,
-                    backgroundColor: isSelected ? "var(--color-brand)" : "transparent",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {isSelected && <Check size={12} color="#FFFFFF" />}
+                <div style={{ pointerEvents: "none", display: "flex", flexShrink: 0 }}>
+                  <Checkbox checked={isSelected} />
                 </div>
                 <span>{option.label}</span>
               </div>

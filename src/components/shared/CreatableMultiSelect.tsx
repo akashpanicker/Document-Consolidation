@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { X, Check, Plus, Search, ChevronDown } from "lucide-react";
+import { Checkbox } from "../ui/checkbox";
 
 interface CreatableMultiSelectProps {
   label: string;
@@ -403,27 +404,8 @@ export function CreatableMultiSelect({
                     }}
                   >
                     {/* Checkbox */}
-                    <div
-                      style={{
-                        width: 16,
-                        height: 16,
-                        borderRadius: 3,
-                        border: `1px solid ${isSelected ? "var(--color-brand)" : "var(--color-surface-5)"}`,
-                        backgroundColor: isSelected
-                          ? "var(--color-brand)"
-                          : "transparent",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {isSelected && (
-                        <Check
-                          size={11}
-                          style={{ color: "var(--color-text-primary)" }}
-                        />
-                      )}
+                    <div style={{ pointerEvents: "none", display: "flex" }}>
+                      <Checkbox checked={isSelected} />
                     </div>
                     <span>
                       {highlightMatch(option.label, inputValue)}
