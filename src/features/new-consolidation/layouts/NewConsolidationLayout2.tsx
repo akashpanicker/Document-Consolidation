@@ -8,12 +8,14 @@ import { Popover, PopoverTrigger, PopoverContent } from "../../../components/ui/
 import { useState } from "react";
 import { ArrowLeft, Sparkles, ExternalLink, FolderSearch, Loader2, CheckCircle2, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 import { NewConsolidationLayoutProps, SourceDocument } from "../NewConsolidationLayoutProps";
 
 const STATUS_MESSAGES_COUNT = 7;
 
 export function NewConsolidationLayout2(props: NewConsolidationLayoutProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const {
     selectedRegions,
     selectedRigTypes,
@@ -63,6 +65,7 @@ export function NewConsolidationLayout2(props: NewConsolidationLayoutProps) {
         showOnlineStatus={true}
         showUser={true}
         layoutSwitcher={layoutSwitcher}
+        onGovernance={() => navigate("/governance")}
       />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 overflow-y-auto">

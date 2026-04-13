@@ -4,6 +4,7 @@ import { DashboardPage } from "./features/dashboard/DashboardPage";
 import { NewConsolidationPage } from "./features/new-consolidation/NewConsolidationPage";
 import { ReviewPage } from "./features/review/ReviewPage";
 import { CompletedDocumentPage } from "./features/view/CompletedDocumentPage";
+import { ReviewGovernancePage } from "./features/governance/ReviewGovernancePage";
 
 export const router = createBrowserRouter([
   { path: "/", Component: LoginPage },
@@ -11,4 +12,5 @@ export const router = createBrowserRouter([
   { path: "/new-consolidation", Component: NewConsolidationPage },
   { path: "/review", Component: ReviewPage },
   { path: "/document/:id/view", Component: CompletedDocumentPage },
+  { path: "/governance", Component: ReviewGovernancePage },
 ]);

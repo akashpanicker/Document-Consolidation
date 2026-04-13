@@ -1,0 +1,18 @@
+export const REGIONS: { value: string; label: string }[] = [
+  { value: "algeria", label: "Algeria" },
+  { value: "australia", label: "Australia" },
+  { value: "azerbaijan", label: "Azerbaijan" },
+  { value: "canada", label: "Canada" },
+  { value: "europe", label: "Europe" },
+  { value: "european-union", label: "European Union" },
+  { value: "germany", label: "Germany" },
+  { value: "iraq", label: "Iraq" },
+  { value: "kuwait", label: "Kuwait" },
+  { value: "netherlands", label: "Netherlands" },
+  { value: "oman", label: "Oman" },
+  { value: "pakistan", label: "Pakistan" },
+  { value: "russia", label: "Russia" },
+  { value: "saudi-arabia", label: "Saudi Arabia" },
+  { value: "united-kingdom", label: "United Kingdom" },
+  { value: "united-states", label: "United States" },
+];

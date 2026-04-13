@@ -211,7 +211,7 @@ export function DashboardPage() {
       className="flex flex-col h-screen w-screen overflow-hidden"
       style={{ backgroundColor: "var(--bg-page)", fontFamily: "Inter, sans-serif" }}
     >
-      <Header breadcrumb={[{ label: "Dashboard" }]} showUser={true} />
+      <Header breadcrumb={[{ label: "Dashboard" }]} showUser={true} onGovernance={() => navigate("/governance")} />
 
       <main className="flex-1 w-full px-[24px] flex flex-col pb-6 mt-2 overflow-y-auto">
         {/* Page title row */}

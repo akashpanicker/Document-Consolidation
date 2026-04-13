@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Globe, Check, Video, LogOut, LayoutGrid, ListFilter } from "lucide-react";
+import { Globe, Check, Video, LogOut, LayoutGrid, ListFilter, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ThemeToggle } from "./ThemeToggle";
 import { useNavigate, useLocation } from "react-router";
 import { useTheme } from "./ThemeContext";
 import svgPaths from "../../imports/svg-ioq6ca64fj";
+import { Tooltip, TooltipTrigger, TooltipContent } from "../ui/tooltip";
 
 interface BreadcrumbItem {
   label: string;
@@ -17,6 +18,8 @@ interface HeaderProps {
   userRole?: string;
   userInitials?: string;
   showUser?: boolean;
+  showOnlineStatus?: boolean;
+  onGovernance?: () => void;
   layoutSwitcher?: {
     activeLayout: 1 | 2;
     onLayoutChange: (layout: 1 | 2) => void;
@@ -29,6 +32,7 @@ export function Header({
   userRole = "Sr. QHSE Manager",
   userInitials = "DM",
   showUser = true,
+  onGovernance,
   layoutSwitcher,
 }: HeaderProps) {
   const { t, i18n } = useTranslation();
@@ -43,6 +47,7 @@ export function Header({
   const [isLayoutHovered, setIsLayoutHovered] = useState(false);
   const [isScopeLayoutHovered, setIsScopeLayoutHovered] = useState(false);
   const [isUserHovered, setIsUserHovered] = useState(false);
+  const [isGovernanceHovered, setIsGovernanceHovered] = useState(false);
   const { theme } = useTheme();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const userDropdownRef = useRef<HTMLDivElement>(null);
@@ -166,6 +171,7 @@ export function Header({
           {(location.pathname === "/briefing" || location.pathname === "/briefing-v2") && (
             <div className="flex items-center gap-[8px]">
               {/* Layout Switcher */}
+              {/*
               <div ref={layoutDropdownRef} className="relative flex items-center shrink-0">
                 <button
                   type="button"
@@ -194,7 +200,6 @@ export function Header({
                   />
                 </button>
 
-                {/* Layout Dropdown */}
                 {showLayoutDropdown && (
                   <div
                     style={{
@@ -231,7 +236,6 @@ export function Header({
                       </span>
                     </div>
 
-                    {/* Layout 1 Option */}
                     <button
                       type="button"
                       onClick={() => {
@@ -272,7 +276,6 @@ export function Header({
                       )}
                     </button>
 
-                    {/* Layout 2 Option */}
                     <button
                       type="button"
                       onClick={() => {
@@ -315,6 +318,7 @@ export function Header({
                   </div>
                 )}
               </div>
+              */}
 
               {/* Watch Safety Video Button */}
               <button
@@ -343,6 +347,7 @@ export function Header({
           )}
 
           {/* Layout Switcher for Scope Screen */}
+          {/*
           {layoutSwitcher && (
             <div ref={scopeLayoutDropdownRef} className="relative flex items-center shrink-0">
               <button
@@ -385,7 +390,6 @@ export function Header({
                 )}
               </button>
 
-              {/* Scope Layout Dropdown */}
               {showScopeLayoutDropdown && (
                 <div
                   style={{
@@ -422,7 +426,6 @@ export function Header({
                     </span>
                   </div>
 
-                  {/* Layout 1 Option */}
                   <button
                     type="button"
                     onClick={() => {
@@ -467,7 +470,6 @@ export function Header({
                     )}
                   </button>
 
-                  {/* Layout 2 Option */}
                   <button
                     type="button"
                     onClick={() => {
@@ -515,51 +517,94 @@ export function Header({
               )}
             </div>
           )}
+          */}
+
+          {/* Governance Settings Button */}
+          {onGovernance && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={onGovernance}
+                  onMouseEnter={() => setIsGovernanceHovered(true)}
+                  onMouseLeave={() => setIsGovernanceHovered(false)}
+                  className="flex items-center justify-center cursor-pointer shrink-0"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--border-radius-md)",
+                    backgroundColor: isGovernanceHovered ? "var(--bg-hover)" : "transparent",
+                    border: "none",
+                    padding: 0,
+                  }}
+                >
+                  <Settings
+                    size={18}
+                    style={{
+                      color: isGovernanceHovered
+                        ? "var(--color-text-primary)"
+                        : "var(--color-text-tertiary)",
+                    }}
+                  />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Review Governance</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {/* Theme Toggle */}
           <ThemeToggle />
 
           {/* Language Switcher */}
           <div ref={dropdownRef} className="relative flex items-center shrink-0">
-            <button
-              type="button"
-              onClick={() => setShowLangDropdown(!showLangDropdown)}
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              className="flex flex-col items-center justify-center cursor-pointer"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "var(--border-radius-md)",
-                backgroundColor: isHovered || showLangDropdown ? "var(--bg-hover)" : "transparent",
-                border: "none",
-                padding: 0,
-                position: "relative",
-              }}
-            >
-              <Globe
-                size={18}
-                style={{
-                  color: showLangDropdown
-                    ? "var(--color-brand)"
-                    : isHovered
-                      ? "var(--color-text-primary)"
-                      : "var(--color-text-tertiary)",
-                }}
-              />
-              <span
-                style={{
-                  color: "var(--color-text-tertiary)",
-                  fontSize: 9,
-                  fontWeight: 600,
-                  fontFamily: "Inter, sans-serif",
-                  lineHeight: 1,
-                  marginTop: 1,
-                }}
-              >
-                {language.toUpperCase()}
-              </span>
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setShowLangDropdown(!showLangDropdown)}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                  className="flex flex-col items-center justify-center cursor-pointer"
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "var(--border-radius-md)",
+                    backgroundColor: isHovered || showLangDropdown ? "var(--bg-hover)" : "transparent",
+                    border: "none",
+                    padding: 0,
+                    position: "relative",
+                  }}
+                >
+                  <Globe
+                    size={18}
+                    style={{
+                      color: showLangDropdown
+                        ? "var(--color-brand)"
+                        : isHovered
+                          ? "var(--color-text-primary)"
+                          : "var(--color-text-tertiary)",
+                    }}
+                  />
+                  <span
+                    style={{
+                      color: "var(--color-text-tertiary)",
+                      fontSize: 9,
+                      fontWeight: 600,
+                      fontFamily: "Inter, sans-serif",
+                      lineHeight: 1,
+                      marginTop: 1,
+                    }}
+                  >
+                    {language.toUpperCase()}
+                  </span>
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Switch Language</p>
+              </TooltipContent>
+            </Tooltip>
 
             {/* Dropdown */}
             {showLangDropdown && (

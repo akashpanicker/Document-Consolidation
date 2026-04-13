@@ -7,6 +7,7 @@ interface SearchableSelectProps {
   onChange: (value: string) => void;
   options: Array<{ value: string; label: string }>;
   placeholder?: string;
+  hideClear?: boolean;
 }
 
 export function SearchableSelect({
@@ -15,6 +16,7 @@ export function SearchableSelect({
   onChange,
   options,
   placeholder = "Select an option...",
+  hideClear = false,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -122,7 +124,7 @@ export function SearchableSelect({
           </span>
         )}
 
-        {value && !isOpen && (
+        {value && !isOpen && !hideClear && (
           <button
             type="button"
             onClick={handleClear}
