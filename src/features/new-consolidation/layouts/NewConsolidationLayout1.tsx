@@ -61,7 +61,7 @@ export function NewConsolidationLayout1(props: NewConsolidationLayoutProps) {
         onGovernance={() => navigate("/governance")}
       />
 
-      <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 min-h-0">
+      <main className="flex-1 w-full px-[24px] flex flex-col pb-5 mt-2 min-h-0 overflow-y-auto">
         {/* Title row */}
         <div className="flex items-center justify-between mt-8 mb-[12px]">
           <h1 className="text-[18px] font-bold uppercase tracking-wide" style={{ color: "var(--text-secondary)" }}>
@@ -168,7 +168,7 @@ export function NewConsolidationLayout1(props: NewConsolidationLayoutProps) {
         </div>
 
         {/* Two Column Document Library */}
-        <div className="grid grid-cols-2 gap-5 flex-1 min-h-0 overflow-hidden" style={{ gridTemplateRows: "1fr" }}>
+        <div className="grid grid-cols-2 gap-5 flex-1" style={{ gridTemplateRows: "1fr" }}>
           {/* ── H&P Column ── */}
           <DocumentColumn
             origin="H&P"
@@ -340,7 +340,7 @@ function DocumentColumn({
   };
 
   return (
-    <div className="flex flex-col gap-2 h-full min-h-0">
+    <div className="flex flex-col gap-2 h-full">
       {/* Title */}
       <h3 className="text-[13px] font-bold uppercase tracking-wide shrink-0" style={{ color: "var(--text-secondary)" }}>
         {origin === "H&P" ? t("scope.column.hpDocuments") : t("scope.column.kcadDocuments")}
@@ -361,7 +361,7 @@ function DocumentColumn({
       </div>
 
       {/* Card */}
-      <div className="rounded-[10px] flex flex-col overflow-hidden flex-1 min-h-0"
+      <div className="rounded-[10px] flex flex-col overflow-hidden flex-1 min-h-[500px]"
         style={{ backgroundColor: "var(--bg-card)", border: "var(--border-default)" }}>
 
         {/* Header row */}
